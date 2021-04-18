@@ -1,0 +1,1 @@
+apt-get install python3-pip ; pip3 install discord ; pip3 install python-decouple ; pip3 install bs4 ; pip3 install pymupdf ; pip3 install numpy ; pip3 install datefinder ; pip3 install dateparser ; apt-get -y install cron ; pip3 install fuzzywuzzy ; pip3 install python-Levenshtein ; pip3 install lxml ; pip3 install pandas
