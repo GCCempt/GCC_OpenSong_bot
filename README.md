@@ -1,5 +1,6 @@
 # GCCOpenSongBot
 Automate OpenSong processing
+
 Design goals:
 •	Replace manual and tedious, error-prone procedure
 •	Integrate all the elements for the OpenSong Projection set (bulletin, various Discord announcements)
