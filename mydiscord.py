@@ -20,7 +20,7 @@ import pandas as pd             #Python data analysis library
 #--- #opensong channel.id = 813193976555241532
 #--- #testing channel.id = 402275911619182592
 
-client = discord.Client()       #--- create and instance of the Discord client toconnect to Discord
+client = discord.Client()       #--- create and instance of the Discord client to connect to Discord
 
 #------------ How to code a Discord Bot
 #https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
@@ -549,6 +549,7 @@ def statuscheck():
     #--- Check the current directory location
     wk_dir = os.getcwd()
     print('\nStatus check - current working directory: ', wk_dir)
+    status_message = [' ']
 
     if 'Sets' in wk_dir:
         os.chdir(filelist.bulletinpath)   #-- change to the Bulletin directory
@@ -556,8 +557,8 @@ def statuscheck():
     
     #--- CHECK THE STATUS FILE FOR PROCESS SUCCESSFUL COMPLETION OF ALL PROCESSING
     if not os.path.isfile(filelist.CurrentStatusFilename):
-        print("File path {} does not exist. Processing still pending...".format(filelist.StatusFile))
-        status_message = 'Processing still pending....'
+        status_message[0] = "File path {} does not exist. Processing still pending...".format(filelist.CurrentStatusFilename)
+        print(status_message)
     else:
         textFile = open(filelist.CurrentStatusFilename, 'r', encoding='utf-8',errors='ignore')
         status_message = textFile.readlines()              #--- read the first line from the file

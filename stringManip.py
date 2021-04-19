@@ -406,8 +406,7 @@ def finalSplit(sentenceList):            #--- function is called with a list of 
             sentence = sentence.strip()
             finalList.append(sentence)
 
-    print('\nAfter Final 
-    Split')
+    print('\nAfter Final Split')
     s = 0
     for sentence in finalList:
         s +=1

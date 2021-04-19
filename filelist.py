@@ -1,14 +1,17 @@
 import os
 #--- Definitions for files and directories used in the process
 #---          Directories
-bulletinpath = '/root/Dropbox/OpenSongV2/Bulletin'          #--- default directory for writing processing files
-setpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Sets'
-songpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Songs'
+#bulletinpath = '/root/Dropbox/OpenSongV2/Bulletin'          #--- default directory for writing processing files
+#setpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Sets'
+#songpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Songs'
 
-#os.chdir('/root/Dropbox/OpenSongV2/Bulletin') #--- set default directory for writing files
-os.chdir(bulletinpath)
+bulletinpath = '/var/opt/bulletin'          #--- default directory for writing processing files
+setpath = '/mnt/c/Dropbox/OpenSongV2/OpenSong Data/Sets'
+songpath = '/mnt/c/Dropbox/OpenSongV2/OpenSong Data/Songs'
 
-#----------- Files
+os.chdir(bulletinpath)          #--- switch to the default directory for writing files
+
+#----------- Files used for processing
 WorshipScheduleFilename = 'worshipschedule.txt'
 OldWorshipScheduleFilename = 'old_worshipschedule.txt'   
 SermonInfoFilename = 'sermoninfo.txt'

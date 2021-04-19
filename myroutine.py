@@ -135,6 +135,7 @@ def main():
     import getdatetime
     import filelist
     import stringsplit
+    import os
 
     #--- =============================
     #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
@@ -152,7 +153,8 @@ def main():
     #sys.exit(0)
 
     #--- ===========================
-    addaffirmation()
+    print('\nEnvironment Variable:', os.getenv('TOKEN'))
+    #addaffirmation()
     sys.exit(0)
 
     #--- =====================
