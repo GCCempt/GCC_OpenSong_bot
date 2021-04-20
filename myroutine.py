@@ -51,13 +51,13 @@ def convertdates():
     'Sunday, March 14, 2021'
     ]
 
-    #for date in date_array:
-    #    print('Parsing dates: ' + date)
-    #    dt = parse(date)
-    #    print(dt.date())
-    #    #print(dt.time())
-    #    #print(dt.tzinfo)
-    #    print('\n')
+    for date in date_array:
+        print('Parsing dates: ' + date)
+        dt = parse(date)
+        print(dt.date())
+        #print(dt.time())
+        #print(dt.tzinfo)
+        print('\n')
 
     return()
 #--- End Get the current date / time
@@ -99,6 +99,7 @@ def addaffirmation():
     #print(body_text)
 
     slide_group_name = 'Affirmation of Faith'
+    print(slide_group_name)
     #addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
     #--- split the text based on period '.' 
     #body_text = split_keep(body_text)           #--- call my function to split the string into lines, delimited by '.'
