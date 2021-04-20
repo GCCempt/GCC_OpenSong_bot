@@ -37,22 +37,12 @@ def read_discord(arg):
     @client.event
     async def on_ready():
         print('We have logged in as {0.user}'.format(client))
-       #--- post the startup message
-        if 'testing' in arg:
-            #channel = client.get_channel(402275911619182592)        #--- post to the #testing channel
-            status_message = 'Discord Bot started in testing mode at', getdatetime.currentdatetime()
-            #await channel.send(status_message)
-            print(status_message)
 
-        else:
-            status_message = 'Discord Bot started at', getdatetime.currentdatetime()
-            print(status_message)
+        #--- display the current status
+        status_message = statuscheck()           #--- status message returned as a 'list' ***********
 
-            #--- display the latest status
-            status_message = statuscheck()           #--- status message returned as a 'list' ***********
-            #--- print the status message
-            for x in status_message:
-                print(x)
+        for x in status_message:                #--- print the status message
+            print(x)
 
     @client.event
     async def on_message(message):
@@ -67,7 +57,7 @@ def read_discord(arg):
         if (message.channel.id == int(READ_CHANNEL)):   #--- accept messages posted on the READ Channel  
             
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
-            channel = client.get_channel(config('POSTCHANNELID'))                 #--- configure #opensong channel to receive reply messages
+            channel = client.get_channel(int((POST_CHANNELID)                 #--- configure channel to receive reply messages
 
             #--- check the Discord message is for the Bulletin post -----
             if 'bulletinhasbeenposted' in msg.replace(" ", '').replace('\t', '').lower():
@@ -90,7 +80,7 @@ def read_discord(arg):
                     status_message = statuscheck()           #--- Post the current status on the opensong channel
                     for x in status_message:
                         await channel.send(x)
-                elif (message.channel.id == 681180782240464897): #--- unrecognized message received on the #pt-announcment channel
+                else:        #--- unrecognized message received on the #pt-announcment channel
                     reply_messages =['Unrecognized message "', message.content, '" received from', message.author, ' on ', message.created_at,
 	                'The following message are accepted:',
                     '1. sermon info for <date>',
@@ -102,8 +92,6 @@ def read_discord(arg):
                     #--- post reply message to the opensong channel
                     for x in reply_messages:
                         await channel.send(x)
-                else:
-                    pass
  
         elif (message.channel.id == int(POST_CHANNEL)):     #--only check for $commands on the "commands" channel
             #--- check for the $status command -----
