@@ -46,18 +46,14 @@ def read_discord(arg):
             print(status_message)
 
         else:
-            #channel = client.get_channel(813193976555241532)        #--- post to the #opensong channel
             status_message = 'Discord Bot started at', getdatetime.currentdatetime()
-            #await channel.send(status_message)
             print(status_message)
 
             #--- display the latest status
             status_message = statuscheck()           #--- status message returned as a 'list' ***********
-            #--- post help message
-            #channel = client.get_channel(813193976555241532)
+            #--- print the status message
             for x in status_message:
-                #await channel.send(x)
-             print(x)
+                print(x)
 
     @client.event
     async def on_message(message):
@@ -66,7 +62,7 @@ def read_discord(arg):
 
         msg = message.content                           #--- retrieve the Discord message and process below
 
-        if (message.channel.id == 402275911619182592):   #--- check for messages on the #testing channel
+        if (message.channel.id == 402275911619182592):   #--- check for messages on the #OpenSongDev 
             message_env = 'test'        #--- set the message environment variable to 'test' for reply messages to the #testing channel
             test_message = '\nTest Discord Message ', message.content,  'received on channel: ', message.channel, ' from: ', message.author, ' on ', message.created_at
             print(test_message)
