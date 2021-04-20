@@ -21,6 +21,12 @@ import pandas as pd             #Python data analysis library
 #--- #testing channel.id = 402275911619182592
 
 client = discord.Client()       #--- create and instance of the Discord client to connect to Discord
+TOKEN = config('TOKEN')
+READ_CHANNEL = config('READCHANNELID')
+POST_CHANNEL = config('POSTCHANNELID')
+print('TOKEN=', TOKEN)
+print('READ CHANNEL=', READ_CHANNEL)
+print('POST CHANNEL=', POST_CHANNEL)
 
 #------------ How to code a Discord Bot
 #https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
