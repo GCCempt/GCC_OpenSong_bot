@@ -57,7 +57,7 @@ def read_discord(arg):
         if (message.channel.id == int(READ_CHANNEL)):   #--- accept messages posted on the READ Channel  
             
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
-            channel = client.get_channel(int(POST_CHANNELID))                 #--- configure channel to receive reply messages
+            channel = client.get_channel(int(POST_CHANNEL))                 #--- configure channel to receive reply messages
 
             #--- check the Discord message is for the Bulletin post -----
             if 'bulletinhasbeenposted' in msg.replace(" ", '').replace('\t', '').lower():
