@@ -6,8 +6,8 @@ import os
 #songpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Songs'
 
 bulletinpath = '/var/opt/bulletin'          #--- default directory for writing processing files
-setpath = '/mnt/c/Dropbox/OpenSongV2/OpenSong Data/Sets'
-songpath = '/mnt/c/Dropbox/OpenSongV2/OpenSong Data/Songs'
+setpath = '/var/opt/sets'                   #--- default directory for writing set files
+songpath = '/var/opt/songs'                 #--- default directory for wring song files
 
 os.chdir(bulletinpath)          #--- switch to the default directory for writing files
 
