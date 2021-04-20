@@ -62,16 +62,11 @@ def read_discord(arg):
 
         msg = message.content                           #--- retrieve the Discord message and process below
 
-        if (message.channel.id == 402275911619182592):   #--- check for messages on the #OpenSongDev 
-            message_env = 'test'        #--- set the message environment variable to 'test' for reply messages to the #testing channel
-            test_message = '\nTest Discord Message ', message.content,  'received on channel: ', message.channel, ' from: ', message.author, ' on ', message.created_at
-            print(test_message)
-            await message.channel.send(test_message)        #--- reply on the same channel
-            #return()
-
-        elif (message.channel.id == 681180782240464897):   #--- accept messages posts on the #pt-announcment 
+        #elif (message.channel.id == 681180782240464897):   #--- accept messages posted on the READ Channel
+        if (message.channel.id == config('READCHANNELID')):   #--- accept messages posted on the READ Channel  
+            
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
-            channel = client.get_channel(813193976555241532)                 #--- configure #opensong channel to receive reply messages
+            channel = client.get_channel(config('POSTCHANNELID'))                 #--- configure #opensong channel to receive reply messages
 
             #--- check the Discord message is for the Bulletin post -----
             if 'bulletinhasbeenposted' in msg.replace(" ", '').replace('\t', '').lower():
@@ -109,7 +104,8 @@ def read_discord(arg):
                 else:
                     pass
 
-        elif (message.channel.id == 813193976555241532):     #--only check for $commands on the #opensong channel
+        #elif (message.channel.id == 813193976555241532):     #--only check for $commands on the "commands" channel
+        elif (message.channel.id == config('READCHANNELID')):     #--only check for $commands on the "commands" channel
             #--- check for the $status command -----
             if '$status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
@@ -559,8 +555,8 @@ def statuscheck():
     
     #--- CHECK THE STATUS FILE FOR PROCESS SUCCESSFUL COMPLETION OF ALL PROCESSING
     if not os.path.isfile(filelist.CurrentStatusFilename):
-        status_message[0] = "File path {} does not exist. Processing still pending...".format(filelist.CurrentStatusFilename)
-        print(status_message)
+        status_message[0] = "File {} does not exist. Processing still pending...".format(filelist.CurrentStatusFilename)
+        #print(status_message)
     else:
         textFile = open(filelist.CurrentStatusFilename, 'r', encoding='utf-8',errors='ignore')
         status_message = textFile.readlines()              #--- read the first line from the file
