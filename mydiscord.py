@@ -12,7 +12,6 @@ import subprocess               #--- for launching external shell commands
 import downloadbulletin         #--- my module for downloading the bulletin
 import stringsplit              #--- my module to split a string based on different criteria
 import maintainsong               #--- module to add a new song to OpenSong
-import testdiscord             #--- module for testing added Discord Bot functions
 import pandas as pd             #Python data analysis library
 
 #--- Discord channels: read messages from both, write responses to the opensong channel
@@ -61,9 +60,10 @@ def read_discord(arg):
             return()
 
         msg = message.content                           #--- retrieve the Discord message and process below
+        print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
 
         #elif (message.channel.id == 681180782240464897):   #--- accept messages posted on the READ Channel
-        if (message.channel.id == config('READCHANNELID')):   #--- accept messages posted on the READ Channel  
+        if (message.channel.id == int(config('READCHANNELID'))):   #--- accept messages posted on the READ Channel  
             
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
             channel = client.get_channel(config('POSTCHANNELID'))                 #--- configure #opensong channel to receive reply messages
@@ -105,7 +105,7 @@ def read_discord(arg):
                     pass
 
         #elif (message.channel.id == 813193976555241532):     #--only check for $commands on the "commands" channel
-        elif (message.channel.id == config('READCHANNELID')):     #--only check for $commands on the "commands" channel
+        elif (message.channel.id == int(config('READCHANNELID'))):     #--only check for $commands on the "commands" channel
             #--- check for the $status command -----
             if '$status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
