@@ -60,10 +60,11 @@ def read_discord(arg):
             return()
 
         msg = message.content                           #--- retrieve the Discord message and process below
-        print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
+        print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at, 'message =', msg, 'channel ID=', message.channel.id)
 
         #elif (message.channel.id == 681180782240464897):   #--- accept messages posted on the READ Channel
-        if (message.channel.id == int(config('READCHANNELID'))):   #--- accept messages posted on the READ Channel  
+
+        if (message.channel.id == int(READ_CHANNEL)):   #--- accept messages posted on the READ Channel  
             
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ', message.created_at)
             channel = client.get_channel(config('POSTCHANNELID'))                 #--- configure #opensong channel to receive reply messages
