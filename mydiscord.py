@@ -104,9 +104,8 @@ def read_discord(arg):
                         await channel.send(x)
                 else:
                     pass
-
-        #elif (message.channel.id == 813193976555241532):     #--only check for $commands on the "commands" channel
-        elif (message.channel.id == int(config('READCHANNELID'))):     #--only check for $commands on the "commands" channel
+ 
+        elif (message.channel.id == int(POST_CHANNEL)):     #--only check for $commands on the "commands" channel
             #--- check for the $status command -----
             if '$status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
