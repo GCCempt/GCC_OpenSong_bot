@@ -153,7 +153,7 @@ def main():
     #sys.exit(0)
 
     #--- ===========================
-    print('\nCommitted This Where are the changes going -Environment Variable:', os.getenv('TOKEN'))
+    print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
     #addaffirmation()
     sys.exit(0)
 
