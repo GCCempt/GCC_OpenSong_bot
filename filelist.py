@@ -1,13 +1,10 @@
 import os
 #--- Definitions for files and directories used in the process
 #---          Directories
-#bulletinpath = '/root/Dropbox/OpenSongV2/Bulletin'          #--- default directory for writing processing files
-#setpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Sets'
-#songpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Songs'
 
-bulletinpath = '/var/opt/bulletin'          #--- default directory for writing processing files
-setpath = '/var/opt/sets'                   #--- default directory for writing set files
-songpath = '/var/opt/songs'                 #--- default directory for wring song files
+bulletinpath = 'bulletin'          #--- default directory for writing processing files
+setpath = 'sets'                   #--- default directory for writing set files
+songpath = 'songs'                 #--- default directory for wring song files
 
 os.chdir(bulletinpath)          #--- switch to the default directory for writing files
 
