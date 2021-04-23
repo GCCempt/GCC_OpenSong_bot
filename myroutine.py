@@ -133,10 +133,14 @@ def addaffirmation():
 #---- start transfer files
 def transferfiles():
     import pysftp
+    HOSTNAME = 'moonspell.asoshared.com'
+    USERNAME = 'gccpraise'
+    PASSWORD = ''
 
     with pysftp.Connection('hostname', username='me', password='secret') as sftp:
-        with sftp.cd('public'):             # temporarily chdir to public
-            sftp.put('/my/local/filename')  # upload file to public/ on remote
+        with sftp.cd('/home/gccpraise/publicHTMLBulle_html/bulletin/'):             # temporarily chdir to public
+            sftp.put('bulletin/test.rtf')  # upload file to public/ on remote
+            #sftp.put('bulletin/HTMLBulletinFilename')  # upload file to public/ on remote
             #sftp.get('remote_file')         # get a remote file
 
 #--- end transferfiles
@@ -164,7 +168,8 @@ def main():
     #print(link)
     #for i in range(0, len(link)):
     #    print(i, link[i])
-    #sys.exit(0)
+    transferfiles()
+    sys.exit(0)
 
     #--- ===========================
     print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
