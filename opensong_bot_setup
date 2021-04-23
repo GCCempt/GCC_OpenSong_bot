@@ -1,5 +1,6 @@
 apt-get -y install python3-pip ; 
 apt-get -y install cron ;
+apt-get -y install rclone ;
 pip3 install discord ; 
 pip3 install python-decouple ; 
 pip3 install bs4 ; 
