@@ -133,6 +133,7 @@ def main():
     print('\nYou are in Main')
     sys.exit(0)
     return()
+    return()
 #------ Call the subfunctions
 #--- test the bulletin parse function
     #mydiscord.parsemessage()
