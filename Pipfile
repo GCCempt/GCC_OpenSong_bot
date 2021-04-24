@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+bs4 = "*"
+pymupdf = "*"
+datefinder = "*"
+dateparser = "*"
+discord = "*"
+python-decouple = "*"
+pysftp = "*"
+fuzzywuzzy = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

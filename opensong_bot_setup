@@ -1,4 +1,6 @@
-apt-get -y install python3-pip ; 
+#TODO: Cleanup this file / replace with pip install
+
+apt-get -y install python3-pip ;
 apt-get -y install cron ;
 apt-get -y install rclone ;
 pip3 install discord ; 
