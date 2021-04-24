@@ -3,7 +3,7 @@ import readworshipschedule
 import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
 import opensong
 import stringsplit
-import mydiscord
+#import mydiscord
 import monitorfiles
 from datetime import datetime, timedelta
 import maintainsong
