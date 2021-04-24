@@ -112,7 +112,7 @@ def read_discord(arg):
             # --- check for the $cleanup command used when processing did not complete successfully -----
             elif '$cleanup' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ",
                                                                                                          '').replace(
-                    '\t', '').lower():
+                '\t', '').lower():
                 print('\nDiscord Cleanup message received from ', message.author, ' on ', message.created_at)
                 opensong.cleanup()  # ---cleanup residual files ******************************
                 return ()

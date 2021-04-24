@@ -153,8 +153,8 @@ def main():
     # --https://realpython.com/python-pass-by-reference/
     print('\nYou are in Main')
     sys.exit(0)
-    return ()
-    return ()
+    return () #TODO: This code is unreachable
+    return () #TODO: This code is unreachable
     # ------ Call the subfunctions
     # --- test the bulletin parse function
     # mydiscord.parsemessage()
@@ -235,7 +235,7 @@ def main():
     # return()
     # ---   run the main process
     # createset70.buildset()
-    return ()
+    return () #TODO: This code is unreachable
 
 
 # -- end of function definition routine

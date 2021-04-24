@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import calendar
 import datefinder
 from dateparser.search import search_dates
@@ -11,7 +10,7 @@ def currentdatetime():
     received_dt = datetime.now()
     received_dt = received_dt.strftime('%m/%d/%Y %H:%M %p')
 
-    return (received_dt)
+    return received_dt
 
 
 # --- End Get the current date / time
@@ -22,7 +21,7 @@ def currentdate():
     received_dt = datetime.now()
     received_dt = received_dt.strftime('%m/%d/%Y')
 
-    return (received_dt)
+    return received_dt
 
 
 # --- End Get the current date / time
@@ -35,7 +34,7 @@ def parsedates(text_string):
     returned_dates = datefinder.find_dates(text_string, strict=False)  # --- returns a list containing matched dates
     for match in returned_dates:
         # print('\nReturned date:', match.strftime('%m/%d/%Y'))
-        return (match.strftime('%m/%d/%Y'))
+        return match.strftime('%m/%d/%Y')
 
 
 # ------------ extract dates
@@ -76,7 +75,7 @@ def nextSunday():
 
     rd = REL.relativedelta(days=1, weekday=REL.SU)
     next_Sunday = today + rd
-    return (next_Sunday)
+    return next_Sunday
 
 
 # ------------ search for dates in a string
@@ -94,5 +93,5 @@ def convertdate(receivedDate='2021-04-04'):
     convertedDateObject = receivedDateObject.strftime('%m/%d')
 
     print('\nConverted Date=', convertedDateObject)
-    return (convertedDateObject)
+    return convertedDateObject
 # --- End Get the current date / time
