@@ -1,4 +1,3 @@
-#! python3
 import sys
 import readworshipschedule
 import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway

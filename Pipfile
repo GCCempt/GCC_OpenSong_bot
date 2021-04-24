@@ -12,6 +12,7 @@ discord = "*"
 python-decouple = "*"
 pysftp = "*"
 fuzzywuzzy = "*"
+pandas = "*"
 
 [dev-packages]
 
