@@ -1,5 +1,5 @@
-#--- https://api.esv.org/docs/samples/
-#!/usr/bin/env python
+# --- https://api.esv.org/docs/samples/
+# !/usr/bin/env python
 
 import sys
 import requests
@@ -7,8 +7,8 @@ import requests
 API_KEY = 'ad0e0de3fd9289f49425ba1c4ff7cb224d11f7a5'
 API_URL = 'https://api.esv.org/v3/passage/text/'
 
-def get_esv_text(passage, numbers):
 
+def get_esv_text(passage, numbers):
     params = {
         'q': passage,
         'include-headings': False,
@@ -28,23 +28,24 @@ def get_esv_text(passage, numbers):
 
     return passages[0].strip() if passages else 'Error: Passage not found'
 
-#--- end of GetESVText function
+
+# --- end of GetESVText function
 
 def parse_passages(passages):
     scripture = ''
     book_chapter = ''
     passages = passages.replace(',', ';')
-    for p in passages.strip().split(';'):       #split into multiple passages
+    for p in passages.strip().split(';'):  # split into multiple passages
         if ':' in p:
             book_chapter, verse = p.split(':', 1)
         else:
             ref = book_chapter.rstrip()
-            p =  ref + ':'  + p
+            p = ref + ':' + p
 
         numbers = ('-' in p)
         passage = get_esv_text(p, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
         passage = p + '\n' + passage + '\n'
         scripture = scripture + passage + '\n'
-    #print('\nparse passage: \n')
-    #print(scripture)
-    return(scripture)       #--- return scripture as a string with newline characters
+    # print('\nparse passage: \n')
+    # print(scripture)
+    return (scripture)  # --- return scripture as a string with newline characters
