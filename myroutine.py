@@ -138,15 +138,20 @@ def addaffirmation():
 #---- start transfer files
 def transferfiles():
     import pysftp
-    HOSTNAME = 'moonspell.asoshared.com'
-    USERNAME = 'gccpraise'
-    PASSWORD = ''
 
-    with pysftp.Connection('hostname', username='me', password='secret') as sftp:
-        with sftp.cd('public'):  # temporarily chdir to public
-            sftp.put('/my/local/filename')  # upload file to public/ on remote
+    FTPVALUES = {
+        'HOSTNAME': 'moonspell.asoshared.com',
+        'USERNAME': 'gccpraise',
+        'PASSWORD': 'BaJ5pcl6EpNK',
+        'FILENAME': '/bulletin/test.txt',
+        'REMOTEDIR': 'bulletin'
+    }
+
+    with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=FTPVALUES['PASSWORD']) as sftp:
+        with sftp.cd(FTPVALUES['REMOTEDIR']):  # temporarily chdir to public
+            sftp.put(FTPVALUES['FILENAME'])  # upload file to public/ on remote
             #sftp.get('remote_file')         # get a remote file
-
+    print('\nEnd Test File Transfer', FTPVALUES['FILENAME'])
 #--- end transferfiles
 
 
@@ -173,6 +178,9 @@ def main():
     #for i in range(0, len(link)):
     #    print(i, link[i])
     # sys.exit(0)
+    #test python sftp
+    transferfiles()
+    sys.exit(0)
 
     #--- ===========================
     print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
