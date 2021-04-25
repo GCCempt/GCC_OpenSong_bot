@@ -1,10 +1,9 @@
-#! python3
 import sys
 import readworshipschedule
 import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
 import opensong
 import stringsplit
-import mydiscord
+#import mydiscord
 import monitorfiles
 from datetime import datetime, timedelta
 import maintainsong
@@ -135,19 +134,6 @@ def addaffirmation():
     #--- end addaffirmation
 
 
-#---- start transfer files
-def transferfiles():
-    import pysftp
-    HOSTNAME = 'moonspell.asoshared.com'
-    USERNAME = 'gccpraise'
-    PASSWORD = ''
-
-    with pysftp.Connection('hostname', username='me', password='secret') as sftp:
-        with sftp.cd('public'):  # temporarily chdir to public
-            sftp.put('/my/local/filename')  # upload file to public/ on remote
-            #sftp.get('remote_file')         # get a remote file
-
-#--- end transferfiles
 
 
 def main():
@@ -173,6 +159,9 @@ def main():
     #for i in range(0, len(link)):
     #    print(i, link[i])
     # sys.exit(0)
+    #test python sftp
+    transferfiles()
+    sys.exit(0)
 
     #--- ===========================
     print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
