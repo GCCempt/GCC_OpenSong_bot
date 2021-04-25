@@ -13,6 +13,8 @@ python-decouple = "*"
 pysftp = "*"
 fuzzywuzzy = "*"
 pandas = "*"
+dropbox = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

@@ -1,6 +1,13 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3.8-slim-buster
 
+# Discord Bot Tokens and keys
+ENV DISCORD_TOKEN_DEV=''
+ENV READCHANNELID_DEV=''
+ENV POSTCHANNELID_DEV=''
+ENV DROPBOX_ACCESS_TOKEN=''
+ENV FTP_PASSWORD=''
+
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
 

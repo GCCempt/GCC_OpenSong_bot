@@ -1,5 +1,4 @@
 {
     "python.linting.enabled": true,
-    "python.linting.pycodestyleEnabled": true,
-    "python.pythonPath": "C:\\Users\\roger\\.virtualenvs\\GCC_OpenSong_bot-Gngsycc8"
+    "python.linting.pycodestyleEnabled": true
 }
