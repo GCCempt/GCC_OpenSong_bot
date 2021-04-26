@@ -18,14 +18,31 @@ FTPVALUES = {
 #--- end constants definition
 
 #---- start transfer files
-def pushfiles():
-    #print(os.environ[''])
+def pushfiles(file_type, file_name):
+    current_working_directory = os.getcwd()
+    print('\nPushFiles() Current Working Directory:', current_working_directory)
+
+    if 'bulletin' in current_working_directory:
+        os.chdir('../')
+
+    print('\nStarting File Transfer for:', file_name)
+
+    if file_type == 'set':
+        remote_file_path = FTPVALUES['REMOTE_SETS_DIR']
+        set_path = FTPVALUES['LOCAL_SETS_DIR']
+
+        try:
+            os.chdir(set_path)          #-- change to the local sets directory
+        except:
+            print('\nLocal Sets Directory: {0} does not exit'.format(set_path))
+            return()
 
     with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=os.environ['FTP_PASSWORD']) as sftp:
-        with sftp.cd(FTPVALUES['REMOTE_BULLETIN_DIR']):  #-- switch to the bulletin directory
-            sftp.put(FTPVALUES['BULLETIN_FILENAME'])  # upload file to public/ on remote
+        with sftp.cd(remote_file_path):  #-- switch to the remote directory
+            sftp.put(file_name)  # upload file to public/ on remote
             #sftp.get('remote_file')         # get a remote file
-    print('\nEnd Test File Transfer', FTPVALUES['BULLETIN_FILENAME'])
+    
+    print('\nEnd File Transfer for:', remote_file_path, ':', file_name)
 #--- end transferfiles
 
 def getfiles():

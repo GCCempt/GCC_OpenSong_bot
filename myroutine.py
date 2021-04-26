@@ -144,6 +144,7 @@ def main():
     import filelist
     import stringsplit
     import os
+    import sftp_files
 
     #--- =============================
     #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
@@ -160,7 +161,14 @@ def main():
     #    print(i, link[i])
     # sys.exit(0)
     #test python sftp
-    transferfiles()
+
+    # --- ftp the completed set to the website
+    textFile = open(filelist.SetFilename, 'r', encoding='utf-8', errors='ignore')
+    file_name = textFile.read()  # --- read the file containing the set name into a string
+    textFile.close()
+
+    file_type = 'set'
+    sftp_files.pushfiles(file_type, file_name)      #--- call sftp function
     sys.exit(0)
 
     #--- ===========================

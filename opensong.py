@@ -3,8 +3,7 @@ import filelist  # --- definition of list of files and directories used in the p
 import os
 import getdatetime
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
-import subprocess  # --- for launching external shell commands
-
+import sftp_files   #-- my module to call pysftp
 
 # ------------ Start Assemble Set function -
 def assembleset():
@@ -35,8 +34,6 @@ def assembleset():
     root = doctree.getroot()
     print('\nAssembleSet - the number of slide_groups in the set: ', len(root[0]))
 
-    os.chdir(filelist.bulletinpath)  # -- switch back to the default Bulletins directory
-
     # -------------- call the process files function to process the files with the extracted bulletin information
     processfiles(doctree)  # --- pass the XML set document tree
 
@@ -48,6 +45,12 @@ def processfiles(doctree):
     import xml.etree.ElementTree as ET
     import addnode
     import os
+
+    current_working_directory = os.getcwd()
+    print('\nProcessFiles() Current Working Directory:', current_working_directory)
+    bulletin_path='../bulletin'
+    if 'sets' in current_working_directory:
+        os.chdir(bulletin_path)          #-- change to the bulletin director for reading files
 
     # -------------- Read the contents of the Call To Worship text file -----------------------------
     textFile = open(filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
@@ -330,17 +333,26 @@ def writeXMLSet(doctree):
     print(myroot.tag, myroot.attrib)
 
     # --- End of processing - write out the modified worship set
-    os.chdir(filelist.setpath)  # -- change to the Sets directory
+    current_working_directory = os.getcwd()
+    print('\nProcessFiles() Current Working Directory:', current_working_directory)
+    set_path='../sets'
+    if not 'sets' in current_working_directory:
+        os.chdir(set_path)          #-- change to the bulletin director for reading files
+
+    #os.chdir(filelist.setpath)  # -- change to the Sets directory
     outputset = setNameAttrib  # --- the set file name is the same as the set name
     doctree.write(outputset)
 
     # --- write the status complete file
-    os.chdir(filelist.bulletinpath)  # -- switch back to the default directory
+    bulletin_path='../bulletin'
+    if not 'bulletin' in bulletin_path:
+        os.chdir(bulletin_path)  # -- switch back to the default directory
 
     updatefinalstatus()  # --- update the current status file upon comletion of processing
 
-    return ()
+    sftp_files.pushfiles('set', setNameAttrib)        #--- replace rclone with ftp once the set is completed
 
+    return ()
 
 # ------------End -  Write the new XML set
 
@@ -474,6 +486,12 @@ def process_responsivereading(Lines, body_text):
 
 # ------------Start Function to extract string after Nth occurrence of specified character
 def updatefinalstatus():  # --- update the current status  file
+    current_working_directory = os.getcwd()
+    print('\nProcessFiles() Current Working Directory:', current_working_directory)
+    bulletin_path='../bulletin'
+    if not 'bulletin' in current_working_directory:
+        os.chdir(bulletin_path)          #-- change to the bulletin director for reading files
+
     # --- read the bulletin date file
     textFile = open(filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
     filedate = textFile.read()  # --- read the file into a string
@@ -487,9 +505,6 @@ def updatefinalstatus():  # --- update the current status  file
     textFile.close()
 
     writehtml.buildhtmlcontent()  # --- create the HTML page to be uploaded to the website
-
-    subprocess.Popen(
-        '/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process to upload the set to the website
 
     print('\nEnd of OpenSong processing - OpenSong Set created ', filelist.SundaySet, 'on ',
           getdatetime.currentdatetime())
