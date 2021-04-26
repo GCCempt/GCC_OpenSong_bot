@@ -18,8 +18,16 @@ def assembleset():
 
     # -------------- Open the Template Set and load into XML document tree -----------------------------
     print('\nOpenSong.assembleset() Current Working Directory:', os.getcwd())
-    os.chdir(filelist.setpath)  # -- change to the Sets directory
-    print('\nOpenSong.assembleset() change working Directory to:', os.getcwd())
+
+    try:
+        #os.chdir(filelist.setpath)  # -- change to the Sets directory
+        path='../sets'
+        os.chdir(path)  # -- change to the Sets directory
+        print('\nOpenSong.assembleset() change working Directory to:', os.getcwd())
+    except:
+        print('\nDirectory: {0} does not exit'.format(path))
+        return()
+        
 
     datasource = open(XMLsetName, 'rb')
 

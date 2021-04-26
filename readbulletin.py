@@ -25,11 +25,11 @@ def selectset():
         line_count += 1
 
         if 'songofassurance' in line.replace(" ", '').replace('\t', '').lower():
-            inputset_name = 'SampleSet-No Gloria Patri'  # -- use the "no Gloria Patri set"
+            inputset_name = 'SampleSet-NoGloriaPatri'  # -- use the "no Gloria Patri set"
             # --- check if Lord's Supper is included
             for j in range(line_count, len(Lines)):
                 if 'Sacrament' in Lines[j]:
-                    inputset_name = 'SampleSet-No Gloria PatriWCommunion'  # --- use the communion set
+                    inputset_name = 'SampleSet-NoGloriaPatriWCommunion'  # --- use the communion set
             break
 
         elif "thegloriapatri" in line.replace(" ", '').replace('\t', '').lower():
