@@ -24,9 +24,9 @@ TOKEN = os.environ['DISCORD_TOKEN']
 READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 
-print('MY TOKEN=', TOKEN)
-print('READ CHANNEL=', READ_CHANNEL)
-print('POST CHANNEL=', POST_CHANNEL)
+#print('MY TOKEN=', TOKEN)
+#print('READ CHANNEL=', READ_CHANNEL)
+#print('POST CHANNEL=', POST_CHANNEL)
 
 
 # ------------ How to code a Discord Bot
