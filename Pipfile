@@ -15,6 +15,7 @@ fuzzywuzzy = "*"
 pandas = "*"
 dropbox = "*"
 python-dotenv = "*"
+requests = "*"
 
 [dev-packages]
 
