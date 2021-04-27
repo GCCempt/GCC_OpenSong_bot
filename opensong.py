@@ -4,6 +4,7 @@ import os
 import getdatetime
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
 import sftp_files   #-- my module to call pysftp
+import dropbox_api_call #--- my module to call Dropbox API
 
 # ------------ Start Assemble Set function -
 def assembleset():
@@ -350,7 +351,9 @@ def writeXMLSet(doctree):
 
     updatefinalstatus()  # --- update the current status file upon comletion of processing
 
-    sftp_files.pushfiles('set', setNameAttrib)        #--- replace rclone with ftp once the set is completed
+    file_type = 'set'
+    sftp_files.pushfiles(file_type, setNameAttrib)              #--- sftp the set to the website
+    dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
 
     return ()
 
