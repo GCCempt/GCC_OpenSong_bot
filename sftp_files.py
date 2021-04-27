@@ -3,6 +3,9 @@
 import pysftp
 import os
 
+cnopts = pysftp.CnOpts()
+cnopts.hostkeys = None
+
 FTPVALUES = {
         'HOSTNAME': 'moonspell.asoshared.com',
         'USERNAME': 'gccpraise',
@@ -37,7 +40,7 @@ def pushfiles(file_type, file_name):
             print('\nLocal Sets Directory: {0} does not exit'.format(set_path))
             return()
 
-    with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=os.environ['FTP_PASSWORD']) as sftp:
+    with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=os.environ['FTP_PASSWORD'], cnopts=cnopts) as sftp:
         with sftp.cd(remote_file_path):  #-- switch to the remote directory
             sftp.put(file_name)  # upload file to public/ on remote
             #sftp.get('remote_file')         # get a remote file
@@ -57,7 +60,7 @@ def getfiles():
         print('\nDirectory: {0} does not exit'.format(set_path))
         return()
     
-    with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=os.environ['FTP_PASSWORD']) as sftp:
+    with pysftp.Connection(host=FTPVALUES['HOSTNAME'], username=FTPVALUES['USERNAME'], password=os.environ['FTP_PASSWORD'], cnopts=cnopts) as sftp:
         with sftp.cd(FTPVALUES['REMOTE_SETS_DIR']):  #-- switch to the bulletin directory
             sftp.get(FTPVALUES['SET_FILENAME'])  # upload file to public/ on remote
             #sftp.get('remote_file')         # get a remote file
