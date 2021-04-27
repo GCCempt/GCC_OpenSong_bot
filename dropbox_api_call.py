@@ -44,7 +44,7 @@ def main():
     #file_name ='2021-05-02 GCCEM Sunday Worship'
     #file_type ='set'
 
-    dropboxsync(file_type, file_name)
+    #dropboxsync(file_type, file_name)
     return()
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
