@@ -20,9 +20,9 @@ import pandas as pd  # Python data analysis library
 # --- #testing channel.id = 402275911619182592
 
 client = discord.Client()  # --- create and instance of the Discord client to connect to Discord
-TOKEN = os.environ['DISCORD_TOKEN_DEV']
-READ_CHANNEL = os.environ['READCHANNELID_DEV']
-POST_CHANNEL = os.environ['POSTCHANNELID_DEV']
+TOKEN = os.environ['DISCORD_TOKEN']
+READ_CHANNEL = os.environ['READCHANNELID']
+POST_CHANNEL = os.environ['POSTCHANNELID']
 
 print('MY TOKEN=', TOKEN)
 print('READ CHANNEL=', READ_CHANNEL)
@@ -343,7 +343,7 @@ def read_discord(arg):
         return
 
     # --- Start the bot
-    client.run(os.environ['DISCORD_TOKEN_DEV'])  # --- logon token retrieved from .env variable
+    client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
     # --- End of Discord Bot
 
 
