@@ -61,8 +61,8 @@ def getfiles():
         return()
     
     with pysftp.Connection(host=os.environ['FTP_HOSTNAME'], username=os.environ['FTP_USERNAME'], password=os.environ['FTP_PASSWORD'], cnopts=cnopts) as sftp:
-        with sftp.cd(FTPVALUES['REMOTE_SETS_DIR']):  #-- switch to the bulletin directory
-            sftp.get(FTPVALUES['SET_FILENAME'])  # upload file to public/ on remote
+        with sftp.cd(FTPVALUES['REMOTE_SETS_DIR']):  #-- switch to the sets directory
+            sftp.get(FTPVALUES['SET_FILENAME'])  # retrieve file from the website
             #sftp.get('remote_file')         # get a remote file
     print('\nEnd Test File Transfer get', FTPVALUES['SET_FILENAME'])
 

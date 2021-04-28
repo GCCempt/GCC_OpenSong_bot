@@ -260,8 +260,8 @@ def read_discord(arg):
                         await message.channel.send(embed=embed)
 
             elif '$displayset' in msg.replace(" ", '').replace('\t', '').lower():
-                returned_elements = maintainsong.bs4buildSetSummary()
-                print(returned_elements)
+                #returned_elements = maintainsong.bs4buildSetSummary()
+                #print(returned_elements)
 
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)

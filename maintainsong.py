@@ -320,10 +320,10 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
     print('\nSetpath=', filelist.setpath)
 
     # -------------- Open the Template Set and load into XML document tree -----------------------------
-    print('\nStart BS4BuildSetSummary - current working directory: ', os.getcwd())
     wk_dir = os.getcwd()
-    if 'Bulletin' in wk_dir:
-        os.chdir(filelist.setpath)  # -- change to the Sets directory
+    print('\nStart BS4BuildSetSummary - current working directory: ', wk_dir)
+    if 'bulletin' in wk_dir:
+        os.chdir('../sets')  # -- change to the Sets directory
         print('\nBS4BuildSetSummary - changed working directory: ', os.getcwd())
 
     # --- test finding the set file
