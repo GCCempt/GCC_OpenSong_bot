@@ -26,4 +26,13 @@
 *	Message posts to Discord #opensong channel with status updates
 *	XML OpenSong Set based on the current bulletin
 
-
+#### Docker Environment Variables:
+| ENV                  | Description                                                                                           |
+|----------------------|-------------------------------------------------------------------------------------------------------|
+| DISCORD_TOKEN        | Discord Bot Token                                                                                     |
+| READCHANNELID        | The channel ID for the discord channel where announcements are posted                                 |
+| POSTCHANNELID        | The Channel ID for the discord channel where commands can be run and output from the bot is displayed |
+| DROPBOX_ACCESS_TOKEN | The API key for dropbox                                                                               |
+| FTP_HOSTNAME         | Hostname for FTP server                                                                               |
+| FTP_USERNAME         | Username for sFTP Access                                                                              |
+| FTP_PASSWORD         | Password for sFTP Access                                                                              |
