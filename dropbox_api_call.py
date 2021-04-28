@@ -2,6 +2,7 @@
 #--- reference: https://www.dropbox.com/developers/documentation/python
 def dropboxsync(file_type, file_name):
     import dropbox
+    from dropbox.files import WriteMode
     import os
 
     current_working_directory = os.getcwd()
@@ -40,7 +41,7 @@ def dropboxsync(file_type, file_name):
     current_working_directory = os.getcwd()
     print('\nDropbox Api call() Current Working Directory:', current_working_directory, 'computer_path=', computer_path)
 
-    dbx.files_upload(open(computer_path, "rb").read(), dropbox_path)
+    dbx.files_upload(open(computer_path, "rb").read(), dropbox_path, mode=dropbox.files.WriteMode.overwrite )
     print("[UPLOADED] {}".format(dropbox_path))
     dbx.close()
 
