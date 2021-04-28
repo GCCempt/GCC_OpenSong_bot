@@ -1,5 +1,5 @@
-('Status check process started at:', '04/28/2021 02:29 AM')
-Waiting on Assurance of Pardon message post!
-Waiting on Confession of Sin message post!
-Waiting on Worship Schedule post!
-Waiting on Bulletin post!
+('Status check process started at:', '04/28/2021 18:12 PM')
+File assurance.txt does not exist....Waiting on Assurance of Pardon message post!
+File confessionofsin.txt does not exist....Waiting on Confession of Sin message post!
+File worshipschedule.txt does not exist....Waiting on Worship Schedule post!
+File bulletin.txt does not exist....Waiting on Bulletin post!

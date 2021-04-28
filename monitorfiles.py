@@ -15,23 +15,22 @@ import filelist  # --- definition of list of files and directories used in the p
 def filechecker():
     file_count = 0  # --- keep track of which files have been created
     status_message = ''
-    status_message = ('Status check process started at:', getdatetime.currentdatetime())
-    status_message = str(status_message) + '\n'
 
-    print(status_message)
+    status_message = 'Status check process started at:', getdatetime.currentdatetime()
+    status_message = str(status_message) + '\n'
 
     # --- check if assurance file exists
     if not os.path.isfile(filelist.AssuranceFilename):
-        print("File {} does not exist....".format(filelist.AssuranceFilename))
+        status_message = status_message + "File {} does not exist....".format(filelist.AssuranceFilename)
         status_message = status_message + 'Waiting on Assurance of Pardon message post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
         # print('\nFileChecker - Assurance.txt file found:', filelist.AssuranceFilename)
-        status_message = status_message = status_message + 'Assurance of Pardon ready!\n'
+        status_message = status_message + 'Assurance of Pardon ready!\n'
 
     # --- check if confession file exists
     if not os.path.isfile(filelist.ConfessionFilename):
-        print("File {} does not exist....".format(filelist.ConfessionFilename))
+        status_message = status_message + "File {} does not exist....".format(filelist.ConfessionFilename)
         status_message = status_message + 'Waiting on Confession of Sin message post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
@@ -40,7 +39,7 @@ def filechecker():
 
     # --- check if worshipschedule file exists
     if not os.path.isfile(filelist.WorshipScheduleFilename):
-        print("File {} does not exist....".format(filelist.WorshipScheduleFilename))
+        status_message = status_message + "File {} does not exist....".format(filelist.WorshipScheduleFilename)
         status_message = status_message + 'Waiting on Worship Schedule post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
@@ -49,16 +48,14 @@ def filechecker():
 
     # --- check if worshipschedule file exists
     # print('\nFilechecker - looking for text bulletin file:', filelist.TextBulletinFilename)
-    if not os.path.isfile(
-            filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
-        print("File {} does not exist....".format(filelist.TextBulletinFilename))
+    if not os.path.isfile(filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
+        status_message = status_message + "File {} does not exist....".format(filelist.TextBulletinFilename)
         status_message = status_message + 'Waiting on Bulletin post!\n'
     else:
         # --- begin the main process - all requirements met
         file_count += 1  # --- increment the file watcher count
         status_message = status_message + 'Bulletin ready!\n'
 
-    # print(status_message)
     # --- write the current status file
     textFile = open(filelist.CurrentStatusFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(status_message)
@@ -66,12 +63,11 @@ def filechecker():
 
     if file_count == 4:  # --- if all the prerequisite have been created check for a new bulletin
         status_message = status_message + 'All necessary files created.  OpenSong processing can proceed'
-        print(status_message)
+        #print(status_message)
         # --- start the build set process
         opensong.assembleset()  # --- all files exist, run the buildset process
-    else:
-        print(status_message)
-    return ()
+
+    return (status_message)
 
 
 # --- function to read the key files, extract the date and very that the indidcated dates match
@@ -134,3 +130,16 @@ def comparefiledates():
         print('\nDates found: ', listofdates)
 
     return ()
+
+# ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
+def main():
+    status_message = filechecker()
+    print('\nReturn from monitor files:\n', status_message)
+
+
+# ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
+#
+if __name__ == "__main__":
+    main()
+#
+# ======================================================================================

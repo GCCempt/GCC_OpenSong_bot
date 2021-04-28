@@ -183,3 +183,8 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
+# intermediate directories used by the OpenSong bot
+/bulletin
+/sets
+/songs
