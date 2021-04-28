@@ -233,7 +233,7 @@ def read_discord(arg):
                     await message.channel.send(status_message)
 
             # --- check for the $displaysong command -----
-            elif '$searchsong' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '$displaysong' in msg.replace(" ", '').replace('\t', '').lower():
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)
                 message_text = message.content
@@ -256,7 +256,8 @@ def read_discord(arg):
                             embed.description = '[' + song + '](' + url + ')'
                             status_message = embed.description
                             # --- post embed message
-                            await message.channel.send(embed=embed)
+
+                        await message.channel.send(embed=embed)
 
             elif '$displayset' in msg.replace(" ", '').replace('\t', '').lower():
                 returned_elements = maintainsong.bs4buildSetSummary()
