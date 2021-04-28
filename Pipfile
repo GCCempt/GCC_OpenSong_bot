@@ -16,6 +16,7 @@ pandas = "*"
 dropbox = "*"
 python-dotenv = "*"
 requests = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 

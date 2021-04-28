@@ -351,10 +351,24 @@ def writeXMLSet(doctree):
 
     updatefinalstatus()  # --- update the current status file upon comletion of processing
 
+    #--- push the set to the website and to Dropbox
     file_type = 'set'
     sftp_files.pushfiles(file_type, setNameAttrib)              #--- sftp the set to the website
     dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
 
+    #--- push the html files to the website
+    file_type = 'bulletin'
+    sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
+    sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
+
+
+    #--- clean up the local set file
+    current_working_directory = os.getcwd()
+    if not 'sets' in current_working_directory:
+        os.chdir('../sets')  # -- switch back to the default directory
+    os.remove(setNameAttrib)
+    
+    print('\nClean-up processing completed')
     return ()
 
 # ------------End -  Write the new XML set
