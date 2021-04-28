@@ -1,5 +1,6 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.8-slim-buster
+FROM python:3.9-slim-buster
+RUN apt-get update && apt-get install build-essential python-dev -y
 
 # Discord Bot Tokens and keys
 ENV DISCORD_TOKEN_DEV=''
