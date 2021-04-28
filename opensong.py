@@ -363,12 +363,12 @@ def writeXMLSet(doctree):
 
 
     #--- clean up the local set file
-    current_working_directory = os.getcwd()
-    if not 'sets' in current_working_directory:
-        os.chdir('../sets')  # -- switch back to the default directory
-    os.remove(setNameAttrib)
+    #current_working_directory = os.getcwd()
+    #if not 'sets' in current_working_directory:
+    #    os.chdir('../sets')  # -- switch back to the default directory
+    #os.remove(setNameAttrib)
     
-    print('\nClean-up processing completed')
+    #print('\nClean-up processing completed')
     return ()
 
 # ------------End -  Write the new XML set

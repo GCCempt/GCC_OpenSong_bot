@@ -40,10 +40,13 @@ def read_discord(arg):
         print('We have logged in as {0.user}'.format(client))
 
         # --- display the current status
-        status_message = statuscheck()  # --- status message returned as a 'list' ***********
+        #status_message = statuscheck()  # --- status message returned as a 'list' ***********
 
-        for x in status_message:  # --- print the status message
-            print(x)
+        #for x in status_message:  # --- print the status message
+        #    print(x)
+
+        status_message = monitorfiles.filechecker()  # --- status message returned as a 'string' ***********
+        print(status_message)
 
     @client.event
     async def on_message(message):
@@ -80,10 +83,10 @@ def read_discord(arg):
 
                 status_message = parsemessage()  # --- parse the incoming Discord message   ***********************************
                 if status_message:  # --- check if a valid status message was received
-                    monitorfiles.filechecker()  # --- update the current processing status
-                    status_message = statuscheck()  # --- Post the current status on the opensong channel
-                    for x in status_message:
-                        await channel.send(x)
+                    status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
+                    #status_message = statuscheck()  # --- Post the current status on the opensong channel
+                    print(status_message)
+                    await channel.sent(status_message)
                 else:  # --- unrecognized message received on the #pt-announcment channel
                     reply_messages = ['Unrecognized message "', message.content, '" received from', message.author,
                                       ' on ', message.created_at,
@@ -103,11 +106,11 @@ def read_discord(arg):
             if '$status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace(
                     '\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
-                status_message = statuscheck()  # ---read the current status message returned as a 'list'
+                status_message = monitorfiles.filechecker()  # ---read the current status message returned as a 'list'
 
                 # --- post status message
-                for x in status_message:
-                    await message.channel.send(x)
+                await message.channel.send(status_message)
+
                 return ()
 
             # --- check for the $cleanup command used when processing did not complete successfully -----
@@ -127,11 +130,10 @@ def read_discord(arg):
 
                 # --- post restore process completed message
                 # await message.channel.send(status_message)
-                status_message = statuscheck()  # --- status message returned as a 'list'
+                status_message = monitorfiles.filechecker()  # --- status message returned as a 'string'
+
                 # --- post status message
-                for x in status_message:
-                    # await message.channel.send(x)
-                    print(x)
+                print(status_message)
                 return ()
 
             # --- check for the $update command -----
@@ -143,18 +145,18 @@ def read_discord(arg):
 
                 # --- post rerun process completed message
                 await message.channel.send(status_message)
-                status_message = statuscheck()  # --- status message returned as a 'list'
+                status_message = monitorfiles.filechecker()  # --- status message returned as a 'string'
 
                 # --- post status message
-                for x in status_message:
-                    await message.channel.send(x)
+                await message.channel.send(status_message)
                 return ()
 
             # --- check for the $rerun command -----
             elif '$rerun' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong $rerun message received from ', message.author, ' on ', message.created_at)
-                monitorfiles.filechecker()  # *************************************
-                status_message = '$rerun processing completed!'
+                status_message = monitorfiles.filechecker()  # *************************************
+                status_message = status_message + '$rerun processing completed!'
+                print(status_message)
 
                 return ()
 
@@ -199,13 +201,12 @@ def read_discord(arg):
 
                 status_message = parsemessage()  # --- parse the incoming Discord message   ***********************************
                 if status_message:  # --- check if a valid status message was received
-                    monitorfiles.filechecker()  # --- update the current processing status
-                    status_message = statuscheck()  # --- Post the current status on the opensong channel
-                    for x in status_message:
-                        await channel.send(x)
+                    status_message = monitorfiles.filechecker()  # --- update the current processing status
 
-                status_text = '\nOpenSong  {} command received'.format(message)
-                print(status_text)
+
+                status_message = status_message + '\nOpenSong  {} command received'.format(message)
+                print(status_message)
+                await channel.send(status_message)
                 return ()
 
             # --- check for the $newsong command -----
@@ -260,8 +261,8 @@ def read_discord(arg):
                         await message.channel.send(embed=embed)
 
             elif '$displayset' in msg.replace(" ", '').replace('\t', '').lower():
-                returned_elements = maintainsong.bs4buildSetSummary()
-                print(returned_elements)
+                #returned_elements = maintainsong.bs4buildSetSummary()
+                #print(returned_elements)
 
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)
@@ -483,7 +484,8 @@ def restoreprocess():
             filelist.OldTextBulletinFilename))
 
     # --- rerun the main process
-    monitorfiles.filechecker()
+    status_message = monitorfiles.filechecker()
+    print(status_message)
 
     return ()
 
@@ -560,27 +562,3 @@ def updateprocess():
 
 
 # --- End of rerun processing
-
-
-# ------------on Bot start run the statuscheck process to check for system state to determine if processing can run
-def statuscheck():
-    # --- Check the current directory location
-    wk_dir = os.getcwd()
-    print('\nStatus check - current working directory: ', wk_dir)
-    status_message = [' ']
-
-    if 'Sets' in wk_dir:
-        os.chdir(filelist.bulletinpath)  # -- change to the Bulletin directory
-        print('\nStatus Check - changed working directory: ', os.getcwd())
-
-    # --- CHECK THE STATUS FILE FOR PROCESS SUCCESSFUL COMPLETION OF ALL PROCESSING
-    if not os.path.isfile(filelist.CurrentStatusFilename):
-        status_message[0] = "File {} does not exist. Processing still pending...".format(filelist.CurrentStatusFilename)
-        # print(status_message)
-    else:
-        textFile = open(filelist.CurrentStatusFilename, 'r', encoding='utf-8', errors='ignore')
-        status_message = textFile.readlines()  # --- read the first line from the file
-        textFile.close()
-
-    return (status_message)  # --- return status message as a list
-# ------------end of status checks

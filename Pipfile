@@ -17,6 +17,7 @@ dropbox = "*"
 python-dotenv = "*"
 requests = "*"
 python-levenshtein = "*"
+lxml = "*"
 
 [dev-packages]
 
