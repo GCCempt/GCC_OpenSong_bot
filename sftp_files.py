@@ -76,11 +76,11 @@ def main():
 
 #    file_type = 'bulletin'
 #    pushfiles(file_type, filelist.HTMLBulletinFilename)
-    return()
+#    return()
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
 #
 # ======================================================================================

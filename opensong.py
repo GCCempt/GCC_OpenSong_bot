@@ -21,7 +21,7 @@ def assembleset():
 
     try:
         #os.chdir(filelist.setpath)  # -- change to the Sets directory
-        path='../sets'
+        path='../sample_sets'
         os.chdir(path)  # -- change to the Sets directory
         print('\nOpenSong.assembleset() change working Directory to:', os.getcwd())
     except:

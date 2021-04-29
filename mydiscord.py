@@ -86,7 +86,7 @@ def read_discord(arg):
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     #status_message = statuscheck()  # --- Post the current status on the opensong channel
                     print(status_message)
-                    await channel.sent(status_message)
+                    await channel.send(status_message)
                 else:  # --- unrecognized message received on the #pt-announcment channel
                     reply_messages = ['Unrecognized message "', message.content, '" received from', message.author,
                                       ' on ', message.created_at,
@@ -560,5 +560,17 @@ def updateprocess():
 
     return ()
 
-
 # --- End of rerun processing
+
+def main():
+# ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
+    print('\nNormal start - no argument provided')
+    read_discord('normal')
+    return()
+
+# ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
+#
+    if __name__ == "__main__":
+        main()
+#
+# ======================================================================================
