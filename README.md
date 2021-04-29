@@ -1,3 +1,4 @@
+[![CodeQL](https://github.com/GCCempt/GCC_OpenSong_bot/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/GCCempt/GCC_OpenSong_bot/actions/workflows/codeql-analysis.yml)
 # GCCOpenSongBot
 ## Automate OpenSong processing
 
