@@ -211,7 +211,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $newsong command -----
-            elif '$add' in msg.replace(" ", '').replace('\t', '').lower() or '$new' in msg.replace(" ", '').replace(
+            elif '$addsong' in msg.replace(" ", '').replace('\t', '').lower() or '$new' in msg.replace(" ", '').replace(
                     '\t', '').lower():
                 # print('\nOpenSong New Song message received', message.content, ' from ', message.author, ' on ', message.created_at)
                 message_text = message.content.replace('-', ' ').replace('<', '').replace('>', '')
