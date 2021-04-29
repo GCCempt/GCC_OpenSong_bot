@@ -1,13 +1,13 @@
-#! python3
 import sys
 import readworshipschedule
-import passagelookup            #--- modulue to do API lookup for ESV passage from Crossway
+import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
 import opensong
 import stringsplit
-import mydiscord
+#import mydiscord
 import monitorfiles
 from datetime import datetime, timedelta
 import maintainsong
+
 
 def printBoard():
     rows, cols = 5, 5
@@ -27,88 +27,92 @@ def printBoard():
     #printBoard("."*60)
 #--- end printBoard
 
-#--- Covert string to standard date
+# --- Covert string to standard date
 def convertdates():
     from dateutil.parser import parse
     import stringsplit
 
     converted_date = stringsplit.split_on_number('Sunday, March 14, 2021  •  11:15 am ')
     print('Converted date:', converted_date)
-    #dt = parse(converted_date)
-    #print(dt.date())
+    # dt = parse(converted_date)
+    # print(dt.date())
 
     date_array = [
-    '2018-06-29 08:15:27.243860',
-    'Jun 28 2018 7:40AM',
-    'Jun 28 2018 at 7:40AM',
-    'September 18, 2017, 22:19:55',
-    'Sun, 05/12/1999, 12:30PM',
-    'Mon, 21 March, 2015',
-    '2018-03-12T10:12:45Z',
-    '2018-06-29 17:08:00.586525+00:00',
-    '2018-06-29 17:08:00.586525+05:00',
-    'Tuesday , 6th September, 2017 at 4:30pm',
-    'Sunday, March 14, 2021'
+        '2018-06-29 08:15:27.243860',
+        'Jun 28 2018 7:40AM',
+        'Jun 28 2018 at 7:40AM',
+        'September 18, 2017, 22:19:55',
+        'Sun, 05/12/1999, 12:30PM',
+        'Mon, 21 March, 2015',
+        '2018-03-12T10:12:45Z',
+        '2018-06-29 17:08:00.586525+00:00',
+        '2018-06-29 17:08:00.586525+05:00',
+        'Tuesday , 6th September, 2017 at 4:30pm',
+        'Sunday, March 14, 2021'
     ]
 
     for date in date_array:
         print('Parsing dates: ' + date)
         dt = parse(date)
         print(dt.date())
-        #print(dt.time())
-        #print(dt.tzinfo)
+        # print(dt.time())
+        # print(dt.tzinfo)
         print('\n')
 
-    return()
-#--- End Get the current date / time
+    return ()
 
-#--- https://pymupdf.readthedocs.io/en/latest/tutorial.html
+
+# --- End Get the current date / time
+
+# --- https://pymupdf.readthedocs.io/en/latest/tutorial.html
 def readbulletin():
     import fitz
     import filelist
 
     with fitz.open('EM_Bulletin_v01.pdf') as doc:
         text = ""
-        count=0
+        count = 0
         for page in doc:
-            #line = page.getText().strip().encode('utf-8')
-            #line = line.encode('utf-8')
-            #print('\nCount=',count, 'line=', line))
-            count +=1
+            # line = page.getText().strip().encode('utf-8')
+            # line = line.encode('utf-8')
+            # print('\nCount=',count, 'line=', line))
+            count += 1
             text += page.getText().strip()
-    #print(text) 
-    
-    #--- write the PDF text to a temporary text file
-    textFile = open('EM_Bulletin_v01.txt', 'w', encoding='utf-8',errors='ignore')
+    # print(text)
+
+    # --- write the PDF text to a temporary text file
+    textFile = open('EM_Bulletin_v01.txt', 'w', encoding='utf-8', errors='ignore')
     textFile.write(text)
     textFile.close()
 
-    return()
-#--- End Get the current date / time
+    return ()
 
-#---- add affirmation of faith
+
+# --- End Get the current date / time
+
+# ---- add affirmation of faith
 def addaffirmation():
     import filelist
     import stringManip
     import stringsplit
     myList = []
 
-    #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8',errors='ignore')
-    body_text = textFile.readlines()              #--- read the file into a list
-    #print(body_text)
+    # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
+    textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
+    body_text = textFile.readlines()  # --- read the file into a list
+    # print(body_text)
 
     slide_group_name = 'Affirmation of Faith'
     print(slide_group_name)
-    #addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
-    #--- split the text based on period '.' 
-    #body_text = split_keep(body_text)           #--- call my function to split the string into lines, delimited by '.'
-    #body_text.insert(0, slide_group_name)       #--- insert the title at the beginning of the list
-    
+    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
+    # --- split the text based on period '.'
+    # body_text = split_keep(body_text)           #--- call my function to split the string into lines, delimited by '.'
+    # body_text.insert(0, slide_group_name)       #--- insert the title at the beginning of the list
+
     temp_text = body_text[0] + body_text[1]
-    #print('\nTemp Text=', temp_text)
-    del body_text[1]              #--- remove the 1st and second list items
-    del body_text[0]              #--- remove the 1st and second list items
+    # print('\nTemp Text=', temp_text)
+    del body_text[1]  # --- remove the 1st and second list items
+    del body_text[0]  # --- remove the 1st and second list items
 
     #body_text = stringsplit.convertListToString(body_text)     #convert the list to a string
 
@@ -130,16 +134,6 @@ def addaffirmation():
     #--- end addaffirmation
 
 
-#---- start transfer files
-def transferfiles():
-    import pysftp
-
-    with pysftp.Connection('hostname', username='me', password='secret') as sftp:
-        with sftp.cd('public'):             # temporarily chdir to public
-            sftp.put('/my/local/filename')  # upload file to public/ on remote
-            #sftp.get('remote_file')         # get a remote file
-
-#--- end transferfiles
 
 
 def main():
@@ -150,6 +144,7 @@ def main():
     import filelist
     import stringsplit
     import os
+    import sftp_files
 
     #--- =============================
     #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
@@ -164,7 +159,20 @@ def main():
     #print(link)
     #for i in range(0, len(link)):
     #    print(i, link[i])
-    #sys.exit(0)
+    # sys.exit(0)
+    #test python sftp
+
+    opensong.updatefinalstatus()
+    sys.exit(0)
+
+    # --- ftp the completed set to the website
+    textFile = open(filelist.SetFilename, 'r', encoding='utf-8', errors='ignore')
+    file_name = textFile.read()  # --- read the file containing the set name into a string
+    textFile.close()
+
+    file_type = 'set'
+    sftp_files.pushfiles(file_type, file_name)      #--- call sftp function
+    sys.exit(0)
 
     #--- ===========================
     print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
