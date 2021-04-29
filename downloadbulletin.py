@@ -32,9 +32,9 @@ def get_bulletin():  # --- function to download bulletin
     # sys.exit()      #-- temporarily stop processing
 
     readbulletin.getfiles()  # --- process the downloaded bulletin file
-    monitorfiles.filechecker()  # --- check if all files are ready to be processed
+    status_message = monitorfiles.filechecker()  # --- check if all files are ready to be processed
 
-    return ()
+    return (status_message)
 
 
 # --- end of get_bulltine function

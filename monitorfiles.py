@@ -65,7 +65,8 @@ def filechecker():
         status_message = status_message + 'All necessary files created.  OpenSong processing can proceed'
         #print(status_message)
         # --- start the build set process
-        opensong.assembleset()  # --- all files exist, run the buildset process
+        assemble_status_message = opensong.assembleset()  # --- all files exist, run the buildset process
+        status_message = status_message + assemble_status_message
 
     return (status_message)
 

@@ -69,12 +69,13 @@ def read_discord(arg):
             if 'bulletinhasbeenposted' in msg.replace(" ", '').replace('\t', '').lower():
                 status_message = 'Bulletin posted message received from ' + str(message.author) + ' on ' + str(
                     message.created_at)
-                # print(status_message)
+                # post (status_message)
                 await channel.send(status_message)
 
                 # --- download the new bulletin
-                downloadbulletin.get_bulletin()  # --- Download the bulletin which was just posted  ************************
-
+                status_message = downloadbulletin.get_bulletin()  # --- Download the bulletin which was just posted  ************************
+                # post (status_message)
+                await channel.send(status_message)
             else:
                 # --- write the Message to a file for later processingn
                 textFile = open(filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')

@@ -162,6 +162,9 @@ def main():
     # sys.exit(0)
     #test python sftp
 
+    opensong.updatefinalstatus()
+    sys.exit(0)
+
     # --- ftp the completed set to the website
     textFile = open(filelist.SetFilename, 'r', encoding='utf-8', errors='ignore')
     file_name = textFile.read()  # --- read the file containing the set name into a string

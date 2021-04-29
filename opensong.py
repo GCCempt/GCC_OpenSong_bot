@@ -36,8 +36,9 @@ def assembleset():
     print('\nAssembleSet - the number of slide_groups in the set: ', len(root[0]))
 
     # -------------- call the process files function to process the files with the extracted bulletin information
-    processfiles(doctree)  # --- pass the XML set document tree
+    status_message = processfiles(doctree)  # --- pass the XML set document tree
 
+    return(status_message)
 
 # ------------ End Assemble Set function -
 
@@ -168,12 +169,12 @@ def processfiles(doctree):
     processsongs(doctree)
 
     # --- call the write xml set function to write the new xml set file
-    writeXMLSet(doctree)
+    status_message = writeXMLSet(doctree)
 
     # ---- clean up the intermediary files after processing completes successfully
     cleanup()
 
-    return ()
+    return (status_message)
 
 
 # ------------End -  Process files with extracted bulletin information
@@ -349,7 +350,7 @@ def writeXMLSet(doctree):
     if not 'bulletin' in bulletin_path:
         os.chdir(bulletin_path)  # -- switch back to the default directory
 
-    updatefinalstatus()  # --- update the current status file upon comletion of processing
+    status_message = updatefinalstatus()  # --- update the current status file upon comletion of processing
 
     #--- push the set to the website and to Dropbox
     file_type = 'set'
@@ -369,7 +370,7 @@ def writeXMLSet(doctree):
     #os.remove(setNameAttrib)
     
     #print('\nClean-up processing completed')
-    return ()
+    return (status_message)
 
 # ------------End -  Write the new XML set
 
@@ -501,7 +502,7 @@ def process_responsivereading(Lines, body_text):
 
 # -----------End Function to parse call to worship
 
-# ------------Start Function to extract string after Nth occurrence of specified character
+# ------------Start Function post the completion status
 def updatefinalstatus():  # --- update the current status  file
     current_working_directory = os.getcwd()
     print('\nProcessFiles() Current Working Directory:', current_working_directory)
@@ -513,7 +514,7 @@ def updatefinalstatus():  # --- update the current status  file
     textFile = open(filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
     filedate = textFile.read()  # --- read the file into a string
     textFile.close()
-    status_message = 'Bulletin Processing completed for ' + filedate
+    status_message = '\nBulletin Processing completed for ' + filedate
 
     # --- Update the current status file
     textFile = open(filelist.CurrentStatusFilename, 'a', encoding='utf-8',
@@ -523,8 +524,13 @@ def updatefinalstatus():  # --- update the current status  file
 
     writehtml.buildhtmlcontent()  # --- create the HTML page to be uploaded to the website
 
-    print('\nEnd of OpenSong processing - OpenSong Set created ', filelist.SundaySet, 'on ',
-          getdatetime.currentdatetime())
+    #print('\nEnd of OpenSong processing - OpenSong Set created ', filelist.SundaySet, 'on ',
+    #      getdatetime.currentdatetime())
+    
+    status_date = str(getdatetime.currentdatetime())
+    status_message = status_message + '\nOpenSong Set created on: ' + status_date
+    
+    print(status_message)
 
-    return ()  # --- return the remaining string
+    return (status_message)  # --- return the remaining string
 # -----------End Function to extract residual characters in string
