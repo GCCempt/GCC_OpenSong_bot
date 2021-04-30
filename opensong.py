@@ -209,6 +209,11 @@ def cleanup():
         print("File {} does not exist. Wait for Discord post...".format(filelist.ConfessionFilename))
     else:
         os.replace(filelist.ConfessionFilename, filelist.OldConfessionFilename)
+    
+    if not os.path.isfile(filelist.SermonInfoFilename):
+        print("File {} does not exist. Wait for Discord post...".format(filelist.SermonInfoFilename))
+    else:
+        os.replace(filelist.SermonInfoFilename, filelist.OldSermonInfoFilename)
 
     monitorfiles.filechecker()  # --- update the status file
 

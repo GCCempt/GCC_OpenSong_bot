@@ -16,12 +16,26 @@ def filechecker():
     file_count = 0  # --- keep track of which files have been created
     status_message = ''
 
-    status_message = 'Status check process started at:', getdatetime.currentdatetime()
-    status_message = str(status_message) + '\n'
+    bulletin_date = str(getdatetime.nextSunday())        #--- determine the bulletin date (next sunday relative to today)
+
+    current_date_time = str(getdatetime.currentdatetime())
+    status_message = 'Status check process started at:' + current_date_time + '\n for bulletin date: ' + bulletin_date + '\n'
+
+
+    # --- check if sermon info file exists
+    if not os.path.isfile(filelist.SermonInfoFilename):
+        file_status = str("File {} does not exist....".format(filelist.SermonInfoFilename))
+        status_message = status_message + file_status
+        status_message = status_message + 'Waiting on Sermon Information message post!\n'
+    else:
+        file_count += 1  # --- increment the file watcher count
+        # print('\nFileChecker - Assurance.txt file found:', filelist.AssuranceFilename)
+        status_message = status_message + 'Sermon Information ready!\n'
 
     # --- check if assurance file exists
     if not os.path.isfile(filelist.AssuranceFilename):
-        status_message = status_message + "File {} does not exist....".format(filelist.AssuranceFilename)
+        file_status = str("File {} does not exist....".format(filelist.AssuranceFilename))
+        status_message = status_message + file_status
         status_message = status_message + 'Waiting on Assurance of Pardon message post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
@@ -30,7 +44,8 @@ def filechecker():
 
     # --- check if confession file exists
     if not os.path.isfile(filelist.ConfessionFilename):
-        status_message = status_message + "File {} does not exist....".format(filelist.ConfessionFilename)
+        file_status = str("File {} does not exist....".format(filelist.ConfessionFilename))
+        status_message = status_message + file_status
         status_message = status_message + 'Waiting on Confession of Sin message post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
@@ -39,7 +54,8 @@ def filechecker():
 
     # --- check if worshipschedule file exists
     if not os.path.isfile(filelist.WorshipScheduleFilename):
-        status_message = status_message + "File {} does not exist....".format(filelist.WorshipScheduleFilename)
+        file_status = str( "File {} does not exist....".format(filelist.WorshipScheduleFilename))
+        status_message = status_message + file_status
         status_message = status_message + 'Waiting on Worship Schedule post!\n'
     else:
         file_count += 1  # --- increment the file watcher count
@@ -49,7 +65,8 @@ def filechecker():
     # --- check if worshipschedule file exists
     # print('\nFilechecker - looking for text bulletin file:', filelist.TextBulletinFilename)
     if not os.path.isfile(filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
-        status_message = status_message + "File {} does not exist....".format(filelist.TextBulletinFilename)
+        file_status = str( "File {} does not exist....".format(filelist.TextBulletinFilename))
+        status_message = status_message + file_status
         status_message = status_message + 'Waiting on Bulletin post!\n'
     else:
         # --- begin the main process - all requirements met
@@ -61,7 +78,7 @@ def filechecker():
     textFile.write(status_message)
     textFile.close()
 
-    if file_count == 4:  # --- if all the prerequisite have been created check for a new bulletin
+    if file_count == 5:  # --- if all the prerequisite have been created check for a new bulletin
         status_message = status_message + 'All necessary files created.  OpenSong processing can proceed'
         #print(status_message)
         # --- start the build set process

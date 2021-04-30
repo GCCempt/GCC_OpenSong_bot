@@ -271,8 +271,7 @@ def read_discord(arg):
                 message_text = message.content
 
                 if ' ' in message_text:
-                    command, set_date = message.content.split(' ',
-                                                              1)  # --- split the line at the first space to retrieve the song name
+                    command, set_date = message.content.split(' ', 1)  # --- split the line at the first space to retrieve the song name
                     print('\nInput Set Date =', set_date)
 
                     set_matches = maintainsong.displaySet(
