@@ -13,6 +13,7 @@ os.chdir(bulletinpath)  # --- switch to the default directory for writing files
 WorshipScheduleFilename = 'worshipschedule.txt'
 OldWorshipScheduleFilename = 'old_worshipschedule.txt'
 SermonInfoFilename = 'sermoninfo.txt'
+OldSermonInfoFilename = 'old_sermoninfo.txt'
 BulletinSermonFilename = 'bulletinsermon.txt'
 AssuranceFilename = 'assurance.txt'
 OldAssuranceFilename = 'old_assurance.txt'
