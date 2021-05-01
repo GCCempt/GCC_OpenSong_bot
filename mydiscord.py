@@ -246,6 +246,10 @@ def read_discord(arg):
                     song_matches = {}
                     song_matches = maintainsong.search_songs(
                         song_name)  # --- call the searchsong function   ***********************
+                        
+                    #for match in song_matches:
+                    #    print(match)
+                    
                     if len(song_matches) == 0:
                         status_message = '\nNo songs matching: {} found!)'.format(song_name)
                         # print(status_message)
@@ -253,13 +257,18 @@ def read_discord(arg):
                     else:
                         # print('\nSong {} Found)'. format(url))
                         # --- post returned URL
+                        
+
                         for song, url in song_matches.items():
+                            #print('\nsong:', song, 'url:', url)
                             embed = discord.Embed()
                             embed.description = '[' + song + '](' + url + ')'
                             status_message = embed.description
                             # --- post embed message
-
-                        await message.channel.send(embed=embed)
+                            await message.channel.send(embed=embed)
+                else:
+                    status_message = '\nAt least a partial Song name is required for lookup'
+                    await message.channel.send(status_message)
 
             elif '$displayset' in msg.replace(" ", '').replace('\t', '').lower():
                 #returned_elements = maintainsong.bs4buildSetSummary()

@@ -201,7 +201,7 @@ def search_songs(query):
     # URL Prefix
     prefix = "http://gccpraise.com/os-viewer/preview_song.php?s="
     # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
-    threshold = 85
+    threshold = 80
 
     # Subclass/Override HTMLParser and define the methods we need to change.
     class Parse(HTMLParser, ABC):
@@ -235,7 +235,8 @@ def search_songs(query):
             song = uparse.quote(song, safe='')
             song = prefix + song
             matches[song_name] = song
-    return matches
+    
+    return(matches)
 
 
 # ------------ Start Dislay Set function -  send link to song
