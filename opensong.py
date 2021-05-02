@@ -332,6 +332,8 @@ def writeXMLSet(doctree):
 
     # --- rename the template set "set" tag
     setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
+    #--- TEST
+    #setNameAttrib = '2021-01-01'
     setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
 
     myroot = doctree.getroot()  # --- XML document tree passed as a parameter
