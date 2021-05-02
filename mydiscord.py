@@ -92,7 +92,7 @@ def read_discord(arg):
                     await channel.send(status_message)
                 else:
                     embed_data = discord.Embed(title="Unrecognized message", color=0xe74c3c,
-                                               description="The entered command " + message.content + "was not "
+                                               description="The entered command '" + message.content + "' was not "
                                                                                                       "recognized.")
                     embed_data.add_field(name="Time received:", value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
                                          inline=True)
