@@ -162,7 +162,9 @@ def main():
     # sys.exit(0)
     #test python sftp
 
-    opensong.updatefinalstatus()
+    passages = 'john 3:16, 5:1-7; 9-11'
+    scripture = passagelookup.build_scripture_ref(passages)
+    #print(scripture)
     sys.exit(0)
 
     # --- ftp the completed set to the website

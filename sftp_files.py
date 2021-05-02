@@ -33,7 +33,7 @@ def pushfiles(file_type, file_name):
         set_path = FTPVALUES['LOCAL_SETS_DIR']
 
         try:
-            os.chdir(set_path)          #-- change to the local sets directory
+            os.chdir('../sets')          #-- change to the local sets directory
         except:
             print('\nLocal Sets Directory: {0} does not exit'.format(set_path))
             return()

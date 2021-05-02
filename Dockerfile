@@ -10,6 +10,7 @@ ENV DROPBOX_ACCESS_TOKEN=''
 ENV FTP_PASSWORD=''
 ENV FTP_HOSTNAME=''
 ENV FTP_USERNAME=''
+ENV ESV_API_KEY=''
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
