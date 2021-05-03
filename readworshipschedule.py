@@ -42,7 +42,7 @@ def readWS():
                 parsesong(songs, line)
             else:
                 line = line.strip()  # --- remove leading and trailing spaces
-                print('\nLooking for hymn - line=', line)
+                #print('\nLooking for hymn - line=', line)
                 # line = ws_hymn
 
                 parsesong(songs, line)
@@ -81,7 +81,6 @@ def readWS():
 
 # ------------ ParseSong - Split the line into song name and presentation order
 def parsesong(songs, line):
-    # global songs
 
     # print('\nParseSong - line: ', line)
     song_name, presentation_order = line.rsplit('-', 1)  # --- split line at 2nd occurrence of '-'
@@ -94,7 +93,7 @@ def parsesong(songs, line):
         pass
 
     song_name = song_name.strip()  # --- remove leading and trailing spaces
-    presentation_order = presentation_order.strip()  # --- remove leading and trailing spaces
+    presentation_order = presentation_order.strip().replace(', ', ' ')  # --- remove leading and trailing spaces
     # worship_set.append['Slide group name'(song_name, presentation_order)
     song_name = song_name + ' - '  # add a deliminter back after the song name for parsing after the file is written
 
