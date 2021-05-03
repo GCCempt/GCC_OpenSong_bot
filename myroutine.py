@@ -162,6 +162,9 @@ def main():
     # sys.exit(0)
     #test python sftp
 
+    readworshipschedule.readWS()
+    sys.exit(0)
+
     passages = 'john 3:16, 5:1-7; 9-11'
     scripture = passagelookup.build_scripture_ref(passages)
     #print(scripture)
