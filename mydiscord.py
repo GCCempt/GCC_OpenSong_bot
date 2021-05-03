@@ -259,7 +259,7 @@ def read_discord(arg):
                         status_message = '\nNo songs matching: {} found!)'.format(song_name)
                         # print(status_message)
                         await message.channel.send(status_message)
-
+                    else:
                         for song, url in song_matches.items():
                             # print('\nsong:', song, 'url:', url)
                             embed = discord.Embed()
