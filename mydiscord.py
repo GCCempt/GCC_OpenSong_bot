@@ -359,13 +359,18 @@ def read_discord(arg):
 
 # --- Parse the incoming Discord message
 def parsemessage():
-    # --- Read the Discord message file
-    textFile = open(filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
-    Lines = textFile.readlines()  # --- read the first line from the file
-    textFile.close()
-
     status_message = []
     valid_message = ''
+
+    try:
+        # --- Read the Discord message file
+        textFile = open(filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
+        Lines = textFile.readlines()  # --- read the first line from the file
+        textFile.close()
+    except:
+        file_status = "Discord Message Text file {} does not exist. Unable to process messages...".format(filelist.DiscordMessageFilename)
+        status_message.append(file_status)
+        return (status_message)
 
     for i in range(0, len(Lines) - 1):
         # --- check for worship schedule message
