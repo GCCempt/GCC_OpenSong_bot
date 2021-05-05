@@ -147,6 +147,9 @@ def main():
     import sftp_files
 
     #--- =============================
+    testscript()
+    sys.exit()
+
     #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
     #textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8',errors='ignore')
     #body_text = textFile.read()              #--- read the file into a list
@@ -260,7 +263,33 @@ def main():
 
 #-- end of function definition routine
 
+# ---- function to perform basic test Discord Bot functionality
+def testscript():
+    import mydiscord
+    import downloadbulletin
 
+    #--- test functionality outside the Discord bot
+
+    # --- Parse the incoming Discord message which is saved in a file
+    print('\nTest Script #1 - mydiscord.parsemessages')
+    status_message = mydiscord.parsemessage()
+    print(status_message)
+
+
+    # --- test the restore files process to be able to rerun the entire process
+    print('\nTest Script #2 - mydiscord.restoreprocess')
+    status_message = mydiscord.restoreprocess()
+    print(status_message)
+
+    if 'Waiting on Bulletin post' in status_message:
+        status_message = downloadbulletin.get_bulletin()    #--- download the latest bulletin file if one does not exit
+
+    # --- test the monitor files function to check the overall satus of processing
+    print('\nTest Script #3 - monitorfiles.filechecker')
+    status_message = monitorfiles.filechecker()
+    print(status_message)
+
+# ---- end of testscript functionality 
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #

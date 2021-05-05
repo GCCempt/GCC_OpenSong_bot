@@ -463,39 +463,54 @@ def restoreprocess():
     print("\n !!!Warning -- this will overwrite any currently posted files!!! OpenSong restore processing starting at",
           getdatetime.currentdatetime())
 
-    # --- rename the Old Assurance of Pardon of Sin file
-    if os.path.isfile(filelist.OldAssuranceFilename):
-        os.replace(filelist.OldAssuranceFilename, filelist.AssuranceFilename)
-    else:
-        print("Assurance of Pardon file {} does not exist. Assurance of Pardon must be manually posted...".format(
+    try:
+        # --- rename the Old Assurance of Pardon of Sin file
+        if os.path.isfile(filelist.OldAssuranceFilename):
+            os.replace(filelist.OldAssuranceFilename, filelist.AssuranceFilename)
+        else:
+            print("Assurance of Pardon file {} does not exist. Assurance of Pardon must be manually posted...".format(
+            filelist.OldAssuranceFilename))
+    except:
+            print("Assurance of Pardon file {} exists. Rename not performed...".format(
             filelist.OldAssuranceFilename))
 
-    # --- rename the Old Confession of Sin file
-    if os.path.isfile(filelist.ConfessionFilename):
-        os.replace(filelist.OldConfessionFilename, filelist.ConfessionFilename)
-    else:
-        print("Confession of Sin file {} does not exist. Confession of Sin must be manually posted...".format(
+    try:
+        # --- rename the Old Confession of Sin file
+        if os.path.isfile(filelist.ConfessionFilename):
+            os.replace(filelist.OldConfessionFilename, filelist.ConfessionFilename)
+        else:
+            print("Confession of Sin file {} does not exist. Confession of Sin must be manually posted...".format(
+            filelist.OldConfessionFilename))
+    except:
+            print("Confession of Sin file {} exists. Rename not performed...".format(
             filelist.OldConfessionFilename))
 
-    # --- rename the Old Worship Schedule file
-    if os.path.isfile(filelist.WorshipScheduleFilename):
-        os.replace(filelist.OldWorshipScheduleFilename, filelist.WorshipScheduleFilename)
-    else:
-        print("Worship Schedule file {} does not exist. Worship Schedule must be manually posted...".format(
+    try:
+        # --- rename the Old Worship Schedule file
+        if os.path.isfile(filelist.WorshipScheduleFilename):
+            os.replace(filelist.OldWorshipScheduleFilename, filelist.WorshipScheduleFilename)
+        else:
+            print("Worship Schedule file {} does not exist. Worship Schedule must be manually posted...".format(
+            filelist.OldWorshipScheduleFilename))
+    except:
+            print("Worship Schedule file {} exists. Rename not performed...".format(
             filelist.OldWorshipScheduleFilename))
 
-    # --- rename the Old text Bulletin File
-    if os.path.isfile(filelist.TextBulletinFilename):
-        os.replace(filelist.OldTextBulletinFilename, filelist.TextBulletinFilename)
-    else:
-        print("Bulletin file {} does not exist. Bulletin posted message must be manually posted...".format(
+    try:# --- rename the Old text Bulletin File
+        if os.path.isfile(filelist.TextBulletinFilename):
+            os.replace(filelist.OldTextBulletinFilename, filelist.TextBulletinFilename)
+        else:
+            print("Bulletin file {} does not exist. Bulletin posted message must be manually posted...".format(
+            filelist.OldTextBulletinFilename))
+    except:
+            print("Bulletin file {} exists. Rename not performed...".format(
             filelist.OldTextBulletinFilename))
 
     # --- rerun the main process
     status_message = monitorfiles.filechecker()
     print(status_message)
 
-    return ()
+    return (status_message)
 
 
 # --- End of rerun processing
