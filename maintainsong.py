@@ -171,15 +171,14 @@ def displaysong(song_name):
     try:
         status_code = urllib.request.urlopen(req)
         print('\nDisplaySong song=', status_code.read().decode('utf-8'))
-        if song_name in status_code.read().decode('utf-8'):
-            # print('\nReturned status code=', status_code.read().decode('utf-8'))
-            return (url)
+        if song_name in status_code.read():
+            return url
         else:
-            return ('Song Not Found')
+            return 'Song Not Found'
     # except urllib.request.HTTPError:
     except urllib.error.HTTPError as e:
         status_code = '\nHTTPError: {}'.format(e.code)
-        return (status_code)
+        return status_code
 
 
 # ------------ Start Search Song function -
