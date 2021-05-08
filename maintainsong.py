@@ -1,11 +1,10 @@
 # ------------ Add new song to OpenSong
-import filelist  # --- definition of list of files and directories used in the proces
 import os
-import getdatetime
-import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
 import subprocess  # --- for launching external shell commands
 import xml.etree.ElementTree as ET
-import sys
+
+import filelist  # --- definition of list of files and directories used in the proces
+import getdatetime
 
 
 # ------------ Start Add Song function -
@@ -170,11 +169,12 @@ def displaysong(song_name):
 
     try:
         status_code = urllib.request.urlopen(req)
-        print('\nDisplaySong song=', status_code.read().decode('utf-8'))
-        if song_name in status_code.read():
-            return url
-        else:
-            return 'Song Not Found'
+        with urllib.request.urlopen(req) as page:
+            output = page.read().decode('utf-8')
+            if song_name in output:
+                return url
+            else:
+                return 'Song Not Found'
     # except urllib.request.HTTPError:
     except urllib.error.HTTPError as e:
         status_code = '\nHTTPError: {}'.format(e.code)
@@ -245,8 +245,6 @@ def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date
     from urllib import parse as uparse
     from urllib.request import urlopen, Request
     from fuzzywuzzy import fuzz
-    import urllib
-    import getdatetime  # --- my module for date calculation / generation
 
     # setDate = str(getdatetime.nextSunday())         #--- get next Sunday date to build the set name
     # print('\nUsing default date of this Sunday=', setDate)
