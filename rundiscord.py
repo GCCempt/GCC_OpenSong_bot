@@ -2,6 +2,7 @@
 # --- program to launch the Discord OpenSong Processing
 import mydiscord
 import sys
+import test_script
 
 
 def main():
@@ -13,8 +14,12 @@ def main():
         else:
             continue
     print('\nNormal start - no argument provided')
-    mydiscord.read_discord('normal')
 
+    #--- call the test / validation script as the first thing before the bot starts
+    test_script.run_test_scripts()
+
+    #---  start the discord Bot
+    mydiscord.read_discord('normal')
 
 # --- End of function main()
 
