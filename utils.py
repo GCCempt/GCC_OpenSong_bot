@@ -30,7 +30,7 @@ def parse_songs_from_file(worship_schedule):
 
 
 # Takes in a list of songs.
-def validate_songs(SongList):
+def validate_songs(SongList, limit):
     """
     Checks the website using the maintainsong.displaysong function to see if the songs are valid.
 
