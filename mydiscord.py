@@ -13,11 +13,9 @@ import downloadbulletin  # --- my module for downloading the bulletin
 import stringsplit  # --- my module to split a string based on different criteria
 import maintainsong  # --- module to add a new song to OpenSong
 import pandas as pd  # Python data analysis library
+import logging
 
-# --- Discord channels: read messages from both, write responses to the opensong channel
-# --- #pt_announcement channel.id = 681180782240464897
-# --- #opensong channel.id = 813193976555241532
-# --- #testing channel.id = 402275911619182592
+logging.basicConfig(level=logging.ERROR)
 
 client = discord.Client()  # --- create and instance of the Discord client to connect to Discord
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -85,7 +83,7 @@ def read_discord(arg):
 
                 # --- parse the incoming Discord message
                 status_message = parsemessage()
-                if status_message:  # --- check if a valid status message was received
+                if not "Unrecognized" in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
                     print(status_message)
@@ -365,10 +363,10 @@ def parsemessage():
     try:
         # --- Read the Discord message file
         textFile = open(filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
-        Lines = textFile.readlines()  # --- read the first line from the file
+        Lines = textFile.readlines()  # --- read the file into a list
         textFile.close()
     except:
-        file_status = "Discord Message Text file {} does not exist. Unable to process messages...".format(filelist.DiscordMessageFilename)
+        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(filelist.DiscordMessageFilename)
         status_message.append(file_status)
         return (status_message)
 
@@ -454,7 +452,10 @@ def parsemessage():
 
         i += 1
     if valid_message:
-        return (status_message)  # --- if a valid message was posted, return status message as a list
+        return(status_message)  # --- if a valid message was posted, return status message as a list
+    else:
+        status_message.append('\nUnrecognized message received')
+        return(status_message)
 
 
 # ------------end of status checks
