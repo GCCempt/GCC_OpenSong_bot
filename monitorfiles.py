@@ -62,7 +62,7 @@ def filechecker():
         # print('\nFileChecker - WorshipSchedule.txt file found:', filelist.WorshipScheduleFilename)
         status_message = status_message + 'Worship Schedule ready!\n'
 
-    # --- check if worshipschedule file exists
+    # --- check if bulletin file exists
     # print('\nFilechecker - looking for text bulletin file:', filelist.TextBulletinFilename)
     if not os.path.isfile(filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
         file_status = str( "File {} does not exist....".format(filelist.TextBulletinFilename))

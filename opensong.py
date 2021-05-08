@@ -179,7 +179,7 @@ def processfiles(doctree):
 
 # ------------End -  Process files with extracted bulletin information
 
-# ------------Start -  cleanup process i.e. rename files
+# ------------Start -  cleanup process i.e. rename / delete files
 def cleanup():
     import os
     import monitorfiles
@@ -220,6 +220,22 @@ def cleanup():
     else:
         os.replace(filelist.SermonInfoFilename, filelist.OldSermonInfoFilename)
 
+    if os.path.isfile(filelist.CurrentStatusFilename):
+        os.remove(filelist.CurrentStatusFilename)
+    else: ## Show an error ##
+        print("File {} does not exist. Procesing will continue....".format(filelist.CurrentStatusFilename))
+
+    if os.path.isfile(filelist.DiscordMessageFilename):
+        os.remove(filelist.DiscordMessageFilename)
+    else: ## Show an error ##
+        print("File {} does not exist. Procesing will continue....".format(filelist.DiscordMessageFilename))
+
+    if os.path.isfile(filelist.OldWorshipScheduleFilename):
+        os.remove(filelist.OldWorshipScheduleFilename)
+    else: ## Show an error ##
+        print("File {} does not exist. Procesing will continue....".format(filelist.OldWorshipScheduleFilename))
+
+    #--- update the current status
     status_message = monitorfiles.filechecker()  # --- update the status file
 
     return (status_message)
