@@ -184,6 +184,11 @@ def cleanup():
     import os
     import monitorfiles
 
+    current_working_directory = os.getcwd()
+    print('\nStart File Clean up process. Current Working Directory:', current_working_directory)
+    if not 'bulletin' in current_working_directory:
+        os.chdir('../bulletin')   
+
     # --- clean up (or rename) the intermediate files to prepare for the next run
     if not os.path.isfile(filelist.PDFBulletinFilename):
         print("File {} does not exist. Wait for Discord post...".format(filelist.PDFBulletinFilename))
@@ -215,11 +220,9 @@ def cleanup():
     else:
         os.replace(filelist.SermonInfoFilename, filelist.OldSermonInfoFilename)
 
-    monitorfiles.filechecker()  # --- update the status file
+    status_message = monitorfiles.filechecker()  # --- update the status file
 
-    return ()
-
-
+    return (status_message)
 # ------------End  -  cleanup process
 
 # ------------Start -  Process Songs
@@ -331,9 +334,11 @@ def writeXMLSet(doctree):
     import xml.etree.ElementTree as ET
 
     # --- rename the template set "set" tag
-    setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
-    #--- TEST
-    #setNameAttrib = '2021-01-01'
+    if os.environ['ENVIRON'] == 'PROD':
+        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
+    else:           #--- running in TEST
+        setNameAttrib = '2021-01-01'        #--- set default dummy set name for TEST
+    
     setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
 
     myroot = doctree.getroot()  # --- XML document tree passed as a parameter
@@ -365,9 +370,10 @@ def writeXMLSet(doctree):
     dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
 
     #--- push the html files to the website
-    file_type = 'bulletin'
-    sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
-    sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
+    if os.environ['ENVIRON'] == 'PROD':
+        file_type = 'bulletin'
+        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
+        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
 
 
     #--- clean up the local set file

@@ -18,6 +18,7 @@ python-dotenv = "*"
 requests = "*"
 python-levenshtein = "*"
 lxml = "*"
+logging = "*"
 
 [dev-packages]
 
