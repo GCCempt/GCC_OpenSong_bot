@@ -1,17 +1,17 @@
 # -------- Read Discord Messages -last updated 03/02/2021 by Steve Rogers
 # ! python3
-import discord
 import os
-import sys
-from decouple import config
-import monitorfiles
-import opensong  # --- my modulue to build the OpenSong set based on bulletin content and Discord postings
+import subprocess  # --- for launching external shell commands
+
+import discord
+
+import downloadbulletin  # --- my module for downloading the bulletin
 import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime  # --- my module to get the current date / time
-import subprocess  # --- for launching external shell commands
-import downloadbulletin  # --- my module for downloading the bulletin
-import stringsplit  # --- my module to split a string based on different criteria
 import maintainsong  # --- module to add a new song to OpenSong
+import monitorfiles
+import opensong  # --- my modulue to build the OpenSong set based on bulletin content and Discord postings
+from utils import parse_songs_from_file, validate_songs
 import pandas as pd  # Python data analysis library
 import logging
 
@@ -83,6 +83,9 @@ def read_discord(arg):
 
                 # --- parse the incoming Discord message
                 status_message = parsemessage()
+                if 'Worship Schedule' in message.content:
+                    await client.get_channel(int(READ_CHANNEL)).send(
+                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename), 5))
                 if not "Unrecognized" in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
@@ -91,7 +94,7 @@ def read_discord(arg):
                 else:
                     embed_data = discord.Embed(title="Unrecognized message", color=0xe74c3c,
                                                description="The entered command '" + message.content + "' was not "
-                                                                                                      "recognized.")
+                                                                                                       "recognized.")
                     embed_data.add_field(name="Time received:", value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
                                          inline=True)
                     embed_data.add_field(name="User:", value=message.author, inline=True)
