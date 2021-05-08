@@ -38,3 +38,4 @@
 | FTP_USERNAME         | Username for sFTP Access                                                                              |
 | FTP_PASSWORD         | Password for sFTP Access                                                                              |
 | ESV_API_KEY          | API key to https://api.esv.org                                                                        |
+| ENVIRON              | PROD or DEV                                                                                           |
