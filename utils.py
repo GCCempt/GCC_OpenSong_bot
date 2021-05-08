@@ -1,11 +1,14 @@
-# Utility functions
-
-
-# This function will check to see the song(s) passed as a list are valid.
+# Utility functions that could be re-used elsewhere
 import discord
 
 
 def parse_songs_from_file(worship_schedule):
+    """
+    Parses the worshipSchedule.txt and creates a python list of the song names.
+
+    :param worship_schedule: The filename of worship schedule
+    :return: python list of song names.
+    """
     with open(worship_schedule) as file:
         worship_text = file.readlines()
     # Find the line with songs in the array. Assume everything after is a song per line.
@@ -22,6 +25,12 @@ def parse_songs_from_file(worship_schedule):
 
 # Takes in a list of songs.
 def validate_songs(SongList):
+    """
+    Checks the website using the maintainsong.displaysong function to see if the songs are valid.
+
+    :param SongList: A python list of song names to check.
+    :return: embed data object to be used with discord.py's embed send.
+    """
     import maintainsong
     for song in SongList:
         if (maintainsong.displaysong(song)) == "Song Not Found":
