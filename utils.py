@@ -14,8 +14,14 @@ def parse_songs_from_file(worship_schedule):
     # Find the line with songs in the array. Assume everything after is a song per line.
     formatted_song_list = []
 
+    try:
+        worship_text.index('Songs\n')
+    except ValueError as error:
+
+        return 'No songs found.'
     for index, song in enumerate(worship_text):
         # Build a list of elements after "Songs" is found.
+
         if index > worship_text.index('Songs\n'):
             stripped_song = song.split("-")
             stripped_song = stripped_song[0].strip("* ")
@@ -29,20 +35,32 @@ def validate_songs(SongList):
     Checks the website using the maintainsong.displaysong function to see if the songs are valid.
 
     :param SongList: A python list of song names to check.
+    :param limit: The maximum number of song suggestions to return
     :return: embed data object to be used with discord.py's embed send.
     """
     import maintainsong
+
+    song_error = False
+    if SongList == "No songs found.":
+        song_error = discord.Embed(title="Songs not found.", color=0xe74c3c,
+                                   description="There must be at least one song.")
+        return song_error
     for song in SongList:
-        if (maintainsong.displaysong(song)) == "Song Not Found":
+        display_song = maintainsong.displaysong(song)
+        if display_song == "Song Not Found" or "Error" in display_song:
             possible_matches = maintainsong.search_songs(song)
             # Build embed object
-            embed_data = discord.Embed(title="\'Song " + song + " not found.\'", color=0xe74c3c,
+            song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
                                        description="Here are some suggestions of similar songs:")
 
-            for match in possible_matches:
-                embed_data.add_field(name=match, value=possible_matches[match], inline=False)
-
-            return embed_data
+            for index, match in enumerate(possible_matches, 1):
+                song_error.add_field(name=match, value=possible_matches[match], inline=False)
+                if index == limit:
+                    break
         else:
             embed_data = discord.Embed(title="All Songs are Valid!")
-            return embed_data
+
+    if song_error:
+        return song_error
+    else:
+        return embed_data

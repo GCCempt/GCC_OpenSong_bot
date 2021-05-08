@@ -86,7 +86,7 @@ def read_discord(arg):
                 status_message = parsemessage()
                 if 'Worship Schedule' in message.content:
                     await client.get_channel(int(READ_CHANNEL)).send(
-                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename)))
+                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename), 5))
                 if status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
