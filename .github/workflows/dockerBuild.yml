@@ -1,10 +1,10 @@
-name: dockerBuild
+name: DockerBuild
 
 on:
   push:
     branches:
-      -'main' 
-      -'dev'
+    - main
+    - dev
 
 jobs:
   docker:
