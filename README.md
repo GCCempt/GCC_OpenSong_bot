@@ -48,7 +48,7 @@
 | extractpdftext.py      | Read the downloaded pdf bulletin file, extract the text, and write to a file for additional processing                                                                     |
 | filelist.py            | Contains static definitions of all the files used in the processing                                                                                                        |
 | getdatetime.py         | Used for date manipulation, conversion, etc.                                                                                                                               |
-| insertxml.py           | Intended to be a general purpose routine to insert elements in an XML doctree, but not currently used                                                                      |
+| ~~insertxml.py~~           | Intended to be a general purpose routine to insert elements in an XML doctree, but not currently used                                                                      |
 | maintainsong.py        | Utility function for manipulating  song items to be added to Dropbox and for various song lookup functions                                                                 |
 | monitorfiles.py        | Routine to check the current status of the process and determine whether all the prerequisites are met to build the Opensong set                                           |
 | mydiscord.py           | Main Discord bot for processing and responding to Discord Post messages and / or # commands                                                                                |
