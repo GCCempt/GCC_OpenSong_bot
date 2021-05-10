@@ -3,7 +3,6 @@ name: DockerBuild
 on:
   push:
     branches:
-    - main
     - dev
 
 jobs:
