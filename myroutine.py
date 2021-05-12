@@ -1,12 +1,10 @@
 import sys
-import readworshipschedule
-import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
-import opensong
-import stringsplit
-#import mydiscord
-import monitorfiles
-from datetime import datetime, timedelta
+
 import maintainsong
+# import mydiscord
+import monitorfiles
+import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
+import utils
 
 
 def printBoard():
@@ -19,13 +17,15 @@ def printBoard():
 
     for i in range(cols):
         for j in range(rows):
-            print(board[i],[j])
+            print(board[i], [j])
 
     #        print(board[i:j])
-     #   print(count, ',', j)
+    #   print(count, ',', j)
 
-    #printBoard("."*60)
-#--- end printBoard
+    # printBoard("."*60)
+
+
+# --- end printBoard
 
 # --- Covert string to standard date
 def convertdates():
@@ -67,7 +67,6 @@ def convertdates():
 # --- https://pymupdf.readthedocs.io/en/latest/tutorial.html
 def readbulletin():
     import fitz
-    import filelist
 
     with fitz.open('EM_Bulletin_v01.pdf') as doc:
         text = ""
@@ -94,7 +93,6 @@ def readbulletin():
 def addaffirmation():
     import filelist
     import stringManip
-    import stringsplit
     myList = []
 
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
@@ -114,63 +112,52 @@ def addaffirmation():
     del body_text[1]  # --- remove the 1st and second list items
     del body_text[0]  # --- remove the 1st and second list items
 
-    #body_text = stringsplit.convertListToString(body_text)     #convert the list to a string
+    # body_text = stringsplit.convertListToString(body_text)     #convert the list to a string
 
-    #print('\nAfter Call to convert List To String:\n', body_text)
+    # print('\nAfter Call to convert List To String:\n', body_text)
 
-    #myList = stringManip.sentenceSplit(body_text)
-    #myList = stringManip.paragraphSplit(body_text)
+    # myList = stringManip.sentenceSplit(body_text)
+    # myList = stringManip.paragraphSplit(body_text)
     myList = stringManip.paragraphSplit(body_text)
 
-    myList.insert(0, temp_text)           #---- must add back the heading lines for the Affirmation of Faith
+    myList.insert(0, temp_text)  # ---- must add back the heading lines for the Affirmation of Faith
     print('\nafter return from paragraph split\n')
-    
-    #print(myList)
+
+    # print(myList)
     s = 0
     for sentence in myList:
         s += 1
         print('s=', s, 'length of sentence=', len(sentence), ' ', sentence)
 
-    #--- end addaffirmation
-
-
+    # --- end addaffirmation
 
 
 def main():
-    import urllib
-    import writehtml
-    import readworshipschedule
-    import getdatetime
-    import filelist
-    import stringsplit
-    import os
-    import sftp_files
-
-    #--- =============================
+    # --- =============================
     testscript()
     sys.exit()
 
-    #-------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    #textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8',errors='ignore')
-    #body_text = textFile.read()              #--- read the file into a list
-    #writehtml.buildSermonScriptureContent()
-    #sys.exit(0)
-    #--- ======================================
-    #message_link ='https://discord.com/channels/402266274962341900/681180782240464897/832381042689048597'
+    # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
+    # textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8',errors='ignore')
+    # body_text = textFile.read()              #--- read the file into a list
+    # writehtml.buildSermonScriptureContent()
+    # sys.exit(0)
+    # --- ======================================
+    # message_link ='https://discord.com/channels/402266274962341900/681180782240464897/832381042689048597'
 
-    #link = message_link.split('/')
-    #print(link)
-    #for i in range(0, len(link)):
+    # link = message_link.split('/')
+    # print(link)
+    # for i in range(0, len(link)):
     #    print(i, link[i])
     # sys.exit(0)
-    #test python sftp
+    # test python sftp
 
     readworshipschedule.readWS()
     sys.exit(0)
 
     passages = 'john 3:16, 5:1-7; 9-11'
     scripture = passagelookup.build_scripture_ref(passages)
-    #print(scripture)
+    # print(scripture)
     sys.exit(0)
 
     # --- ftp the completed set to the website
@@ -179,63 +166,61 @@ def main():
     textFile.close()
 
     file_type = 'set'
-    sftp_files.pushfiles(file_type, file_name)      #--- call sftp function
+    sftp_files.pushfiles(file_type, file_name)  # --- call sftp function
     sys.exit(0)
 
-    #--- ===========================
+    # --- ===========================
     print('\nCommitted - I think I am beginning to understand -Environment Variable:', os.getenv('TOKEN'))
-    #addaffirmation()
+    # addaffirmation()
     sys.exit(0)
 
-    #--- =====================
+    # --- =====================
     writehtml.buildSermonScriptureContent()
 
     sys.exit(0)
-    #--- ====================
+    # --- ====================
 
     returned_elements = maintainsong.bs4buildSetSummary('2021-03-28 GCCEM Sunday Worship')
     print(returned_elements)
 
-    #--- convert returned list to a string separated by newlines
+    # --- convert returned list to a string separated by newlines
     print('\nafter convert to string \n')
     print('\n'.join(returned_elements))
     sys.exit(0)
 
+    # =====================
 
-    #=====================
-
-    #import readbulletin
-    #readbulletin.parsebulletin()
-    #maintainsong.addsong('steves song')
-    #maintainsong.updatesong('steves song')
-    #maintainsong.displaysong('steves song')
-    #testRenameSet()
-
+    # import readbulletin
+    # readbulletin.parsebulletin()
+    # maintainsong.addsong('steves song')
+    # maintainsong.updatesong('steves song')
+    # maintainsong.display_song('steves song')
+    # testRenameSet()
 
     set_matches = maintainsong.displaySet()
     for myset, url in set_matches.items():
         print(myset, url)
- 
-     #opensong.assembleset()
-    #opensong.cleanup()
-    #readworshipschedule.readWS()
+
+    # opensong.assembleset()
+    # opensong.cleanup()
+    # readworshipschedule.readWS()
     sys.exit(0)
 
-    #--- test mode function
+    # --- test mode function
     args = sys.argv[1:]
     result = ''
     for arg in args:
         result += ' ' + arg
-    
+
     if result:
         print('\nInput arguments:', result)
     else:
         print('\nMissing song name argument')
-        return()
-    
+        return ()
+
     url = maintainsong.search_songs(result)
     if url == 'notfound':
-        print('\nSong: {} does not exist; (song titles are case sensitive)'. format(result))
+        print('\nSong: {} does not exist; (song titles are case sensitive)'.format(result))
     else:
         print('\nSong Found; URL =', url)
         sys.exit(0)
@@ -251,9 +236,9 @@ def main():
         else:
             song_name = arg
             urllib.parse.quote(song_name, safe='')
-            url = maintainsong.displaysong(song_name)
+            url = utils.display_song(song_name)
             if 'Not Found' in url:
-                print('\nSong: {} does not exist; (song titles are case sensitive)'. format(song_name))
+                print('\nSong: {} does not exist; (song titles are case sensitive)'.format(song_name))
             else:
                 print('\nSong Found; URL =', url)
             sys.exit(0)
@@ -261,20 +246,20 @@ def main():
     print('\nMissing song name argument')
     sys.exit(0)
 
-#-- end of function definition routine
+
+# -- end of function definition routine
 
 # ---- function to perform basic test Discord Bot functionality
 def testscript():
     import mydiscord
     import downloadbulletin
 
-    #--- test functionality outside the Discord bot
+    # --- test functionality outside the Discord bot
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - mydiscord.parsemessages')
     status_message = mydiscord.parsemessage()
     print(status_message)
-
 
     # --- test the restore files process to be able to rerun the entire process
     print('\nTest Script #2 - mydiscord.restoreprocess')
@@ -282,14 +267,15 @@ def testscript():
     print(status_message)
 
     if 'Waiting on Bulletin post' in status_message:
-        status_message = downloadbulletin.get_bulletin()    #--- download the latest bulletin file if one does not exit
+        status_message = downloadbulletin.get_bulletin()  # --- download the latest bulletin file if one does not exit
 
     # --- test the monitor files function to check the overall satus of processing
     print('\nTest Script #3 - monitorfiles.filechecker')
     status_message = monitorfiles.filechecker()
     print(status_message)
 
-# ---- end of testscript functionality 
+
+# ---- end of testscript functionality
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #
@@ -297,4 +283,3 @@ if __name__ == "__main__":
     main()
 #
 # ======================================================================================
-

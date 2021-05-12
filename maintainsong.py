@@ -147,39 +147,6 @@ def updatesong(songname):
 
 # ------------End -  Update Song function
 
-# ------------ Start Dislay Song function -  send link to song
-def displaysong(song_name):
-    import urllib.request, urllib.error
-    # from urllib.request import Request, urlopen, urlretrieve
-    # --- Sample URL: http://gccpraise.com/os-viewer/preview_song.php?s=A%20New%20Hallelujah
-    print('\nDisplaySong received song_name=', song_name)
-    result = song_name.strip()  # --- strip leading and trailing whitespace
-    song_name_encoded = urllib.parse.quote(result, safe='')  # ---convert string to valid URL encoded spaces
-    url = 'http://gccpraise.com/os-viewer/preview_song.php?s=' + song_name_encoded
-
-    print('\nDisplaySong url lookup = ', url)
-    # --- Set Browser Agent
-    req = urllib.request.Request(
-        url,
-        data=None,
-        headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-        }
-    )
-
-    try:
-        status_code = urllib.request.urlopen(req)
-        with urllib.request.urlopen(req) as page:
-            output = page.read().decode('utf-8')
-            if song_name in output:
-                return url
-            else:
-                return 'Song Not Found'
-    # except urllib.request.HTTPError:
-    except urllib.error.HTTPError as e:
-        status_code = '\nHTTPError: {}'.format(e.code)
-        return status_code
-
 
 # ------------ Start Search Song function -
 def search_songs(query):
@@ -292,7 +259,6 @@ def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date
     matches = {}
     # Check the match ratio on each song in the song list. This is expensive using pure-python.
     for myset in set_list:
-        if fuzz.partial_ratio(myset, query) >= threshold:
             set_name = myset.replace("%20", " ")
             myset = uparse.quote(myset, safe='')
             myset = prefix + myset

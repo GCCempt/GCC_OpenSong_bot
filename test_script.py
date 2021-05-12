@@ -64,9 +64,9 @@ def run_test_scripts():
     status_message = monitorfiles.filechecker()
     print(status_message)
 
-    # --- test the $displaysong functionality
-    print('\nTest Script #4 - $displaysong\n')
-    status_message = test_displaysong(message='$displaysong marvelous')
+    # --- test the $display_song functionality
+    print('\nTest Script #4 - $display_song\n')
+    status_message = test_displaysong(message='$display_song marvelous')
     print(status_message)
 
     # --- test the $displayset functionality
@@ -82,17 +82,17 @@ def run_test_scripts():
 # ---- end of testscript functionality 
 
 
-def test_displaysong(message='$displaysong'):
+def test_displaysong(message='$display_song'):
     import maintainsong
 
- # --- Test the $displaysong functionality -----
+ # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
  
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
         command, song_name = message.split(' ',1)
-        #print('\nSong name =', song_name)
+        #print('\nSong name =', url)
         song_matches = {}
         # --- call the searchsong function
         song_matches = maintainsong.search_songs(song_name)
@@ -106,13 +106,13 @@ def test_displaysong(message='$displaysong'):
     else:
         status_message = '\nAt least a partial Song name is required for lookup\n'
         print(status_message)
-# ---- end of test $displaysong functionality 
+# ---- end of test $display_song functionality
 
 def test_displayset(message='$displayset'):
     import maintainsong
     import getdatetime
 
- # --- Test the $displaysong functionality -----
+ # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
     set_matches = {}
@@ -120,7 +120,7 @@ def test_displayset(message='$displayset'):
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
         command, set_date.split(' ',1)
-        #print('\nSong name =', song_name)
+        #print('\nSong name =', url)
         # --- call the searchsong function
         set_matches = maintainsong.displaySet(set_date)
     else:
@@ -135,7 +135,7 @@ def test_displayset(message='$displayset'):
             print(myset)
 
     #print(status_message)
-# ---- end of test $displaysong functionality 
+# ---- end of test $display_song functionality
 
 def build_message_file():
     import filelist

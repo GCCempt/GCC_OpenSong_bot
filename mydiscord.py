@@ -11,6 +11,7 @@ import getdatetime  # --- my module to get the current date / time
 import maintainsong  # --- module to add a new song to OpenSong
 import monitorfiles
 import opensong  # --- my modulue to build the OpenSong set based on bulletin content and Discord postings
+import utils
 from utils import parse_songs_from_file, validate_songs
 import pandas as pd  # Python data analysis library
 import logging
@@ -85,7 +86,7 @@ def read_discord(arg):
                 status_message = parsemessage()
                 if 'Worship Schedule' in message.content:
                     await client.get_channel(int(READ_CHANNEL)).send(
-                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename), 5))
+                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename), 5, utils.generate_link_list('http://gccpraise.com/opensongv2/xml/')))
                 if not "Unrecognized" in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
@@ -243,8 +244,8 @@ def read_discord(arg):
                     status_message = 'Missing song name. Song name is required!'
                     await message.channel.send(status_message)
 
-            # --- check for the $displaysong command -----
-            elif '$displaysong' in msg.replace(" ", '').replace('\t', '').lower():
+            # --- check for the $display_song command -----
+            elif '$display_song' in msg.replace(" ", '').replace('\t', '').lower():
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)
                 message_text = message.content
