@@ -89,15 +89,15 @@ def parse_passages(input_passages):			#--- input is a string
                 book_chapter, ref = passage_ref.split(':', 1)
                 #hold_book_chapter = str(book_chapter) + ':'
 
-    print('\nInput passage=', input_passages, '\n')
+    #print('\nInput passage=', input_passages, '\n')
     for p in full_ref_passages:         #--- look up each passage
         numbers = ('-' in p)
         passage = get_esv_text(p, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
         passage = p + '\n' + passage + '\n'
         scripture = scripture + passage + '\n'
         
-        print(p)
+        #print(p)
     
-    print('\nComplete passage lookup:\n')
-    print(scripture)
+    #print('\nComplete passage lookup:\n')
+    #print(scripture)
     return(scripture)
