@@ -84,7 +84,7 @@ def parse_passages(input_passages):			#--- input is a string
 
             else:
                 verse = p
-                passage_ref = hold_book_chapter + verse
+                passage_ref = hold_book_chapter + ':' + verse
                 full_ref_passages.append(passage_ref)       
                 book_chapter, ref = passage_ref.split(':', 1)
                 #hold_book_chapter = str(book_chapter) + ':'
@@ -94,7 +94,7 @@ def parse_passages(input_passages):			#--- input is a string
         numbers = ('-' in p)
         passage = get_esv_text(p, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
         passage = p + '\n' + passage + '\n'
-        scripture = scripture + passage + '\n'
+        scripture = '\n' + scripture + passage + '\n'
         
         #print(p)
     
