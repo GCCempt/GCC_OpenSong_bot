@@ -47,11 +47,14 @@ def addscripture(mytree, slide_group_name, scripture_ref):
     # --- Call passageslookup -------
     # numbers='-'
     passages = scripture_ref
-    # print('\naddnode.addscripture - passages=', passages)
-    # scripture = passagelookup.get_esv_text(passages, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
     scripture = passagelookup.parse_passages(passages)
 
-    verses = stringsplit.split_on_number(scripture)
+    dash_split_verses = stringsplit.split_on_dash(scripture) #--- returns a list
+
+    #--- convert list to string
+    new_scripture = stringsplit.convertListToString(dash_split_verses)  #-- returns a string
+
+    verses = stringsplit.split_on_number(new_scripture)
 
     # --- Read Template set to be updated
     myroot = mytree.getroot()

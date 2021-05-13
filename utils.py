@@ -3,6 +3,7 @@ import logging
 from abc import ABC
 from html.parser import HTMLParser
 from urllib import parse, request
+import re
 
 import discord
 
@@ -35,6 +36,7 @@ def parse_songs_from_file(worship_schedule):
             stripped_song = song.split("-")
             stripped_song = stripped_song[0].strip("* ")
             formatted_song_list.append(stripped_song)
+
     return formatted_song_list
 
 
@@ -78,6 +80,7 @@ def validate_songs(SongList, limit):
 
     if not invalid_songs:
         embed_messages['No Errors'] = discord.Embed(title="All Songs are Valid!", color=0x2ecc71)
+
     return embed_messages
 
 
@@ -184,3 +187,27 @@ def search_songs(query):
             matches[song_name] = song
 
     return matches
+
+
+def song_case_correction(song_file, song_list):
+    """
+    Reads the input file, checks to see if the case-insensitive names of any songs from song_list
+    can be found, then updates the text file to match the case given in song_list.
+    :param song_file: The name/path of the text file to update.
+    :param song_list: A list of the songs to be updated with correct case in the file.
+    :return: None
+    """
+    with open(song_file) as file:
+        file_text = file.readlines()
+        file.close()
+
+    for index, line in enumerate(file_text):
+        for song in song_list:
+            if song.lower() in line.lower():
+                file_text[index] = re.sub(song, song, file_text[index])
+                logging.info("Updating the song-case of " + song)
+    with open(song_file, 'w') as file:
+        file.writelines(file_text)
+        file.close()
+
+    return None
