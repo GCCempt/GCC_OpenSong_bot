@@ -117,7 +117,7 @@ def read_discord(arg):
         # --only check for $commands on the "commands" channel
         elif message.channel.id == int(POST_CHANNEL):
             # --- check for the $status command -----
-            if '$status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace(
+            if '/status' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ", '').replace(
                     '\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
                 status_message = monitorfiles.filechecker()  # ---read the current status message returned as a 'list'
@@ -128,7 +128,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $cleanup command used when processing did not complete successfully -----
-            elif '$cleanup' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ",
+            elif '/cleanup' in msg.replace(" ", '').replace('\t', '').lower() or '$check' in msg.replace(" ",
                                                                                                          '').replace(
                 '\t', '').lower():
                 print('\nDiscord Cleanup message received from ', message.author, ' on ', message.created_at)
@@ -136,7 +136,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $restore command message -----
-            elif '$restore' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/restore' in msg.replace(" ", '').replace('\t', '').lower():
                 # print('\nOpenSong restore process message received from ', message.author, ' on ', message.created_at)
                 restoreprocess()  # --- recover files to rerun the process *************************
                 status_message = 'Discord restore processing completed'
@@ -151,7 +151,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $update command -----
-            elif '$update' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/update' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong update message received from ', message.author, ' on ', message.created_at)
                 updateprocess()  # *************************************
                 status_message = 'Discord Update processing completed'
@@ -166,7 +166,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $rerun command -----
-            elif '$rerun' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/rerun' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong $rerun message received from ', message.author, ' on ', message.created_at)
                 status_message = monitorfiles.filechecker()  # *************************************
                 status_message = status_message + '$rerun processing completed!'
@@ -174,7 +174,7 @@ def read_discord(arg):
 
                 return ()
 
-            elif '$repost' in msg.lower():
+            elif '/repost' in msg.lower():
                 # --- split the command and parameters
                 cmd = message.content.split()[0]
                 # --- check if a parameter was passed
@@ -226,7 +226,7 @@ def read_discord(arg):
                 return ()
 
             # --- check for the $newsong command -----
-            elif '$addsong' in msg.replace(" ", '').replace('\t', '').lower() or '$new' in msg.replace(" ", '').replace(
+            elif '/addsong' in msg.replace(" ", '').replace('\t', '').lower() or '$new' in msg.replace(" ", '').replace(
                     '\t', '').lower():
                 message_text = message.content.replace('-', ' ').replace('<', '').replace('>', '')
 
@@ -250,8 +250,8 @@ def read_discord(arg):
                     status_message = 'Missing song name. Song name is required!'
                     await message.channel.send(status_message)
 
-            # --- check for the $display_song command -----
-            elif '$display_song' in msg.replace(" ", '').replace('\t', '').lower():
+            # --- check for the $displaysong command -----
+            elif '/displaysong' in msg.replace(" ", '').replace('\t', '').lower():
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)
                 message_text = message.content
@@ -279,7 +279,7 @@ def read_discord(arg):
                     status_message = '\nAt least a partial Song name is required for lookup'
                     await message.channel.send(status_message)
 
-            elif '$displayset' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/displayset' in msg.replace(" ", '').replace('\t', '').lower():
 
                 status_text = '\nOpenSong  {} command received'.format(message.content)
                 print(status_text)
@@ -317,7 +317,7 @@ def read_discord(arg):
                     await message.channel.send(status_message)
 
             # --- check for the $help command -----
-            elif '$help' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/help' in msg.replace(" ", '').replace('\t', '').lower():
                 help_messages = ['The following commands are available ("$" is required):\n',
                                  '1. $status or $check\n',
                                  '2. $sync (forces sync from OpenSong to the gccpraise website\n',
@@ -333,12 +333,12 @@ def read_discord(arg):
                     await message.channel.send(x)
                 return ()
 
-            elif message.content.startswith('$hello'):
+            elif message.content.startswith('/hello'):
                 await message.channel.send('Hello right back at you!')  # --- just for fun, reply to the same channel
                 return
 
             # --- check for the $sync command (forces the rclone sync to the website -----
-            elif '$sync' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/sync' in msg.replace(" ", '').replace('\t', '').lower():
                 # print('\nOpenSong Update Song message received from', message.author, ' on ', message.created_at)
                 subprocess.Popen('/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process
                 status_message = 'Discord Update Song <sync> processing completed'

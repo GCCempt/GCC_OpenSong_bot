@@ -40,3 +40,25 @@ def convertListToString(Element_List=['The', 'Quick', 'Brown',
 
     # print('\n Joined String=', joined_string)
     return (joined_string)  # --- return String
+
+# --- Start parse string - split by '-'
+def split_on_dash(input_string):
+
+    string_split = input_string.split('—')
+
+    matched = []
+    
+    i = 0
+    for match in string_split:
+        i += 1
+        if i < len(string_split):
+            new_match = match + ' — '         #--- add back the split character
+            matched.append(new_match)
+
+        else:
+            matched.append(match)
+   
+    return(matched)         #--- return a list of verses
+        
+    #--- Inpute String "13Cursed is everyone who is hanged on a tree”—14 so that in Christ Jesus" 
+    #--- Output: ['13Cursed is everyone who is hanged on a tree'-, '14 so that in Christ Jesus']

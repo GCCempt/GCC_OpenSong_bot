@@ -21,6 +21,25 @@ def filechecker():
     current_date_time = str(getdatetime.currentdatetime())
     status_message = 'Status check process started at:' + current_date_time + '\n for bulletin date: ' + bulletin_date + '\n'
 
+    setName = bulletin_date + ' GCCEM Sunday Worship'
+    current_working_directory = os.getcwd()
+    #print('\nMonitorFiles() Current Working Directory:', current_working_directory)
+
+    if not 'sets' in current_working_directory:
+        set_path='../sets'
+        os.chdir(set_path)          #-- change to the sets directory
+
+    if os.path.isfile(setName):			#--- check if the set already exists
+        status_message = '\nSet processing already completed for {}'.format(setName)
+        return(status_message)
+
+    #--- switch back to the bulletin directory to continue processing
+    current_working_directory = os.getcwd()
+    if not 'bulletin' in current_working_directory:
+        bulletin_path='../bulletin'
+        os.chdir(bulletin_path)  # -- switch back to the default directory
+        current_working_directory = os.getcwd()
+        #print('\nMonitorFiles() Bulletin Working Directory:', current_working_directory)
 
     # --- check if sermon info file exists
     if not os.path.isfile(filelist.SermonInfoFilename):
@@ -62,7 +81,7 @@ def filechecker():
         # print('\nFileChecker - WorshipSchedule.txt file found:', filelist.WorshipScheduleFilename)
         status_message = status_message + 'Worship Schedule ready!\n'
 
-    # --- check if worshipschedule file exists
+    # --- check if bulletin file exists
     # print('\nFilechecker - looking for text bulletin file:', filelist.TextBulletinFilename)
     if not os.path.isfile(filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
         file_status = str( "File {} does not exist....".format(filelist.TextBulletinFilename))

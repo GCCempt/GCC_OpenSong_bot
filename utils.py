@@ -35,6 +35,7 @@ def parse_songs_from_file(worship_schedule):
             stripped_song = song.split("-")
             stripped_song = stripped_song[0].strip("* ")
             formatted_song_list.append(stripped_song)
+
     return formatted_song_list
 
 
