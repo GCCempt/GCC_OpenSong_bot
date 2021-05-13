@@ -53,14 +53,18 @@ def validate_songs(SongList, limit):
         display_song = maintainsong.displaysong(song)
         if display_song == "Song Not Found" or "Error" in display_song:
             possible_matches = maintainsong.search_songs(song)
-            # Build embed object
-            song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
-                                       description="Here are some suggestions of similar songs:")
+            if possible_matches:
+                # Build embed object
+                song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
+                                           description="Here are some suggestions of similar songs:")
 
-            for index, match in enumerate(possible_matches, 1):
-                song_error.add_field(name=match, value=possible_matches[match], inline=False)
-                if index == limit:
-                    break
+                for index, match in enumerate(possible_matches, 1):
+                    song_error.add_field(name=match, value=possible_matches[match], inline=False)
+                    if index == limit:
+                        break
+            else:
+                song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
+                                           description="We are not able to find any similar song titles.")
         else:
             embed_data = discord.Embed(title="All Songs are Valid!")
 
