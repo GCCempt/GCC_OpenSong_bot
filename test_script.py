@@ -119,7 +119,7 @@ def test_displayset(message='$displayset'):
  
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
-        command, set_date.split(' ',1)
+        command, set_date = message.split(' ',1)
         #print('\nSong name =', song_name)
         # --- call the searchsong function
         set_matches = maintainsong.displaySet(set_date)
