@@ -1,13 +1,16 @@
 # ---- function to perform basic test Discord Bot functionality
+import utils
+
+
 def run_test_scripts():
     import mydiscord
     import downloadbulletin
-    import  monitorfiles
+    import monitorfiles
     import os
     import filelist
     from opensong import cleanup
 
-    #--- test functionality outside the Discord bot
+    # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
 
     # --- Parse the incoming Discord message which is saved in a file
@@ -83,9 +86,7 @@ def run_test_scripts():
 
 
 def test_displaysong(message='$display_song'):
-    import maintainsong
-
- # --- Test the $display_song functionality -----
+    # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
  
@@ -95,7 +96,7 @@ def test_displaysong(message='$display_song'):
         #print('\nSong name =', url)
         song_matches = {}
         # --- call the searchsong function
-        song_matches = maintainsong.search_songs(song_name)
+        song_matches = utils.search_songs(song_name)
 
         if len(song_matches) == 0:
             status_message = '\nNo songs matching: {} found!)'.format(song_name)

@@ -149,60 +149,6 @@ def updatesong(songname):
 
 
 # ------------ Start Search Song function -
-def search_songs(query):
-    from abc import ABC
-    from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
-    from urllib import parse as uparse
-    from urllib.request import urlopen, Request
-    from fuzzywuzzy import fuzz
-
-    # Directory we're checking
-    url = 'http://gccpraise.com/opensongv2/xml/'
-    # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
-    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
-    # Read the content and decode it
-    content = page.read().decode()
-    # Initialize empty list for songs.
-    song_list = []
-    # URL Prefix
-    prefix = "http://gccpraise.com/os-viewer/preview_song.php?s="
-    # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
-    threshold = 80
-
-    # Subclass/Override HTMLParser and define the methods we need to change.
-    class Parse(HTMLParser, ABC):
-        def __init__(self):
-            # Since Python 3, we need to call the __init__() function of the parent class
-            super().__init__()
-            self.reset()
-
-        # override handle_starttag method to only return the contents of anchor tags as a searchable list.
-        def handle_starttag(self, tag, attrs):
-            # Only parse the 'anchor' tag.
-            if tag == "a":
-                for name, link in attrs:
-                    if name == "href":
-                        song_list.append(link)
-
-    # Create a new parse object.
-    directory_parser = Parse()
-    # Call feed method. incomplete data is buffered until more data is fed or close() is called.
-    directory_parser.feed(content)
-    # format the URL list by replacing the HTML safe %20
-    song_list = [song.replace("%20", " ") for song in song_list]
-    # TODO: Remove test query
-    # query = "the King of Heaven"
-    # Build empty dictionary to add matches to.
-    matches = {}
-    # Check the match ratio on each song in the song list. This is expensive using pure-python.
-    for song in song_list:
-        if fuzz.partial_ratio(song, query) >= threshold:
-            song_name = song.replace("%20", " ")
-            song = uparse.quote(song, safe='')
-            song = prefix + song
-            matches[song_name] = song
-    
-    return(matches)
 
 
 # ------------ Start Dislay Set function -  send link to song
@@ -211,7 +157,6 @@ def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
     from urllib.request import urlopen, Request
-    from fuzzywuzzy import fuzz
 
     # setDate = str(getdatetime.nextSunday())         #--- get next Sunday date to build the set name
     # print('\nUsing default date of this Sunday=', setDate)

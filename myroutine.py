@@ -218,7 +218,7 @@ def main():
         print('\nMissing song name argument')
         return ()
 
-    url = maintainsong.search_songs(result)
+    url = utils.search_songs(result)
     if url == 'notfound':
         print('\nSong: {} does not exist; (song titles are case sensitive)'.format(result))
     else:
