@@ -44,7 +44,7 @@ if __name__ == "__main__":
     new_scripture = stringsplit.convertListToString(dash_split_verses)
 
     number_split_verses = stringsplit.split_on_number(new_scripture)
-    print('\n Final')
+    print('\n Final=', final)
 
     for verse in number_split_verses:
         print(verse)

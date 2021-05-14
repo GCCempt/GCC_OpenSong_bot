@@ -100,4 +100,4 @@ def parse_passages(input_passages):			#--- input is a string
     
     #print('\nComplete passage lookup:\n')
     #print(scripture)
-    return(scripture)
+    return(scripture)       #--- returns a string variable
