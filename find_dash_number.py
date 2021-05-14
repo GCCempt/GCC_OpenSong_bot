@@ -33,7 +33,7 @@ def parse_string(input_string):
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #
 if __name__ == "__main__":
-    scripture = passagelookup.parse_passages('galatians 3:13-15')   #--- returns a string
+    scripture = passagelookup.parse_passages('galatians 3:16-18')   #--- returns a string
     print('\nscripture=', scripture)
 
     dash_split_verses = stringsplit.split_on_dash(scripture)

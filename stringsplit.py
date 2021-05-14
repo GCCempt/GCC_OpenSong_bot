@@ -1,7 +1,9 @@
 # --- Split a string by a number followed by a space
 def split_on_number(text):
+    first_verse = True      #--- flag to identify the first verse number
     final = [text.split()[0]]  # Autoload the first item
-    for i in text.split()[1:]:  # Ignore the first item
+
+    for i in text.split()[1:]:  # Ignore the first item (item 0)
 
         try:
             # Try to convert it to a float
@@ -12,9 +14,21 @@ def split_on_number(text):
             final[-1] = " ".join([final[-1], i])
 
         else:
-            # if you can convert to a float, then append it
-            final.append(i)
-            # print(final)
+            # if you can convert to a float, then it is possibly a verse number
+            if first_verse:
+                final.append(i)
+                prev_verse = int(i)   #--- get the initial verse number
+                first_verse = False
+            else:
+            #--- validity check to ensure this verse is an increment of the previous
+                int_i = int(i)
+                if int_i == prev_verse + 1:        #--- check if the new "verse" i 1 greater than the previous
+                    final.append(i)
+                    # print(final)
+                    prev_verse = int(i)      #--- save the current verse number
+                else:
+                    final[-1] = " ".join([final[-1], i])        #--- continue normal processing
+
     return (final)
 
 
