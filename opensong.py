@@ -263,9 +263,9 @@ def processsongs(doctree):
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Approach - song name=', song_name, ' presentation order=', presentation_order)
+    # print('\nProcess Song of Approach - song name=', url, ' presentation order=', presentation_order)
 
-    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, song_name)
+    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process the Song of Response - last line in the list
@@ -277,9 +277,9 @@ def processsongs(doctree):
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Response - song name=', song_name, ' presentation order=', presentation_order)
+    # print('\nProcess Song of Response - song name=', url, ' presentation order=', presentation_order)
 
-    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, song_name)
+    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process Praise Songs - order is based on the established set name
@@ -298,10 +298,10 @@ def processsongs(doctree):
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
 
-        # print('\nProcess Song of Praise - song name=', song_name, ' presentation order=', presentation_order)
+        # print('\nProcess Song of Praise - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                  presentation_order)  # (slide_group_name, song_name)
+                                  presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
         # --- Song or Assurance
@@ -313,10 +313,10 @@ def processsongs(doctree):
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
 
-        # print('\nProcess Song of Assurance - song name=', song_name, ' presentation order=', presentation_order)
+        # print('\nProcess Song of Assurance - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                  presentation_order)  # (slide_group_name, song_name)
+                                  presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
     else:  # --- process body_text for 2 Songs of Praise
@@ -329,16 +329,16 @@ def processsongs(doctree):
             presentation_order = presentation_order.strip()  # remove leading and trailing spaces
             body_text = body_text + '\n' + song_name
 
-            # print('\nProcess Songs of Praise Body Text- song name=', song_name)
+            # print('\nProcess Songs of Praise Body Text- song name=', url)
             addnode.addbodytext(doctree, slide_group_name, body_text)
 
         for s in range(len(songs) - 2, 1, -1):  # --- process 2 Songs of Praise in reverse order
             song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
             song_name = song_name.strip()  # remove leading and trailing spaces
             presentation_order = presentation_order.strip()  # remove leading and trailing spaces
-            # print('\nProcess Songs of Praise - song name=', song_name, ' presentation order=', presentation_order)
+            # print('\nProcess Songs of Praise - song name=', url, ' presentation order=', presentation_order)
             doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                      presentation_order)  # (slide_group_name, song_name)
+                                      presentation_order)  # (slide_group_name, url)
 
     return ()
 

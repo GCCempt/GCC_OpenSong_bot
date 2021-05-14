@@ -1,13 +1,16 @@
 # ---- function to perform basic test Discord Bot functionality
+import utils
+
+
 def run_test_scripts():
     import mydiscord
     import downloadbulletin
-    import  monitorfiles
+    import monitorfiles
     import os
     import filelist
     from opensong import cleanup
 
-    #--- test functionality outside the Discord bot
+    # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
 
     # --- Parse the incoming Discord message which is saved in a file
@@ -64,9 +67,9 @@ def run_test_scripts():
     status_message = monitorfiles.filechecker()
     print(status_message)
 
-    # --- test the $displaysong functionality
-    print('\nTest Script #4 - $displaysong\n')
-    status_message = test_displaysong(message='$displaysong marvelous')
+    # --- test the $display_song functionality
+    print('\nTest Script #4 - $display_song\n')
+    status_message = test_displaysong(message='$display_song marvelous')
     print(status_message)
 
     # --- test the $displayset functionality
@@ -82,20 +85,18 @@ def run_test_scripts():
 # ---- end of testscript functionality 
 
 
-def test_displaysong(message='$displaysong'):
-    import maintainsong
-
- # --- Test the $displaysong functionality -----
+def test_displaysong(message='$display_song'):
+    # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
  
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
         command, song_name = message.split(' ',1)
-        #print('\nSong name =', song_name)
+        #print('\nSong name =', url)
         song_matches = {}
         # --- call the searchsong function
-        song_matches = maintainsong.search_songs(song_name)
+        song_matches = utils.search_songs(song_name)
 
         if len(song_matches) == 0:
             status_message = '\nNo songs matching: {} found!)'.format(song_name)
@@ -106,21 +107,21 @@ def test_displaysong(message='$displaysong'):
     else:
         status_message = '\nAt least a partial Song name is required for lookup\n'
         print(status_message)
-# ---- end of test $displaysong functionality 
+# ---- end of test $display_song functionality
 
 def test_displayset(message='$displayset'):
     import maintainsong
     import getdatetime
 
- # --- Test the $displaysong functionality -----
+ # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
     set_matches = {}
  
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
-        command, set_date = message.split(' ',1)
-        #print('\nSong name =', song_name)
+        command, set_date.split(' ',1)
+        #print('\nSong name =', url)
         # --- call the searchsong function
         set_matches = maintainsong.displaySet(set_date)
     else:
@@ -135,7 +136,7 @@ def test_displayset(message='$displayset'):
             print(myset)
 
     #print(status_message)
-# ---- end of test $displaysong functionality 
+# ---- end of test $display_song functionality
 
 def build_message_file():
     import filelist

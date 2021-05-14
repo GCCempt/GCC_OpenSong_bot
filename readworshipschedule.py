@@ -85,7 +85,7 @@ def parsesong(songs, line):
     # print('\nParseSong - line: ', line)
     song_name, presentation_order = line.rsplit('-', 1)  # --- split line at 2nd occurrence of '-'
 
-    # print('\nParseSong - song_name:', song_name, ' presentation_order:', presentation_order)
+    # print('\nParseSong - url:', url, ' presentation_order:', presentation_order)
 
     try:
         song_name = song_name.strip('*')  # --- remove leading '*' if found
@@ -94,13 +94,13 @@ def parsesong(songs, line):
 
     song_name = song_name.strip()  # --- remove leading and trailing spaces
     presentation_order = presentation_order.strip().replace(', ', ' ')  # --- remove leading and trailing spaces
-    # worship_set.append['Slide group name'(song_name, presentation_order)
+    # worship_set.append['Slide group name'(url, presentation_order)
     song_name = song_name + ' - '  # add a deliminter back after the song name for parsing after the file is written
 
     songs.append(
         [song_name, presentation_order])  # --- update list to hold the worship songs and presentation order for each
 
-    # print('\nParseSong - Song Name:', song_name, ' Presentation Order:', presentation_order)
+    # print('\nParseSong - Song Name:', url, ' Presentation Order:', presentation_order)
     # print(songs)
 
     return (songs)
