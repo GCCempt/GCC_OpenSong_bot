@@ -48,8 +48,8 @@ def validate_songs(SongList, limit):
 
     :param SongList: A python list of song names to check.
     :param limit: The maximum number of song suggestions to return
-    :return: dict of embed data objects to be used with discord.py's embed send.
-    you must iterate through the dict to send all the messages.
+    :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
+    a success/fail message. You must iterate through the embed dict to send all the messages.
     """
     url_to_search = 'http://gccpraise.com/opensongv2/xml/'
     invalid_songs = []
@@ -58,7 +58,9 @@ def validate_songs(SongList, limit):
     # convert all dictionary keys to lowercase.
     source_data = {k.lower(): v for k, v in source_data.items()}
     # find an exact match within the dictionary.
+    status = "invalid songs found."
     for song in SongList:
+
         if source_data.get(song.lower()) is None:
             invalid_songs.append(song)
 
@@ -80,8 +82,13 @@ def validate_songs(SongList, limit):
 
     if not invalid_songs:
         embed_messages['No Errors'] = discord.Embed(title="All Songs are Valid!", color=0x2ecc71)
+        status = "All songs are Valid!"
 
-    return embed_messages
+    return_dict = {
+        "embed": embed_messages,
+        "status": status
+    }
+    return return_dict
 
 
 def generate_link_dict(url):
