@@ -92,7 +92,6 @@ def read_discord(arg):
                     # Return a message on the song status
                     for message in invalid_songs:
                         await client.get_channel(int(READ_CHANNEL)).send(embed=invalid_songs[message])
-
                     # Apply any needed case-correction
                     utils.song_case_correction(filelist.WorshipScheduleFilename, song_list)
 

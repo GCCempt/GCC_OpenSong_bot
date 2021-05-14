@@ -157,7 +157,6 @@ def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
     from urllib.request import urlopen, Request
-    from fuzzywuzzy import fuzz
 
     # setDate = str(getdatetime.nextSunday())         #--- get next Sunday date to build the set name
     # print('\nUsing default date of this Sunday=', setDate)
@@ -205,7 +204,6 @@ def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date
     matches = {}
     # Check the match ratio on each song in the song list. This is expensive using pure-python.
     for myset in set_list:
-        if fuzz.partial_ratio(myset, query) >= threshold:
             set_name = myset.replace("%20", " ")
             myset = uparse.quote(myset, safe='')
             myset = prefix + myset
