@@ -53,16 +53,20 @@ def validate_songs(SongList, limit):
     """
     url_to_search = 'http://gccpraise.com/opensongv2/xml/'
     invalid_songs = []
+    valid_songs = []
     source_data = generate_link_dict(url_to_search)
     embed_messages = {}
     # convert all dictionary keys to lowercase.
-    source_data = {k.lower(): v for k, v in source_data.items()}
+    source_data_lower = {k.lower(): v for k, v in source_data.items()}
     # find an exact match within the dictionary.
-    status = "invalid songs found."
     for song in SongList:
 
-        if source_data.get(song.lower()) is None:
+        if source_data_lower.get(song.lower()) is None:
             invalid_songs.append(song)
+        else:
+            song_index = list(source_data_lower.keys()).index(song.lower())
+            correct_song_names = list(source_data.keys())
+            valid_songs.append(correct_song_names[song_index])
 
     # Search for matches to build discord message.
 
@@ -82,11 +86,10 @@ def validate_songs(SongList, limit):
 
     if not invalid_songs:
         embed_messages['No Errors'] = discord.Embed(title="All Songs are Valid!", color=0x2ecc71)
-        status = "All songs are Valid!"
 
     return_dict = {
         "embed": embed_messages,
-        "status": status
+        "songs": valid_songs
     }
     return return_dict
 
@@ -204,14 +207,14 @@ def song_case_correction(song_file, song_list):
     :param song_list: A list of the songs to be updated with correct case in the file.
     :return: None
     """
-    with open(song_file) as file:
+    with open(song_file, 'r') as file:
         file_text = file.readlines()
         file.close()
 
     for index, line in enumerate(file_text):
         for song in song_list:
             if song.lower() in line.lower():
-                file_text[index] = re.sub(song, song, file_text[index])
+                file_text[index] = re.sub(song, song, file_text[index], flags=re.IGNORECASE)
                 logging.info("Updating the song-case of " + song)
     with open(song_file, 'w') as file:
         file.writelines(file_text)

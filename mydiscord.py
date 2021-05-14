@@ -92,8 +92,9 @@ def read_discord(arg):
                     # Return a message on the song status
                     for message in invalid_songs['embed']:
                         await client.get_channel(int(READ_CHANNEL)).send(embed=invalid_songs['embed'][message])
-                    # Apply any needed case-correction
-                    utils.song_case_correction(filelist.WorshipScheduleFilename, song_list)
+                    # Apply any needed case-correction - must pass in the song_list of correct case.
+
+                    utils.song_case_correction(filelist.WorshipScheduleFilename, invalid_songs['songs'])
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
