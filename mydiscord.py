@@ -1,5 +1,6 @@
 # -------- Read Discord Messages -last updated 03/02/2021 by Steve Rogers
 # ! python3
+import logging
 import os
 import subprocess  # --- for launching external shell commands
 
@@ -11,9 +12,8 @@ import getdatetime  # --- my module to get the current date / time
 import maintainsong  # --- module to add a new song to OpenSong
 import monitorfiles
 import opensong  # --- my modulue to build the OpenSong set based on bulletin content and Discord postings
+import utils
 from utils import parse_songs_from_file, validate_songs
-import pandas as pd  # Python data analysis library
-import logging
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -84,9 +84,19 @@ def read_discord(arg):
                 # --- parse the incoming Discord message
                 status_message = parsemessage()
                 if 'Worship Schedule' in message.content:
-                    await client.get_channel(int(READ_CHANNEL)).send(
-                        embed=validate_songs(parse_songs_from_file(filelist.WorshipScheduleFilename), 5))
-                if not "Unrecognized" in status_message:  # --- check if a valid status message was received
+                    # Create a list of songs from the text tile.
+                    song_list = parse_songs_from_file(filelist.WorshipScheduleFilename)
+                    # Check to see if the songs are valid.
+                    invalid_songs = validate_songs(song_list, 5)
+
+                    # Return a message on the song status
+                    for message in invalid_songs['embed']:
+                        await client.get_channel(int(READ_CHANNEL)).send(embed=invalid_songs['embed'][message])
+                    # Apply any needed case-correction - must pass in the song_list of correct case.
+
+                    utils.song_case_correction(filelist.WorshipScheduleFilename, invalid_songs['songs'])
+
+                if "Unrecognized" not in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
                     print(status_message)
@@ -254,7 +264,7 @@ def read_discord(arg):
                     print('\nSong name =', song_name)
                     song_matches = {}
                     # --- call the searchsong function
-                    song_matches = maintainsong.search_songs(song_name)
+                    song_matches = utils.search_songs(song_name)
 
                     if len(song_matches) == 0:
                         status_message = '\nNo songs matching: {} found!)'.format(song_name)
