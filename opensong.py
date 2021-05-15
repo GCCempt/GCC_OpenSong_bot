@@ -235,6 +235,22 @@ def cleanup():
     else: ## Show an error ##
         print("File {} does not exist. Procesing will continue....".format(filelist.OldWorshipScheduleFilename))
 
+    #--- clean up the set file if running in DEV
+    current_working_directory = os.getcwd()
+    if not 'sets' in current_working_directory:
+        os.chdir('../sets')   
+    try:
+        if os.environ['ENVIRON'] == 'DEV':
+            setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
+            os.remove(setNameAttrib)
+    except:
+            print("DEV Set File {} does not exist. Procesing will continue....".format(setNameAttrib))
+
+    #--- switch back to the bulletin directory
+    current_working_directory = os.getcwd()
+    if not 'bulletin' in current_working_directory:
+        os.chdir('../bulletin')   
+
     #--- update the current status
     status_message = monitorfiles.filechecker()  # --- update the status file
 
@@ -353,7 +369,7 @@ def writeXMLSet(doctree):
     if os.environ['ENVIRON'] == 'PROD':
         setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
     else:           #--- running in TEST
-        setNameAttrib = '2021-01-01'        #--- set default dummy set name for TEST
+        setNameAttrib = os.environ['COMPUTERNAME']        #--- set default dummy set name for TEST
     
     setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
 

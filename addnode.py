@@ -44,18 +44,11 @@ def addscripture(mytree, slide_group_name, scripture_ref):
     import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
     import stringsplit  # --- modulue to split a string by a number followed by a space
 
-    # --- Call passageslookup -------
-    # numbers='-'
-    passages = scripture_ref
-    scripture = passagelookup.parse_passages(passages)
+    # --- parse the input passage(s) and create a list of the verse text -------
+    verses = []
 
-    dash_split_verses = stringsplit.split_on_dash(scripture) #--- returns a list
-
-    #--- convert list to string
-    new_scripture = stringsplit.convertListToString(dash_split_verses)  #-- returns a string
-
-    verses = stringsplit.split_on_number(new_scripture)
-
+    verses = passagelookup.build_scripture_text(scripture_ref) #--- returns a list of scripture verses
+ 
     # --- Read Template set to be updated
     myroot = mytree.getroot()
     mynode = mytree.find('./slide_groups')
@@ -72,7 +65,7 @@ def addscripture(mytree, slide_group_name, scripture_ref):
 
                 # ----------- Build Scripture Slide Group
                 new_slide_group = ET.Element('slide_group')
-                scripture_ref = passages + '|ESV'
+                scripture_ref = scripture_ref + '|ESV'
                 slide_attrib = {'type': 'scripture', 'name': scripture_ref, 'print': 'true'}
                 new_slide_group.attrib = slide_attrib
 
@@ -81,7 +74,7 @@ def addscripture(mytree, slide_group_name, scripture_ref):
 
                 # ----------- Build Title SubElement
                 new_title = ET.SubElement(new_slide_group, 'title')
-                new_title.text = passages
+                new_title.text = scripture_ref
                 # new_slide_group.append(new_title)
 
                 # ----------- Build Slides SubElement

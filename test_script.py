@@ -12,75 +12,53 @@ def run_test_scripts():
 
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
+    print('\nGenerated Set Name=', os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship')
+
+    #--- cleanup any residual files before beginning processing
+    cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - mydiscord.parsemessages')
     status_message = str(mydiscord.parsemessage())
     #print(status_message)
 
-    if 'does not exist' in status_message:
-        status_message = build_message_file()
+    if 'does not exist' in status_message:      #--- message.txt file does not exist
+        status_message = build_message_file()   #--- create a dummy message file
+        status_message = str(mydiscord.parsemessage())
     
     print(status_message)
 
     # --- test the restore files process to be able to rerun the entire process
-    print('\nTest Script #2 - mydiscord.restoreprocess')
-    status_message = mydiscord.restoreprocess()
+    print('\nTest Script #2 - build worship schedule')
+    status_message = build_worship_schedule_file()
     print(status_message)
 
-    if 'Waiting on Worship Schedule' in status_message:
-        print('\nCreate Worship Schedule file!')
-
-        try:
-            # --- rename the Old Worship Schedule file
-            if os.path.isfile(filelist.OldWorshipScheduleFilename):
-                os.replace(filelist.OldWorshipScheduleFilename, filelist.WorshipScheduleFilename)
-            else:
-                status_message = build_worship_schedule_file()
-                print(status_message)
-        except:
-                print("Error in Worship Schedule processing - file does not {} exist.".format(filelist.OldWorshipScheduleFilename))
-                #print(status_message)
-
-
-    if 'Waiting on Sermon' in status_message:
-        print('\nCreate Sermon Info file!')
-
-        try:
-            # --- rename the Old Worship Schedule file
-            if os.path.isfile(filelist.OldSermonInfoFilename):
-                os.replace(filelist.OldSermonInfoFilename, filelist.SermonInfoFilename)
-            else:
-                status_message = build_sermon_info_file()
-                print(status_message)
-        except:
-                print("Error in Sermon Info file processing - file does not {} exist.".format(filelist.OldSermonInfoFilename))
-                #print(status_message)
-
-
-    if 'Waiting on Bulletin post' in status_message:
-        status_message = downloadbulletin.get_bulletin()    #--- download the latest bulletin file if one does not exit
-        print('\nReturn from Download bulletin:\n', status_message)
+    print('\nTest Script #3 - Post the bulletin')
+    status_message = downloadbulletin.get_bulletin()    #--- download the latest bulletin file if one does not exit
+    print('\nReturn from Download bulletin:\n', status_message)
 
     # --- test the monitor files function to check the overall satus of processing
-    print('\nTest Script #3 - monitorfiles.filechecker')
+    print('\nTest Script #4 - monitorfiles.filechecker')
     status_message = monitorfiles.filechecker()
     print(status_message)
 
-    # --- test the $display_song functionality
-    print('\nTest Script #4 - $display_song\n')
-    status_message = test_displaysong(message='$display_song marvelous')
+    # --- test the /displaysong functionality
+    print('\nTest Script #5 - /displaysong\n')
+    status_message = test_displaysong(message='/displaysong marvelous')
     print(status_message)
 
-    # --- test the $displayset functionality
-    print('\nTest Script #5 - $displayset\n')
-    test_displayset(message='$displayset')
+    # --- test the /displayset functionality
+    print('\nTest Script #6 - /displayset\n')
+    test_displayset(message='/displayset')
 
     #--- cleanup after yourself - remove files which were created for the validation process
+    print('\nTest Script #7 - Cleanup')
     cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
 
     #--- end testing script
-    print('\nEnd-to_end Testing Script completed!')
+    status_message = '\nEnd-to_end Testing Script completed!'
+    print(status_message)
+    return(status_message)
 
 # ---- end of testscript functionality 
 
@@ -107,48 +85,48 @@ def test_displaysong(message='$display_song'):
     else:
         status_message = '\nAt least a partial Song name is required for lookup\n'
         print(status_message)
-# ---- end of test $display_song functionality
+# ---- end of test /displaysong functionality
 
-def test_displayset(message='$displayset'):
+def test_displayset(message='/displayset'):
     import maintainsong
     import getdatetime
+    import os
 
- # --- Test the $display_song functionality -----
+ # --- Test the /displaysong functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
     set_matches = {}
- 
-    if ' ' in message:
-        # --- split the line at the first space to retrieve the song name
-        command, set_date.split(' ',1)
-        #print('\nSong name =', url)
-        # --- call the searchsong function
-        set_matches = maintainsong.displaySet(set_date)
-    else:
-        set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
-        set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
+
+    if os.environ['ENVIRON'] == 'PROD':
+        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
+    else:           #--- running in TEST
+        setNameAttrib = os.environ['COMPUTERNAME']        #--- set default dummy set name for TEST
+
+    setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
+
+    set_matches = maintainsong.displaySet(setNameAttrib)
 
     if len(set_matches) == 0:
-        status_message = '\nNo sets matching: {} found!)'.format(set_date)
+        status_message = '\nNo sets matching: {} found!)'.format(setNameAttrib)
         print(status_message)
     else:
         for myset in set_matches.items():
             print(myset)
 
     #print(status_message)
-# ---- end of test $display_song functionality
+# ---- end of test /displaysong functionality
 
 def build_message_file():
     import filelist
 
-    message_text = "@here Dear all, here is my sermon info for this Sunday, 1/1: \
+    message_text = "Dear all, here is my sermon info for this Sunday, 1/1: \
     \nSample Message: The Gospel Mentality” (Galatians 3:1–14) \n \
-    \n@here here is the confession of sin to be put on screen, 1/1: \
+    \nhere is the confession of sin to be put on screen, 1/1: \
     \nSample Confession: Almighty God, Father of our Lord Jesus Christ, \
         Maker of all things, Judge of all men; we acknowledge and bewail our manifold sins and wickedness, \
             which we, from time to time, most grievously have committed, by thought, word, and deed, \
                 against Your Divine Majesty, provoking most justly Your wrath and indignation against us. \
-    \n@here here is the assurance of pardon to be put on screen, 1/1: \
+    \nhere is the assurance of pardon to be put on screen, 1/1: \
     \nPsalm 103:11–13 \
     \nSample Assurance: For as high as the heavens are above the earth, \
         so great is his steadfast love toward those who fear him; \
