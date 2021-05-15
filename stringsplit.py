@@ -29,7 +29,7 @@ def split_on_number(text):
                 else:
                     final[-1] = " ".join([final[-1], i])        #--- continue normal processing
 
-    return (final)
+    return (final)          #--- return a list of verses
 
 
 # --- end split_on_number -Split a string by a number followed by a space

@@ -171,6 +171,8 @@ def buildSermonScriptureContent():
     import stringsplit
     import stringManip
     import sys
+    import utils
+    import stringsplit
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
     print('\nStarting BuildSermonScriptureContent')
 
@@ -182,7 +184,8 @@ def buildSermonScriptureContent():
     # --- FOR TESTING - OVERRIDE WITH DEFAULT VALUE
     # scripture_ref = 'Galatians 2:1–10; John 3:16'
 
-    passage = passagelookup.parse_passages(scripture_ref)  # --- return value is a string with newlines
+    verses = passagelookup.build_scripture_text(scripture_ref)  # --- returns a list of verses
+    scripture = stringsplit.convertListToString(verses) #--- convert the list to a string
 
     message = data = """<html>
     <head></head>
@@ -194,7 +197,7 @@ def buildSermonScriptureContent():
 
     # --- update the HTML text
     message = message.replace('reference', scripture_ref)
-    message = message.replace('temp', passage)
+    message = message.replace('temp', scripture)
 
     # --- Write the Bulletin Sermon Scripture HTML file
     f = open(filelist.HTMLSermonScriptureFilename, 'w')

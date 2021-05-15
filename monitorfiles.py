@@ -21,7 +21,11 @@ def filechecker():
     current_date_time = str(getdatetime.currentdatetime())
     status_message = 'Status check process started at:' + current_date_time + '\n for bulletin date: ' + bulletin_date + '\n'
 
-    setName = bulletin_date + ' GCCEM Sunday Worship'
+    if os.environ['ENVIRON'] == 'PROD':
+        setNameAttrib = bulletin_date + ' GCCEM Sunday Worship'
+    else:
+        setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
+
     current_working_directory = os.getcwd()
     #print('\nMonitorFiles() Current Working Directory:', current_working_directory)
 
@@ -29,8 +33,8 @@ def filechecker():
         set_path='../sets'
         os.chdir(set_path)          #-- change to the sets directory
 
-    if os.path.isfile(setName):			#--- check if the set already exists
-        status_message = '\nSet processing already completed for {}'.format(setName)
+    if os.path.isfile(setNameAttrib):			#--- check if the set already exists
+        status_message = '\nSet processing already completed for {}'.format(setNameAttrib)
         return(status_message)
 
     #--- switch back to the bulletin directory to continue processing
