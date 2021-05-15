@@ -2,6 +2,7 @@ import re
 import passagelookup
 import stringsplit
 import sys
+import utils
 
 #--- find pattern of dash followed by number in a string
 def parse_string(input_string):
@@ -33,20 +34,11 @@ def parse_string(input_string):
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #
 if __name__ == "__main__":
-    input_passage = 'galatians 3:16-18; 28-29'
+    input_passage = 'galatians 3:13-18; 28-29; John 3:16-17; 21-23'
     print('\nInput Passage=', input_passage)
-    scripture = passagelookup.parse_passages(input_passage)   #--- returns a string
-    print('\nESV scripture Lookup=', scripture)
+    scripture_verses = passagelookup.build_scripture_text(input_passage)   #--- returns a list of scripture refs
 
-    dash_split_verses = stringsplit.split_on_dash(scripture)
-
-    #--- convert array to string
-    new_scripture = stringsplit.convertListToString(dash_split_verses)
-
-    number_split_verses = stringsplit.split_on_number(new_scripture)
-    print('\n Final')
-
-    for verse in number_split_verses:
+    for verse in scripture_verses:
         print(verse)
         
 #
