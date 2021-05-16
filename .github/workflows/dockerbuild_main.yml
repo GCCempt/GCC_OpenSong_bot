@@ -1,4 +1,4 @@
-name: DockerBuild_Main
+name: DockerBuild_dev
 
 on:
   push:
@@ -27,7 +27,15 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: gccempt/bot:gcc_main
+          tags: gccempt/bot:gcc_dev
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+        
+      - 
+        name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '@here A new docker image has been deployed for `DEV`'
