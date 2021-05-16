@@ -108,7 +108,7 @@ def filechecker():
         assemble_status_message = opensong.assembleset()  # --- all files exist, run the buildset process
         status_message = status_message + str(assemble_status_message)
 
-    return (status_message)
+    return discord.Embed(title='success', color = 0xe74c3c, description=status_message)
 
 
 # --- function to read the key files, extract the date and very that the indidcated dates match
