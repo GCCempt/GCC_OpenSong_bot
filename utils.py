@@ -30,10 +30,10 @@ def parse_songs_from_file(worship_schedule):
         # Build a list of elements after "Songs" is found.
         if "Hymn" in song:
             stripped_song = song.split("-")
-            stripped_song = stripped_song[0].strip("Hymn: ")
+            stripped_song = stripped_song[0].strip("Hymn:")
             formatted_song_list.append(stripped_song)
         if index > worship_text.index('Songs\n'):
-            stripped_song = song.split("-")
+            stripped_song = song.rsplit("-")
             stripped_song = stripped_song[0].strip("* ")
             formatted_song_list.append(stripped_song)
 
