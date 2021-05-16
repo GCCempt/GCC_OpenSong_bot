@@ -238,10 +238,10 @@ def cleanup():
     #--- clean up the set file if running in DEV
     current_working_directory = os.getcwd()
     if not 'sets' in current_working_directory:
-        os.chdir('../sets')
-    setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship'
+        os.chdir('../sets')   
     try:
         if os.environ['ENVIRON'] == 'DEV':
+            setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
             os.remove(setNameAttrib)
     except:
             print("DEV Set File {} does not exist. Procesing will continue....".format(setNameAttrib))
