@@ -28,10 +28,11 @@ def parse_songs_from_file(worship_schedule):
         return 'No songs found.'
     for index, song in enumerate(worship_text):
         # Build a list of elements after "Songs" is found.
-        if "Hymn" in song:
-            stripped_song = song.rsplit("-", 1)
-            stripped_song = stripped_song[0].strip("Hymn:")
-            formatted_song_list.append(stripped_song.strip())
+        if "Hymn:" in song:
+            if song.startswith("Hymn:"):
+                stripped_song = song.rsplit("-", 1)
+                stripped_song = stripped_song[0].strip("Hymn:")
+                formatted_song_list.append(stripped_song.strip())
         if index > worship_text.index('Songs\n'):
             stripped_song = song.rsplit("-", 1)
             stripped_song = stripped_song[0].strip("* ")
