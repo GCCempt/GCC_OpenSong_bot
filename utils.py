@@ -309,4 +309,4 @@ def generate_random_worship_schedule(filename):
     f = open(filename, 'w')
     f.writelines(text)
     f.close()
-    return None
+    return filename
