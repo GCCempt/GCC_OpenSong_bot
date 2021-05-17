@@ -269,7 +269,7 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
 
 
 def generate_song_name():
-    song_dict = utils.generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    song_dict = generate_link_dict("http://gccpraise.com/opensongv2/xml/")
     # Generate a Song
     if '/opensongv2/' in song_dict:
         song_dict.pop('/opensongv2/')
