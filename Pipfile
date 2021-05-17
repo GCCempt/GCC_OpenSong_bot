@@ -19,6 +19,7 @@ requests = "*"
 python-levenshtein = "*"
 lxml = "*"
 names = "*"
+pytest = "*"
 
 [dev-packages]
 
