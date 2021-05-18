@@ -1,19 +1,18 @@
 # -------- Read bulletin file -------------------------------
 # ! python3
-# import win32com.client
 import os
 from datetime import datetime, timedelta
 import sys, getopt
-# import readbulletin
 import downloadbulletin  # --- my module to download PDF bulletin from website and save locally
 import extractpdftext  # --- my module to convert PDF bulletin to .txt file
 import filelist  # --- definition of list of files and directories used in the proces
 
-
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
 # ------------ Read bulletin text file function -
 def selectset():
     # --- read and parse the text bulletin file to select a template set for processing
-    file1 = open(filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
+    file1 = open(bulletin_path + filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = file1.readlines()
     file1.close()
 
@@ -41,7 +40,7 @@ def selectset():
             print('\nReadBulletin.readtxt - inputset_name=', inputset_name, ' for bulletin date:', bulletin_date)
 
     # --- write the selected set name to a file for later processing
-    textFile = open(filelist.SetFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.SetFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(str(inputset_name))
     textFile.close()
 
@@ -57,16 +56,14 @@ def getfiles():
         '\nReadBulletin.getfiles - Welcome to OpenSong Create Set Script to parse the bulletin and create an OpenSong Set!')
 
     # ---------------- Verify the bulletin file exists ------------
-    print('\nCurrent Working Directory:', os.getcwd())
-    print('\nInput Bulletin: ', filelist.PDFBulletinFilename, '\n')
-    if not os.path.isfile(filelist.PDFBulletinFilename):
-        print("File path {} does not exist. Exiting...".format(filelist.PDFBulletinFilename))
+    print('\nInput Bulletin: ', bulletin_path + filelist.PDFBulletinFilename, '\n')
+    if not os.path.exists(bulletin_path + filelist.PDFBulletinFilename):
+        print("File path {} does not exist. Exiting...".format(bulletin_path + filelist.PDFBulletinFilename))
         sys.exit()
 
-    extractpdftext.fitz_extract_text(filelist.PDFBulletinFilename,
-                                     filelist.TextPDFBulletinFilename)  # --- read the pdf bulletin and convert to text file
+    extractpdftext.fitz_extract_text(bulletin_path + filelist.PDFBulletinFilename,
+                                     bulletin_path + filelist.TextPDFBulletinFilename)  # --- read the pdf bulletin and convert to text file
 
-    # inputset_name = readtxt(filelist.TextPDFBulletinFilename)               #--- Read the text bulletin and determine which set template to us
     selectset()  # --- Read the text bulletin and determine which set template to us
 
     # print(lines)
@@ -77,7 +74,7 @@ def getfiles():
 # --------------- Parse the text bulletin, extract relevant text, write to individual files  ---------------------------
 def parsebulletin():
     # --- read the bulletin text file Using readlines()
-    file1 = open(filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
+    file1 = open(bulletin_path + filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = file1.readlines()
     file1.close()
 
@@ -113,7 +110,7 @@ def parsebulletin():
 
                 # print('    ReadBulletin.ParseBulletin - end of Announcements.')
                 # --- write the corporate confession to text file
-                textFile = open(filelist.AnnouncementFileName, 'w', encoding='utf-8',
+                textFile = open(bulletin_path + filelist.AnnouncementFileName, 'w', encoding='utf-8',
                                 errors='ignore')  # --- output announcement text file
                 textFile.write(str(body_text))
                 textFile.close()
@@ -129,7 +126,7 @@ def parsebulletin():
                 if 'songofapproach' in Lines[count + 1].replace(" ", '').replace('\t', '').lower():
                     # print('\n    End of Call To Worship  - found Song of Approach in suceeding line; count=', count, ' line=', Lines[count+1])
                     # --- write the Call to Worship of Faith to text file
-                    textFile = open(filelist.CallToWorshipFileName, 'w', encoding='utf-8',
+                    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'w', encoding='utf-8',
                                     errors='ignore')  # --- output call to worship text file
                     textFile.write(str(body_text))
                     textFile.close()
@@ -145,7 +142,7 @@ def parsebulletin():
             body_text = body_text + Lines[count]
 
             # --- write the Scripture Reading to text file
-            textFile = open(filelist.ScriptureFileName, 'w', encoding='utf-8',
+            textFile = open(bulletin_path + filelist.ScriptureFileName, 'w', encoding='utf-8',
                             errors='ignore')  # --- output call to worship text file
             textFile.write(str(body_text))
             textFile.close()
@@ -161,7 +158,7 @@ def parsebulletin():
             count += 1
             body_text = body_text + Lines[count]
             # --- write the Bulletin Sermon info to text file
-            textFile = open(filelist.BulletinSermonFilename, 'w', encoding='utf-8',
+            textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'w', encoding='utf-8',
                             errors='ignore')  # --- output call to worship text file
             textFile.write(str(body_text))
             textFile.close()
@@ -184,7 +181,7 @@ def parsebulletin():
             # print('\nBulletin Date found; count =', count, ' bulletin line=', Lines[count])
 
             # --- write the bulletin date to text file
-            textFile = open(filelist.BulletinDateFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile = open(bulletin_path + filelist.BulletinDateFilename, 'w', encoding='utf-8', errors='ignore')
             textFile.write(str(bulletin_date))
             textFile.close()
             break
@@ -221,7 +218,7 @@ def aofextract(aof_tag, count, Lines):
                 if 'gracechristianchurch' in Lines[j + 1].replace(" ", '').replace('\t', '').lower():
                     # print('\nReadBulletin.aofextrct - Write the Affirmation of Faith to text file')
                     # print('\nAffirmation of Faith body text=', body_text)
-                    textFile = open(filelist.AffirmationFileName, 'w', encoding='utf-8', errors='ignore')
+                    textFile = open(bulletin_path + filelist.AffirmationFileName, 'w', encoding='utf-8', errors='ignore')
                     textFile.write(str(body_text))
                     textFile.close()
                     return ()

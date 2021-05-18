@@ -4,6 +4,8 @@
 def fitz_extract_text(bulletin_path, OutputtextFilename):
     import fitz # pymupdf package
     import filelist
+    set_path = 'sets/'
+    bulletin_dir = 'bulletin/'
 
     with fitz.open(bulletin_path) as doc:
         text = ""
@@ -17,7 +19,7 @@ def fitz_extract_text(bulletin_path, OutputtextFilename):
     # print(text)
 
     # --- write the PDF text to a temporary text file
-    textFile = open(filelist.TextPDFBulletinFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_dir + filelist.TextPDFBulletinFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(text)
     textFile.close()
 
@@ -25,7 +27,7 @@ def fitz_extract_text(bulletin_path, OutputtextFilename):
     # print('\nExtractPDFText.extract_text - Read Converted PDF file:', PDF_text_fileName)
 
     # --- Using readlines()
-    file1 = open(filelist.TextPDFBulletinFilename, 'r', encoding='utf-8', errors='ignore')
+    file1 = open(bulletin_dir + filelist.TextPDFBulletinFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = file1.readlines()
 
     count = 0
@@ -40,7 +42,7 @@ def fitz_extract_text(bulletin_path, OutputtextFilename):
             text = text + line  # --- add non-empty lines to a new string
 
     # --- write the text string to a new text file
-    textFile = open(filelist.TextBulletinFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_dir + filelist.TextBulletinFilename, 'w', encoding='utf-8', errors='ignore')
     # textFile.write(str(text, 'utf-8'))
     textFile.write(str(text))
 
@@ -52,7 +54,7 @@ def fitz_extract_text(bulletin_path, OutputtextFilename):
     # print('\nExtractPDFText.extract_text - Read final text file:', OutputtextFilename)
 
     # --- Using readlines()
-    file1 = open(filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
+    file1 = open(bulletin_dir + filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = file1.readlines()
     file1.close()
 
