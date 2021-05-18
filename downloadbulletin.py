@@ -8,7 +8,8 @@ import filelist  # --- definition of list of files and directories used in the p
 import monitorfiles
 import readbulletin
 
-
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
 # --- using urllib2
 def get_bulletin():  # --- function to download bulletin
 
@@ -24,12 +25,8 @@ def get_bulletin():  # --- function to download bulletin
 
     current_bulletin = max(bulletins)  # --- get the current bulletin
     current_bulletin = bulletinurl + current_bulletin
-    # print('Current bulletin:', current_bulletin)
-    # urlretrieve(bulletinurl, filelist.PDFBulletinFilename)                             #--- retrieve the bulletin and write to local file
-    urlretrieve(current_bulletin, filelist.PDFBulletinFilename)
-
-    # print('DownloadBulletin.getbulletin - Completed; Local bulletin file name:', filelist.PDFBulletinFilename)
-    # sys.exit()      #-- temporarily stop processing
+                            #--- retrieve the bulletin and write to local file
+    urlretrieve(current_bulletin, bulletin_path + filelist.PDFBulletinFilename)
 
     readbulletin.getfiles()  # --- process the downloaded bulletin file
     status_message = monitorfiles.filechecker()  # --- check if all files are ready to be processed

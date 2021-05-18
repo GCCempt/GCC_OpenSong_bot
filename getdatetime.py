@@ -5,14 +5,11 @@ from dateparser.search import search_dates
 
 
 # --- Get the current date / time and format it
-def currentdatetime():
-    #    received_dt = datetime.now() - timedelta(days=6)
+def currentdatetime(dateformat='%m/%d/%Y %H:%M %p'):
     received_dt = datetime.now()
-    received_dt = received_dt.strftime('%m/%d/%Y %H:%M %p')
+    received_dt = received_dt.strftime(dateformat)
 
-    return received_dt
-
-
+    return(received_dt)
 # --- End Get the current date / time
 
 # --- Get the current date and format it
@@ -22,8 +19,6 @@ def currentdate():
     received_dt = received_dt.strftime('%m/%d/%Y')
 
     return received_dt
-
-
 # --- End Get the current date / time
 
 
@@ -78,7 +73,7 @@ def nextSunday():
     return next_Sunday
 
 
-# ------------ search for dates in a string
+# ------------ search a given string for dates
 def searchdates(mystring):
     from dateparser.search import search_dates
 
@@ -95,3 +90,22 @@ def convertdate(receivedDate='2021-04-04'):
     print('\nConverted Date=', convertedDateObject)
     return convertedDateObject
 # --- End Get the current date / time
+
+# --- get the current day of the week (i.e. for today)
+def getDayOfWeek():
+    #print('\nFind Day of Week for Today')
+    date_format = '%Y,%m,%d'
+    returned_date = currentdatetime(date_format)       #--- get the current date
+    #print('Current Date', returned_date)
+
+    #--- convert date to integer format
+    my_year, my_month, my_date = returned_date.split(',')
+    my_year = int(my_year)
+    my_month = int(my_month)
+    my_date = int(my_date)
+    #print('\ndates=', my_year, my_month, my_date)
+
+    week_days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    weekday = calendar.weekday(my_year, my_month, my_date)
+    return(week_days[weekday])          #--- return the current day of the week
+# --- End getDayOfWeek function

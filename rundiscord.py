@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --- program to launch the Discord OpenSong Processing
 import sys
-import test_script
+import startup_validation
 import mydiscord
 
 
@@ -16,7 +16,7 @@ def main():
     print('\nNormal start - no argument provided')
 
     # --- call the test / validation script as the first thing before the bot starts
-    test_script.run_test_scripts()
+    startup_validation.run_test_scripts()
 
     #---  start the discord Bot
     mydiscord.read_discord('normal')

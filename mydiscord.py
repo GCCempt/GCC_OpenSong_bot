@@ -14,7 +14,8 @@ import opensong  # --- my modulue to build the OpenSong set based on bulletin co
 import utils
 import pandas as pd  # Python data analysis library
 import logging
-import test_script 
+import startup_validation 
+import readworshipschedule
 logging.basicConfig(level=logging.ERROR)
 
 client = discord.Client()  # --- create and instance of the Discord client to connect to Discord
@@ -22,6 +23,8 @@ TOKEN = os.environ['DISCORD_TOKEN']
 READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
 
 # print('MY TOKEN=', TOKEN)
 # print('READ CHANNEL=', READ_CHANNEL)
@@ -55,9 +58,7 @@ def read_discord(arg):
         msg = message.content  # --- retrieve the Discord message and process below
         print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ',
               message.created_at, 'message =', msg, 'channel ID=', message.channel.id)
-
-        # elif (message.channel.id == 681180782240464897):   #--- accept messages posted on the READ Channel
-
+     
         if (message.channel.id == int(READ_CHANNEL)):  # --- accept messages posted on the READ Channel
 
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ',
@@ -77,7 +78,7 @@ def read_discord(arg):
                 await channel.send(status_message)
             else:
                 # --- write the Message to a file for later processingn
-                textFile = open(filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+                textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
                 textFile.writelines(msg)
                 textFile.close()
 
@@ -85,7 +86,7 @@ def read_discord(arg):
                 status_message = parsemessage()
                 if 'Worship Schedule' in message.content:
                     # Create a list of songs from the text tile.
-                    song_list = utils.parse_songs_from_file(filelist.WorshipScheduleFilename)
+                    song_list = utils.parse_songs_from_file(bulletin_path + filelist.WorshipScheduleFilename)
                     # Check to see if the songs are valid.
                     invalid_songs = utils.validate_songs(song_list, 5)
 
@@ -94,7 +95,7 @@ def read_discord(arg):
                         await client.get_channel(int(READ_CHANNEL)).send(embed=invalid_songs['embed'][message])
                     # Apply any needed case-correction - must pass in the song_list of correct case.
 
-                    utils.song_case_correction(filelist.WorshipScheduleFilename, invalid_songs['songs'])
+                    utils.song_case_correction(bulletin_path + filelist.WorshipScheduleFilename, invalid_songs['songs'])
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.filechecker()  # --- retrieve the current processing status
@@ -138,36 +139,6 @@ def read_discord(arg):
                 opensong.cleanup()  # ---cleanup residual files ******************************
                 return ()
 
-            # --- check for the /restore command message -----
-            elif '/restore' in msg.replace(" ", '').replace('\t', '').lower():
-                # print('\nOpenSong restore process message received from ', message.author, ' on ', message.created_at)
-                restoreprocess()  # --- recover files to rerun the process *************************
-                status_message = 'Discord restore processing completed'
-                print('\nCurrent Status=', status_message)
-
-                # --- post restore process completed message
-                # await message.channel.send(status_message)
-                status_message = monitorfiles.filechecker()  # --- status message returned as a 'string'
-
-                # --- post status message
-                print(status_message)
-                return ()
-
-            # --- check for the /update command -----
-            elif '/update' in msg.replace(" ", '').replace('\t', '').lower():
-                print('\nOpenSong update message received from ', message.author, ' on ', message.created_at)
-                updateprocess()  # *************************************
-                status_message = 'Discord Update processing completed'
-                # print('\nCurrent Status=', status_message)
-
-                # --- post rerun process completed message
-                await message.channel.send(status_message)
-                status_message = monitorfiles.filechecker()  # --- status message returned as a 'string'
-
-                # --- post status message
-                await message.channel.send(status_message)
-                return ()
-
             # --- check for the /rerun command -----
             elif '/rerun' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong /rerun message received from ', message.author, ' on ', message.created_at)
@@ -178,9 +149,9 @@ def read_discord(arg):
                 return ()
 
             # --- check for the /validate command -----
-            elif '/test' in msg.replace(" ", '').replace('\t', '').lower():
+            elif '/startuptest' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong /test message received from ', message.author, ' on ', message.created_at)
-                status_message = test_script.run_test_scripts()  # *************************************
+                status_message = startup_validation.run_test_scripts()  # *************************************
                 return ()
 
             elif '/repost' in msg.lower():
@@ -218,7 +189,7 @@ def read_discord(arg):
                 # print('\nMessage retrived', message.content)
 
                 # --- write the Message to a file for later processingn
-                textFile = open(filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+                textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
                 textFile.writelines(message)
                 textFile.close()
 
@@ -245,7 +216,7 @@ def read_discord(arg):
                     if message.attachments:  # --- check for attachments
 
                         # -- save the attachement
-                        await message.attachments[0].save(filelist.NewSongTextFilename)
+                        await message.attachments[0].save(bulletin_path + filelist.NewSongTextFilename)
                         # --- call the addsong routine  ***********************************
                         status_message = maintainsong.addsong(songname)
                         # --- attempt to display the song which was just added
@@ -381,11 +352,11 @@ def parsemessage():
 
     try:
         # --- Read the Discord message file
-        textFile = open(filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
+        textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
         Lines = textFile.readlines()  # --- read the file into a list
         textFile.close()
     except:
-        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(filelist.DiscordMessageFilename)
+        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(bulletin_path + filelist.DiscordMessageFilename)
         status_message.append(file_status)
         return (status_message)
 
@@ -400,10 +371,12 @@ def parsemessage():
                 worshipschedule.append(line)
                 j += 1
             # --- write the worship schedule file
-            textFile = open(filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
             textFile.writelines(worshipschedule)
             textFile.close()
             i = j  # --- reset the line pointer in the file
+
+            readworshipschedule.readWS()  # read the worship schedule file extracted from discord and store in a  "lists" file
 
         elif 'sermoninfo' in Lines[i].replace(" ", '').replace('\t', '').lower():
             valid_message = 'true'
@@ -421,7 +394,7 @@ def parsemessage():
 
             # print('\nWorship Schedule file name is:', filelist.WorshipScheduleFilename)
             # --- write the Sermon Info file
-            textFile = open(filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile = open(bulletin_path + filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
             textFile.writelines(sermoninfo)
             textFile.close()
             i = j  # --- reset the line pointer in the file
@@ -442,7 +415,7 @@ def parsemessage():
                 j += 1
 
             # --- write the Confession of Sin file
-            textFile = open(filelist.ConfessionFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile = open(bulletin_path  + filelist.ConfessionFilename, 'w', encoding='utf-8', errors='ignore')
             textFile.writelines(confessioninfo)
             textFile.close()
             i = j  # --- reset the line pointer in the file
@@ -464,7 +437,7 @@ def parsemessage():
                 j += 1
 
             # --- write the Assurance of Pardon
-            textFile = open(filelist.AssuranceFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile = open(bulletin_path + filelist.AssuranceFilename, 'w', encoding='utf-8', errors='ignore')
             textFile.writelines(assuranceinfo)
             textFile.close()
             i = j  # --- reset the line pointer in the file
@@ -479,137 +452,6 @@ def parsemessage():
 
 # ------------end of status checks
 
-# ------------Start -  Re-run the OpenSong proces
-def restoreprocess():
-    # --- rename the previous processing files to prepare for re-running the process
-    # --- Check if there is a new file first
-    # --- rename the Old Assurance of Faith file
-    # --- /restore command (execute the process build the set from the previous content) \n',
-    print("\n !!!Warning -- this will overwrite any currently posted files!!! OpenSong restore processing starting at",
-          getdatetime.currentdatetime())
-
-    try:
-        # --- rename the Old Assurance of Pardon of Sin file
-        if os.path.isfile(filelist.OldAssuranceFilename):
-            os.replace(filelist.OldAssuranceFilename, filelist.AssuranceFilename)
-        else:
-            print("Assurance of Pardon file {} does not exist. Assurance of Pardon must be manually posted...".format(
-            filelist.OldAssuranceFilename))
-    except:
-            print("Assurance of Pardon file {} exists. Rename not performed...".format(
-            filelist.OldAssuranceFilename))
-
-    try:
-        # --- rename the Old Confession of Sin file
-        if os.path.isfile(filelist.ConfessionFilename):
-            os.replace(filelist.OldConfessionFilename, filelist.ConfessionFilename)
-        else:
-            print("Confession of Sin file {} does not exist. Confession of Sin must be manually posted...".format(
-            filelist.OldConfessionFilename))
-    except:
-            print("Confession of Sin file {} exists. Rename not performed...".format(
-            filelist.OldConfessionFilename))
-
-    try:
-        # --- rename the Old Worship Schedule file
-        if os.path.isfile(filelist.WorshipScheduleFilename):
-            os.replace(filelist.OldWorshipScheduleFilename, filelist.WorshipScheduleFilename)
-        else:
-            print("Worship Schedule file {} does not exist. Worship Schedule must be manually posted...".format(
-            filelist.OldWorshipScheduleFilename))
-    except:
-            print("Worship Schedule file {} exists. Rename not performed...".format(
-            filelist.OldWorshipScheduleFilename))
-
-    try:# --- rename the Old text Bulletin File
-        if os.path.isfile(filelist.TextBulletinFilename):
-            os.replace(filelist.OldTextBulletinFilename, filelist.TextBulletinFilename)
-        else:
-            print("Bulletin file {} does not exist. Bulletin posted message must be manually posted...".format(
-            filelist.OldTextBulletinFilename))
-    except:
-            print("Bulletin file {} exists. Rename not performed...".format(
-            filelist.OldTextBulletinFilename))
-
-    # --- rerun the main process
-    status_message = monitorfiles.filechecker()
-    print(status_message)
-
-    return (status_message)
-
-
-# --- End of rerun processing
-
-# ------------Start -  Re-run the OpenSong proces
-def updateprocess():
-    # --- Use the '$update' command to modify the content of  previous post for this week's processing
-    # --- Check if there is a new file first; if there is, use it, otherwise use the archive file
-    print("\n !!!OpenSong update processing starting at", getdatetime.currentdatetime())
-
-    # --- read the bulletin date file
-    textFile = open(filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
-    bulletin_date = textFile.read()  # --- read the first line from the file
-    textFile.close()
-
-    # --- get current date
-    current_date = getdatetime.currentdate()  # --- get today's date
-    # --- parse the date from the bulletin date file
-    returned_date = getdatetime.parsedates(bulletin_date)
-
-    # --- compare dates
-    if current_date > returned_date:  # --- Bulletin has already been processed
-        print('\nCurrent Date ', current_date, ' is later than Bulletin date=', returned_date)
-        monitorfiles.filechecker()  # --- continue with normal processing
-        return ()
-    else:
-        print('\nBulletin Date ', bulletin_date, ' is later than Current Date=', current_date)
-
-    if os.path.isfile(filelist.AssuranceFilename):  # --- new / updated file exists
-        pass
-    else:
-        if os.path.isfile(filelist.OldAssuranceFilename):  # --- archive file exists and will be renamed to current
-            os.replace(filelist.OldAssuranceFilename, filelist.AssuranceFilename)
-        else:
-            print("Assurance of Pardon file {} does not exist. Assurance of Faith must be posted...".format(
-                filelist.OldAssuranceFilename))
-
-    # --- check the Confession of Sin file
-    if os.path.isfile(filelist.ConfessionFilename):
-        pass
-    else:
-        if os.path.isfile(filelist.OldConfessionFilename):
-            os.replace(filelist.OldConfessionFilename, filelist.ConfessionFilename)
-        else:
-            print("Confession of Sin file {} does not exist. Confession of Sin must be posted...".format(
-                filelist.OldConfessionFilename))
-
-    # --- Check the Worship Schedule file
-    if os.path.isfile(filelist.WorshipScheduleFilename):
-        pass
-    else:
-        if os.path.isfile(filelist.OldWorshipScheduleFilename):
-            os.replace(filelist.OldWorshipScheduleFilename, filelist.WorshipScheduleFilename)
-        else:
-            print("Worship Schedule file {} does not exist. Worship Schedule must be posted...".format(
-                filelist.OldWorshipScheduleFilename))
-
-    # --- Check for the text Bulletin File
-    if os.path.isfile(filelist.TextBulletinFilename):
-        pass
-    else:
-        if os.path.isfile(filelist.OldTextBulletinFilename):
-            os.replace(filelist.OldTextBulletinFilename, filelist.TextBulletinFilename)
-        else:
-            print("Bulletin file {} does not exist. New Bulletin text file must be posted...".format(
-                filelist.OldTextBulletinFilename))
-
-    # --- rerun the main process
-    monitorfiles.filechecker()
-
-    return ()
-
-
-# --- End of rerun processing
 
 def main():
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================

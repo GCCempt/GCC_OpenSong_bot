@@ -6,11 +6,13 @@ import xml.etree.ElementTree as ET
 import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime
 
-
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
+song_path = 'songs/'
 # ------------ Start Add Song function -
 def addsong(songname):
     # -------------- Read the contents of the new song lyrics into a list -----------------------------
-    textFile = open(filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = textFile.readlines()  # --- read the file into a list
 
     # --- ensure the text lines start with ' '; other lines remain as is
@@ -29,13 +31,13 @@ def addsong(songname):
     # --- Open the Template Song and load into XML document tree -----------------------------
     print('\nMaintainSong.buildsong() ', songname, 'Current Working Directory:', os.getcwd())
 
-    datasource = open(filelist.SongTemplate, 'rb')  # --- read the XML song template
+    datasource = open(song_path + filelist.SongTemplate, 'rb')  # --- read the XML song template
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
 
     # --- Read the contents of the lyrics text file -----------------------------
-    textFile = open(filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
     newsong_lyrics = textFile.read()  # --- read the file into a string
 
     root = doctree.getroot()
@@ -50,7 +52,7 @@ def addsong(songname):
         print(child.tag, child.attrib, child.text)
 
     # --- write the new song to the OpenSong songs folder
-    os.chdir(filelist.songpath)  # -- change to the Songs directory
+    os.chdir(song_path + filelist.songpath)  # -- change to the Songs directory
     # --- check if the song already exists
     if os.path.isfile(songname):
         status_message = 'This song already exists: {} Try a different name...'.format(songname)
@@ -67,8 +69,6 @@ def addsong(songname):
             # print("New Song created: {}...".format(songname))
             print(status_message)
 
-    os.chdir(filelist.bulletinpath)  # -- change to the Bulletin directory
-
     # --- execute the rsync process to upload the song to the website
     subprocess.Popen(
         '/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process to upload the set to the website
@@ -81,7 +81,7 @@ def addsong(songname):
 # ------------Start -  Write Song
 def updatesong(songname):
     # -------------- Read the contents of the new song lyrics into a list -----------------------------
-    textFile = open(filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(song_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = textFile.readlines()  # --- read the file into a list
 
     # --- ensure the text lines start with ' '; other lines remain as is
@@ -100,13 +100,13 @@ def updatesong(songname):
     # --- Open the Template Song and load into XML document tree -----------------------------
     print('\nMaintainSong.buildsong() ', songname, 'Current Working Directory:', os.getcwd())
 
-    datasource = open(filelist.SongTemplate, 'rb')  # --- read the XML song template
+    datasource = open(bulletin_path + filelist.SongTemplate, 'rb')  # --- read the XML song template
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
 
     # --- Read the contents of the lyrics text file -----------------------------
-    textFile = open(filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
     newsong_lyrics = textFile.read()  # --- read the file into a string
 
     root = doctree.getroot()
@@ -121,22 +121,19 @@ def updatesong(songname):
         print(child.tag, child.attrib, child.text)
 
     # --- write the new song to the OpenSong songs folder
-    os.chdir(filelist.songpath)  # -- change to the OpenSong Songs directory
 
     # --- check if the song already exists
-    if not os.path.isfile(songname):
+    if not os.path.exists(song_path + songname):
         status_message = 'Unable to update - this song does not exists: {} Try a different name...'.format(songname)
         print(status_message)
         return (status_message)
     else:
         # --- https://stackoverflow.com/questions/39262455/how-to-write-xml-declaration-into-xml-file
-        with open(songname, 'wb') as f:
+        with open(song_path + songname, 'wb') as f:
             f.write(b'<?xml version="1.0" encoding="UTF-8"?>')
             doctree.write(f, xml_declaration=False, encoding='utf-8')
             status_message = 'Song updated: {}...'.format(songname)
             print(status_message)
-
-    os.chdir(filelist.bulletinpath)  # -- change to the Bulletin directory
 
     # --- execute the rsync process to upload the song to the website
     subprocess.Popen(

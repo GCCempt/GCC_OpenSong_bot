@@ -1,5 +1,9 @@
 # ---- function to perform basic test Discord Bot functionality
 import utils
+import readworshipschedule
+
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
 
 
 def run_test_scripts():
@@ -13,6 +17,7 @@ def run_test_scripts():
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
     print('\nGenerated Set Name=', os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship')
+
 
     #--- cleanup any residual files before beginning processing
     cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
@@ -31,6 +36,9 @@ def run_test_scripts():
     # --- test the restore files process to be able to rerun the entire process
     print('\nTest Script #2 - build worship schedule')
     status_message = build_worship_schedule_file()
+
+    readworshipschedule.readWS()  # read the worship schedule file extracted from discord and write the songs.txtfile
+
     print(status_message)
 
     print('\nTest Script #3 - Post the bulletin')
@@ -55,9 +63,17 @@ def run_test_scripts():
     print('\nTest Script #7 - Cleanup')
     cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
 
+    #--- clean up the set file if running in DEV
+    try:
+        if os.environ['ENVIRON'] == 'DEV':
+            setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
+            os.remove(set_path + setNameAttrib)
+    except:
+            print("DEV Set File {} does not exist. Procesing will continue....".format(setNameAttrib))
+
     #--- end testing script
-    status_message = '\nEnd-to_end Testing Script completed!'
-    print(status_message)
+    status_message = '\nEnd-to-end Testing Script completed!'
+    #print(status_message)
     return(status_message)
 
 # ---- end of testscript functionality 
@@ -134,7 +150,7 @@ def build_message_file():
                 As a father shows compassion to his children, so the LORD shows compassion to those who fear him."
 
  # --- write a dummy message.txt file -----
-    textFile = open(filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(message_text)
     textFile.close()
 
@@ -162,7 +178,7 @@ def build_worship_schedule_file():
     \n* By Faith - V1 V2 C V3 V4 C V5 C C T"
 
     # --- write a dummy message.txt file -----
-    textFile = open(filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(worship_text)
     textFile.close()
    
@@ -179,7 +195,7 @@ def build_sermon_info_file():
         \nSample Message: The Gospel Mentality” (Galatians 3:1–14)"
 
     # --- write a dummy sermoninfo.txt file -----
-    textFile = open(filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(sermon_info_text)
     textFile.close()
    
