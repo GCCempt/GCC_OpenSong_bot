@@ -22,7 +22,8 @@ def split_on_number(text):
             else:
             #--- validity check to ensure this verse is an increment of the previous
                 int_i = int(i)
-                if int_i == prev_verse + 1:        #--- check if the new "verse" i 1 greater than the previous
+                #--- check if the new "verse" i 1 greater than the previous or if reset to 1 (indicates a chapter change)
+                if int_i == prev_verse + 1 or int_i == 1:        
                     final.append(i)
                     # print(final)
                     prev_verse = int(i)      #--- save the current verse number
