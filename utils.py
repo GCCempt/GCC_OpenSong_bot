@@ -1,11 +1,14 @@
 # Utility functions that could be re-used elsewhere
+import datetime
 import logging
 import re
 from abc import ABC
 from html.parser import HTMLParser
+from random import randint, choice
 from urllib import parse, request
 
 import discord
+import names
 
 
 def parse_songs_from_file(worship_schedule):
@@ -28,10 +31,11 @@ def parse_songs_from_file(worship_schedule):
         return 'No songs found.'
     for index, song in enumerate(worship_text):
         # Build a list of elements after "Songs" is found.
-        if "Hymn" in song:
-            stripped_song = song.rsplit("-", 1)
-            stripped_song = stripped_song[0].strip("Hymn:")
-            formatted_song_list.append(stripped_song.strip())
+        if "Hymn:" in song:
+            if song.startswith("Hymn:"):
+                stripped_song = song.rsplit("-", 1)
+                stripped_song = stripped_song[0].strip("Hymn:")
+                formatted_song_list.append(stripped_song.strip())
         if index > worship_text.index('Songs\n'):
             stripped_song = song.rsplit("-", 1)
             stripped_song = stripped_song[0].strip("* ")
@@ -262,3 +266,47 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
                 book_chapter, ref = passage_ref.split(':', 1)
                 # hold_book_chapter = str(book_chapter) + ':'
     return full_ref_passages
+
+
+def generate_song_name():
+    song_dict = generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    # Generate a Song
+    if '/opensongv2/' in song_dict:
+        song_dict.pop('/opensongv2/')
+    keys = list(song_dict.keys())
+    song_suffix = ' -'
+    chars = ['V', 'C', 'T', 'B', 'E', 'X', 'P', 'O', 'I']
+    # Generate pseudo-random opensong stuff
+    for char in range(randint(4, 8)):
+        song_suffix += " " + choice(chars) + str(randint(0, 9))
+    song_name = choice(keys) + song_suffix
+    # Reset the suffix
+    suffix = ' -'
+
+    return song_name
+
+
+def generate_random_worship_schedule(filename):
+    # Get a random date.
+    date = (datetime.date.today() + datetime.timedelta(randint(1, 1000))).strftime("%m/%d/%y")
+    text = "Worship Schedule " + str(date) + "\n\n"
+    prefix = ["Mr.", "Mrs", "Ms.", "Dr.", "Pastor"]
+    text += "Worship Leader: " + choice(prefix) + " " + names.get_full_name() + "\n"
+    text += "Speaker: " + choice(prefix) + " " + names.get_full_name() + "\n"
+    text += "Hymn: " + generate_song_name() + "\n"
+    text += "\n"
+    text += "Praise Team\n"
+    text += choice(prefix) + " " + names.get_first_name() + ", " + names.get_first_name() + "\n"
+    text += "\n"
+    text += "Computer: " + choice(prefix) + " " + names.get_last_name() + "\n"
+    text += "Sound: " + names.get_first_name() + "\n"
+    text += "Camera: " + names.get_first_name() + "\n"
+    text += "\n"
+    text += "Songs\n"
+    # Finish with random number of songs
+    for number in range(randint(1, 5)):
+        text += "* " + generate_song_name() + "\n"
+    f = open(filename, 'w')
+    f.writelines(text)
+    f.close()
+    return filename
