@@ -4,10 +4,9 @@ import sys
 import startup_validation
 import mydiscord
 
-
 def main():
     for arg in sys.argv[1:]:
-        print('Argumeents passed:', arg)
+        print('Arguments passed:', arg)
         if 'testing' in arg:
             print('\nStart up argument=', arg)
             mydiscord.read_discord('testing')  # --- start the Discord bot with the "testing" argument
@@ -20,6 +19,7 @@ def main():
 
     #---  start the discord Bot
     mydiscord.read_discord('normal')
+
 
 # --- End of function main()
 

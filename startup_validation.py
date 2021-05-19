@@ -12,7 +12,7 @@ def run_test_scripts():
     import monitorfiles
     import os
     import filelist
-    from opensong import cleanup
+    from monitorfiles import cleanup, set_cleanup
 
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
@@ -21,6 +21,7 @@ def run_test_scripts():
 
     #--- cleanup any residual files before beginning processing
     cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
+    set_cleanup     #--- clean up the OpenSong set file if running in DEV
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - mydiscord.parsemessages')

@@ -5,6 +5,7 @@ import getdatetime
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
 import sftp_files   #-- my module to call pysftp
 import dropbox_api_call #--- my module to call Dropbox API
+import monitorfiles
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
@@ -45,7 +46,6 @@ def processfiles(doctree):
     # -------------- Read the contents of the Call To Worship text file -----------------------------
     textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
-    #print('opensong.processfiles - call to worship body_text =', body_text)
 
     slide_group_name = 'Call to Worship'
     body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides
@@ -80,7 +80,6 @@ def processfiles(doctree):
 
     # --- split the text based on period '.'
     body_text = split_keep(body_text)  # --- call my function to split the string into lines, delimited by '.'
-    # print('OpenSong.processfiles - body_text=', body_text)
     body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
 
     try:
@@ -160,95 +159,12 @@ def processfiles(doctree):
     status_message = writeXMLSet(doctree)
 
     # ---- clean up the intermediary files after processing completes successfully
-    cleanup()
+    monitorfiles.cleanup()
 
     return (status_message)
 
 
 # ------------End -  Process files with extracted bulletin information
-
-# ------------Start -  cleanup process i.e. rename / delete files
-def cleanup():
-    import os
-    import monitorfiles
-    import os.path
-    from os import path
-
-    file_list = []
-    bulletin_path ='bulletin/'
-
-    current_working_directory = os.getcwd()
-    print('\nStart File Clean up process. Current Working Directory:', current_working_directory)
-
-    file_name = bulletin_path + filelist.SongsFileName
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.PDFBulletinFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.TextBulletinFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.WorshipScheduleFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.AssuranceFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.ConfessionFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.SermonInfoFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.CurrentStatusFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.DiscordMessageFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.BulletinDateFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.SetFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.AffirmationFileName
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.AnnouncementFileName
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.HTMLBulletinFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.BulletinSermonFilename
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.CallToWorshipFileName
-    file_list.append(file_name)
-
-    file_name = bulletin_path + filelist.TextPDFBulletinFilename
-    file_list.append(file_name) 
-
-    file_name = bulletin_path + filelist.ScriptureFileName
-    file_list.append(file_name) 
-
-    file_name = bulletin_path + filelist.HTMLSermonScriptureFilename
-    file_list.append(file_name) 
-
-    for file in file_list:
-        if os.path.exists(file):
-            try:
-                os.remove(file)
-            except:
-                print('\nUnable to remove file {}..'.format(file))
-
-    #--- update the current status
-    status_message = monitorfiles.filechecker()  # --- update the status file
-
-    return (status_message)
-# ------------End  -  cleanup process
 
 # ------------Start -  Process Songs
 def processsongs(doctree):
