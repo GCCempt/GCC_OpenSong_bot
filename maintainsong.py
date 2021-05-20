@@ -149,17 +149,19 @@ def updatesong(songname):
 
 
 # ------------ Start Dislay Set function -  send link to song
-def displaySet(setDate=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
+def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
     from abc import ABC
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
     from urllib.request import urlopen, Request
     from fuzzywuzzy import fuzz
 
-    # setDate = str(getdatetime.nextSunday())         #--- get next Sunday date to build the set name
-    # print('\nUsing default date of this Sunday=', setDate)
+    if os.environ['ENVIRON'] == 'PROD':
+        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
+    else:           #--- running in TEST
+        setNameAttrib = os.environ['COMPUTERNAME'] 
 
-    query = setDate  # --  this is the fuzzy varible for the the set search
+    query = setNameAttrib  # --  this is the fuzzy varible for the the set search
     print('\nSet Lookup date=', query)
 
     # Directory we're checking
@@ -223,16 +225,12 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
     SetName = SetName.lstrip()
     SetName = SetName.rstrip()
     SetName = SetName.replace('%20', '@')
-    print('\nBS4BuildSetSummary - SetName=', SetName)
-    # setpath = '/root/Dropbox/OpenSongV2/OpenSong Data/Sets'
-    print('\nSetpath=', filelist.setpath)
+
+    setpath = 'sets/'
 
     # -------------- Open the Template Set and load into XML document tree -----------------------------
-    wk_dir = os.getcwd()
-    print('\nStart BS4BuildSetSummary - current working directory: ', wk_dir)
-    if 'bulletin' in wk_dir:
-        os.chdir('../sets')  # -- change to the Sets directory
-        print('\nBS4BuildSetSummary - changed working directory: ', os.getcwd())
+    SetName = setpath + SetName
+    print('\nBS4BuildSetSummary - SetName=', SetName)
 
     # --- test finding the set file
     datasource = open(SetName, 'rb')

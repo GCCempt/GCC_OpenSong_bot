@@ -12,7 +12,7 @@ def run_test_scripts():
     import monitorfiles
     import os
     import filelist
-    from opensong import cleanup
+    from monitorfiles import cleanup, set_cleanup
 
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
@@ -20,7 +20,8 @@ def run_test_scripts():
 
 
     #--- cleanup any residual files before beginning processing
-    cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
+    #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
+    #set_cleanup()     #--- clean up the OpenSong set file if running in DEV
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - mydiscord.parsemessages')
@@ -61,19 +62,12 @@ def run_test_scripts():
 
     #--- cleanup after yourself - remove files which were created for the validation process
     print('\nTest Script #7 - Cleanup')
-    cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
-
-    #--- clean up the set file if running in DEV
-    try:
-        if os.environ['ENVIRON'] == 'DEV':
-            setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
-            os.remove(set_path + setNameAttrib)
-    except:
-            print("DEV Set File {} does not exist. Procesing will continue....".format(setNameAttrib))
-
+    #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
+    #set_cleanup()
+  
     #--- end testing script
     status_message = '\nEnd-to-end Testing Script completed!'
-    #print(status_message)
+    print(status_message)
     return(status_message)
 
 # ---- end of testscript functionality 

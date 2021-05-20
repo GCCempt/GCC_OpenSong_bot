@@ -3,23 +3,19 @@
 import sys
 import startup_validation
 import mydiscord
-
+import threading
+from schedule_tasks import scheduled_cleanup
 
 def main():
-    for arg in sys.argv[1:]:
-        print('Argumeents passed:', arg)
-        if 'testing' in arg:
-            print('\nStart up argument=', arg)
-            mydiscord.read_discord('testing')  # --- start the Discord bot with the "testing" argument
-        else:
-            continue
-    print('\nNormal start - no argument provided')
+    # --- schedule the weekly file cleanup  on a separate thread
+    #t1 = threading.Thread(target=scheduled_cleanup, name='cleanup')
 
     # --- call the test / validation script as the first thing before the bot starts
     startup_validation.run_test_scripts()
-
+   
     #---  start the discord Bot
-    mydiscord.read_discord('normal')
+    mydiscord.read_discord()
+
 
 # --- End of function main()
 

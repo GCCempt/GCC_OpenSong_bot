@@ -2,6 +2,11 @@
         
 def main():
     import passagelookup
+    import monitorfiles
+
+    status_message = monitorfiles.statusheck()
+    print('\nStatus Check=', status_message)
+    return()
 
     #---    test multi-part scripture ref
 
