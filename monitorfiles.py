@@ -160,7 +160,7 @@ def statuscheck():
 
     current_date_time = str(getdatetime.currentdatetime())
 
-    setNameAttrib = generate_set_name
+    setNameAttrib = generate_set_name()
 
     status_message = 'Status check process started at:' + current_date_time + '\n for: ' + setNameAttrib + '\n'
 
