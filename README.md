@@ -1,4 +1,3 @@
-[![CodeQL](https://github.com/GCCempt/GCC_OpenSong_bot/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/GCCempt/GCC_OpenSong_bot/actions/workflows/codeql-analysis.yml)
 # GCCOpenSongBot
 ## Automate OpenSong processing
 
@@ -39,6 +38,7 @@
 | FTP_PASSWORD         | Password for sFTP Access                                                                              |
 | ESV_API_KEY          | API key to https://api.esv.org                                                                        |
 | ENVIRON              | PROD or DEV                                                                                           |
+| COMPUTERNAME         | For use in Dev environements for creation of the set
 
 #### File Descriptions
 | Python   File Name     | Description                                                                                                                                                                |
