@@ -158,11 +158,7 @@ def processfiles(doctree):
     # --- call the write xml set function to write the new xml set file
     status_message = writeXMLSet(doctree)
 
-    # ---- clean up the intermediary files after processing completes successfully
-    monitorfiles.cleanup()
-
     return (status_message)
-
 
 # ------------End -  Process files with extracted bulletin information
 

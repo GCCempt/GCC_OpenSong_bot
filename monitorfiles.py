@@ -246,16 +246,20 @@ def cleanup():
     file_name = bulletin_path + filelist.HTMLSermonScriptureFilename
     file_list.append(file_name) 
 
-    for file in file_list:
-        if os.path.exists(file):
-            try:
-                os.remove(file)
-            except:
-                print('\nUnable to remove file {}..'.format(file))
+    print('\nFile Cleanup list build completed!')
+
+    for myfile in file_list:
+        #if os.path.exists(myfile):
+        try:
+            os.remove(myfile)
+            print('\nFile cleanup - file removed', myfile)
+        except:
+            print('\nUnable to remove file {}..'.format(myfile))
 
     #--- update the current status
-    status_message = monitorfiles.filechecker()  # --- update the status file
-
+    #status_message = monitorfiles.filechecker()  # --- update the status file
+    status_message = 'File Cleanup completed'
+    print(status_message)
     return (status_message)
 # ------------End  -  cleanup process
 

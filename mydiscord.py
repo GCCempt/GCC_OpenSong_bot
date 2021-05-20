@@ -34,7 +34,7 @@ bulletin_path = 'bulletin/'
 # ------------ How to code a Discord Bot
 # https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
 
-def read_discord(arg):
+def read_discord():
     print("\n !!!Hello world - OpenSong Discord Client starting at", getdatetime.currentdatetime())
 
     @client.event
@@ -47,8 +47,8 @@ def read_discord(arg):
         # for x in status_message:  # --- print the status message
         #    print(x)
 
-        status_message = monitorfiles.filechecker()  # --- status message returned as a 'string' ***********
-        print(status_message)
+        #status_message = monitorfiles.filechecker()  # --- status message returned as a 'string' ***********
+        #print(status_message)
 
     @client.event
     async def on_message(message):
@@ -92,6 +92,8 @@ def read_discord(arg):
                     set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
 
                     if len(set_matches) == 0:
+                        set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
+
                         status_message = '\nNo sets matching: {} found!'.format(set_date)
                         await message.channel.send(status_message)
                     else:
@@ -162,6 +164,8 @@ def read_discord(arg):
                         set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
 
                         if len(set_matches) == 0:
+                            set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
+
                             status_message = '\nNo sets matching: {} found!'.format(set_date)
                             await message.channel.send(status_message)
                         else:
@@ -527,8 +531,8 @@ def parsemessage():
 
 def main():
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
-    print('\nNormal start - no argument provided')
-    read_discord('normal')
+    #--- Execute the main function
+    read_discord()
     return ()
 
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
