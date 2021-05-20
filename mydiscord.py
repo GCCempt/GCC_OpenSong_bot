@@ -233,7 +233,7 @@ def read_discord():
             elif '/version' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
                                                                                                          '').replace(
                 '\t', '').lower():
-                status_message = '\nOpenSong Discord Version 2.0.0\n'
+                status_message = '\nOpenSong Discord Version 1.03\n'
                  
                 # --- post status message
                 await message.channel.send(status_message)
