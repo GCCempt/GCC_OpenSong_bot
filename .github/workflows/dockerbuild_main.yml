@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: gccempt/bot:gcc_dev
+          tags: gccempt/bot:gcc_main
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
