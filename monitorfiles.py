@@ -187,7 +187,7 @@ def cleanup():
     bulletin_path ='bulletin/'
     set_path = 'sets/'
 
-    print('\nStart File Clean up processing started!')
+    status_message = '\nStart File Clean up processing started!\n'
 
     file_name = bulletin_path + filelist.SongsFileName
     file_list.append(file_name)
@@ -246,36 +246,43 @@ def cleanup():
     file_name = bulletin_path + filelist.HTMLSermonScriptureFilename
     file_list.append(file_name) 
 
-    print('\nFile Cleanup list build completed!')
-
     for myfile in file_list:
-        #if os.path.exists(myfile):
         try:
             os.remove(myfile)
-            print('\nFile cleanup - file removed', myfile)
         except:
-            print('\nUnable to remove file {}..'.format(myfile))
+            status_message = status_message + '\nUnable to remove file {}..'.format(myfile)
 
     #--- update the current status
     #status_message = monitorfiles.filechecker()  # --- update the status file
-    status_message = 'File Cleanup completed'
-    print(status_message)
+    status_message = status_message + 'File Cleanup completed'
+
     return (status_message)
 # ------------End  -  cleanup process
 
 # ------------Start -  cleanup process i.e. rename / delete files
 def set_cleanup():
     #--- clean up the OpenSong set
+    status_message = '\nSet Cleanup process started'
     setNameAttrib = ''
     if os.environ['ENVIRON'] == 'DEV':
-        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
+        setNameAttrib = os.environ['COMPUTERNAME'] 
         file_name = set_path +  setNameAttrib + ' GCCEM Sunday Worship'
 
         if os.path.exists(file_name):
             try:
                 os.remove(file_name)
+                status_message = status_message + '\nSet removed {}'.fornat(file_name)
             except:
-                print('\nUnable to remove file {}..'.format(file_name))  
+                status_message = status_message + '\nUnable to remove file {}..'.format(file_name)
+  
+
+    #--- clean up the OpenSong processing files
+    cleanup_status = cleanup()
+    status_message = status_message + cleanup_status
+
+    print(status_message)
+
+    return(status_message)
  
 # ------------End  -  set_cleanup process
 

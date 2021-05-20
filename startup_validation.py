@@ -63,7 +63,7 @@ def run_test_scripts():
     #--- cleanup after yourself - remove files which were created for the validation process
     print('\nTest Script #7 - Cleanup')
     #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
-    #set_cleanup()
+    set_cleanup()
   
     #--- end testing script
     status_message = '\nEnd-to-end Testing Script completed!'
