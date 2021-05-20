@@ -16,8 +16,7 @@ def run_test_scripts():
 
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
-    print('\nGenerated Set Name=', os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship')
-
+    print('\nRuntime Environment=', os.environ['ENVIRON'])
 
     #--- cleanup any residual files before beginning processing
     #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
@@ -62,7 +61,6 @@ def run_test_scripts():
 
     #--- cleanup after yourself - remove files which were created for the validation process
     print('\nTest Script #7 - Cleanup')
-    #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
     set_cleanup()
   
     #--- end testing script
@@ -107,12 +105,7 @@ def test_displayset(message='/displayset'):
     print(status_text)
     set_matches = {}
 
-    if os.environ['ENVIRON'] == 'PROD':
-        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
-    else:           #--- running in TEST
-        setNameAttrib = os.environ['COMPUTERNAME']        #--- set default dummy set name for TEST
-
-    setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
+    setNameAttrib = utils.generate_set_name()        #--- get the generated set name
 
     set_matches = maintainsong.displaySet(setNameAttrib)
 

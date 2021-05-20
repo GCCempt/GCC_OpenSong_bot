@@ -3,6 +3,7 @@
 # --- https://veteransec.com/2020/05/08/python-script-to-monitor-website-changes/
 # --- https://www.geeksforgeeks.org/python-script-to-monitor-website-changes/
 import os
+from utils import generate_set_name
 import readbulletin
 import opensong
 import downloadbulletin
@@ -159,10 +160,7 @@ def statuscheck():
 
     current_date_time = str(getdatetime.currentdatetime())
 
-    if os.environ['ENVIRON'] == 'PROD':
-        setNameAttrib = bulletin_date + ' GCCEM Sunday Worship'
-    else:
-        setNameAttrib = os.environ['COMPUTERNAME'] + ' GCCEM Sunday Worship' 
+    setNameAttrib = generate_set_name
 
     status_message = 'Status check process started at:' + current_date_time + '\n for: ' + setNameAttrib + '\n'
 
@@ -261,20 +259,22 @@ def cleanup():
 
 # ------------Start -  cleanup process i.e. rename / delete files
 def set_cleanup():
+    from utils import generate_set_name
+
     #--- clean up the OpenSong set
     status_message = '\nSet Cleanup process started'
-    setNameAttrib = ''
-    if os.environ['ENVIRON'] == 'DEV':
-        setNameAttrib = os.environ['COMPUTERNAME'] 
-        file_name = set_path +  setNameAttrib + ' GCCEM Sunday Worship'
+    print(status_message)
+    
+    setNameAttrib = generate_set_name()
+    file_name = set_path +  setNameAttrib
 
-        if os.path.exists(file_name):
-            try:
-                os.remove(file_name)
-                status_message = status_message + '\nSet removed {}'.fornat(file_name)
-            except:
-                status_message = status_message + '\nUnable to remove file {}..'.format(file_name)
-  
+    if os.path.exists(file_name):
+        try:
+            os.remove(file_name)
+            status_message = status_message + '\nSet removed {}'.fornat(file_name)
+        except:
+            status_message = status_message + '\nUnable to remove file {}..'.format(file_name)
+ 
 
     #--- clean up the OpenSong processing files
     cleanup_status = cleanup()

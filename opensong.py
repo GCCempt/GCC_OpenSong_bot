@@ -1,4 +1,5 @@
 # ------------ Start Build OpenSong Set function - last updated 03/02/2021 by Steve Rogers
+from utils import generate_set_name
 import filelist  # --- definition of list of files and directories used in the proces
 import os
 import getdatetime
@@ -268,16 +269,11 @@ def processsongs(doctree):
 # ------------Start -  Write the new XML set
 def writeXMLSet(doctree):
     import xml.etree.ElementTree as ET
+    from utils import generate_set_name
 
     set_path = 'sets/'
 
-    # --- rename the template set "set" tag
-    if os.environ['ENVIRON'] == 'PROD':
-        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
-    else:           #--- running in TEST
-        setNameAttrib = os.environ['COMPUTERNAME']        #--- set default dummy set name for TEST
-    
-    setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
+    setNameAttrib = generate_set_name()
 
     myroot = doctree.getroot()  # --- XML document tree passed as a parameter
 
@@ -297,7 +293,7 @@ def writeXMLSet(doctree):
     dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
 
     #--- push the html files to the website
-    if os.environ['ENVIRON'] == 'PROD':
+    if os.environ['ENVIRON'] == 'PROD'or os.environ['ENVIRON'] == 'MAINDEV':
         file_type = 'bulletin'
         sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
         sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file

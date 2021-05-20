@@ -9,6 +9,7 @@ from urllib import parse, request
 
 import discord
 import names
+import os
 
 
 def parse_songs_from_file(worship_schedule):
@@ -310,3 +311,20 @@ def generate_random_worship_schedule(filename):
     f.writelines(text)
     f.close()
     return filename
+
+#--- generate the OpenSong Set name to be used by various functions
+def generate_set_name():
+    from getdatetime import nextSunday
+   
+    # get the environment variables
+    runtime_env = os.environ['ENVIRON']
+    computer_name = os.environ['COMPUTERNAME']
+    
+    if runtime_env == 'PROD':
+        setNameAttrib = str(nextSunday())  # --- get the "upcoming" Sunday date
+    else:           #--- running in TEST
+        setNameAttrib = computer_name        #--- set default dummy set name for NON-PROD environments
+
+    setname = setNameAttrib + ' GCCEM Sunday Worship'
+
+    return(setname)     #--- return the generated set name
