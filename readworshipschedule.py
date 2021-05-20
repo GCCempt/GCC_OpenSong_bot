@@ -2,18 +2,20 @@
 # --- Definitions for files and directories used in the process
 import filelist  # --- definition of list of files and directories used in the proces
 
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
 
 def readWS():
     import pickle
     import numpy as np
+    import os
 
     # print('\nReadWorshipSchedule - file name: ' + filelist.WorshipScheduleFilename)
     songs = []  # --- array to hold the worship songs and presentation order for each song extracted from Discord into a file
-    # print(songs)
-
+ 
     # ----- read the worship schedule file extracted from Discord into a list / array
 
-    textFile = open(filelist.WorshipScheduleFilename, 'r')
+    textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'r')
     lines = textFile.readlines()
 
     count = 0
@@ -57,21 +59,12 @@ def readWS():
 
         count += 1
 
-    # print('\nEnd of Read Worship Schedule function:\n', songs)
-
-    # --- write the songs 2-dimensional list to a file
-    # print('\nSongs=', songs)
-    np.savetxt(filelist.SongsFileName, songs,
+    np.savetxt(bulletin_path + filelist.SongsFileName, songs,
                fmt='%s')  # --- use numpy module to write 2-dimensional list of songs to file
 
-    # --- read the numpy file to validate contents
-    # y = np.loadtxt(filelist.SongsFileName, dtype=np.object)
-    # y = y.tolist()
-    # y = np.fromfile(filelist.SongsFileName, count=-1, sep=',')
-
-    textFile = open(filelist.SongsFileName, 'r')
-    lines = textFile.readlines()
-    textFile.close()
+    #textFile = open(bulletin_path + filelist.SongsFileName, 'r')
+    #lines = textFile.readlines()
+    #textFile.close()
 
     # print('\nSongs File read=',lines)
     # for i in lines:
@@ -85,7 +78,7 @@ def parsesong(songs, line):
     # print('\nParseSong - line: ', line)
     song_name, presentation_order = line.rsplit('-', 1)  # --- split line at 2nd occurrence of '-'
 
-    # print('\nParseSong - song_name:', song_name, ' presentation_order:', presentation_order)
+    # print('\nParseSong - url:', url, ' presentation_order:', presentation_order)
 
     try:
         song_name = song_name.strip('*')  # --- remove leading '*' if found
@@ -94,13 +87,13 @@ def parsesong(songs, line):
 
     song_name = song_name.strip()  # --- remove leading and trailing spaces
     presentation_order = presentation_order.strip().replace(', ', ' ')  # --- remove leading and trailing spaces
-    # worship_set.append['Slide group name'(song_name, presentation_order)
+    # worship_set.append['Slide group name'(url, presentation_order)
     song_name = song_name + ' - '  # add a deliminter back after the song name for parsing after the file is written
 
     songs.append(
         [song_name, presentation_order])  # --- update list to hold the worship songs and presentation order for each
 
-    # print('\nParseSong - Song Name:', song_name, ' Presentation Order:', presentation_order)
+    # print('\nParseSong - Song Name:', url, ' Presentation Order:', presentation_order)
     # print(songs)
 
     return (songs)

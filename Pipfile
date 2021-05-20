@@ -18,6 +18,9 @@ python-dotenv = "*"
 requests = "*"
 python-levenshtein = "*"
 lxml = "*"
+names = "*"
+pytest = "*"
+schedule = "*"
 
 [dev-packages]
 

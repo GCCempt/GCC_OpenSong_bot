@@ -4,6 +4,8 @@
 import sys
 import requests
 import os
+import utils
+import stringsplit
 
 ESV_API_KEY = os.environ['ESV_API_KEY']
 ESV_API_URL = 'https://api.esv.org/v3/passage/text/'
@@ -28,76 +30,31 @@ def get_esv_text(passage, numbers):
 
     return passages[0].strip() if passages else 'Error: Passage not found'
 
-
 # --- end of GetESVText function
 
-def old_parse_passages(passages):
-    scripture = ''
-    book_chapter = ''
-    passages = passages.replace(',', ';')
-    for p in passages.strip().split(';'):  # split into multiple passages
-        if ':' in p:
-            book_chapter, verse = p.split(':', 1)
-        else:
-            ref = book_chapter.rstrip()
-            p = ref + ':' + p
+#--- funtion to convert scripture references to full scripture text
+def build_scripture_text(input_scripture):
+    scripture_refs = utils.parse_passages(input_scripture)   #--- returns a list of scripture refs
+    #print('\nScripture Refs=', scripture_refs)
+    scripture = ''          #--- stores the raw scripture text from the ESV API
+    final_scripture_list =[]    #--- holds the separated verses
 
+    #--- lookup each individual passage
+    for p in scripture_refs:         #--- look up each passage
         numbers = ('-' in p)
         passage = get_esv_text(p, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
         passage = p + '\n' + passage + '\n'
-        scripture = scripture + passage + '\n'
-    # print('\nparse passage: \n')
-    # print(scripture)
-    return (scripture)  # --- return scripture as a string with newline characters
-
-#--- ensure proper formatting of scripture references
-def parse_passages(input_passages):			#--- input is a string
-    full_ref_passages = []						#--- list to hold the complete scripture references
-
-    passages = input_passages.replace(',', ';')		#--- standarize ';' as scripture separator
-    passages = passages.strip().split(';')	#--- split the string into an array
-
-    #--- get book, chapter, verse
-    hold_book_chapter = ''			#-- save the book and chapter reference
-    book = ''
-    chapter = ''
-    scripture = ''
-    for p in passages:
-        p = p.strip()
-        if ' ' in p:				#--- indicates a references includes book; e.g. 'john '
-            if ':' in p:				#--- indicates a complete references includes book; e.g. 'john 3:'
-                book_chapter, verse = p.split(':', 1)
-                book, chapter = book_chapter.split(' ', 1)
-                hold_book_chapter = book_chapter.strip()	#--- remove leading and trailing spaces
-                passage_ref = hold_book_chapter + ':' + verse
-                full_ref_passages.append(passage_ref)
-            else:
-                passage_ref = hold_book_chapter + ':' + verse   
-                full_ref_passages.append(passage_ref)
-                book, chapter = hold_book_chapter.split(' ', 1)
-        else:
-            if ':' in p:    #--- no book; just chapter and verse(s), e.g. 5:1-3
-                passage_ref = book + ' ' + p
-                full_ref_passages.append(passage_ref)
-                book_chapter, ref = passage_ref.split(':', 1)
-                hold_book_chapter = str(book_chapter) + ':'
-
-            else:
-                verse = p
-                passage_ref = hold_book_chapter + verse
-                full_ref_passages.append(passage_ref)       
-                book_chapter, ref = passage_ref.split(':', 1)
-                #hold_book_chapter = str(book_chapter) + ':'
-
-    #print('\nInput passage=', input_passages, '\n')
-    for p in full_ref_passages:         #--- look up each passage
-        numbers = ('-' in p)
-        passage = get_esv_text(p, numbers).replace('[', '').replace(']', '').replace('–', '-').replace('\n\n  ', ':  ')
-        passage = p + '\n' + passage + '\n'
-        scripture = scripture + passage + '\n'
+        scripture = '\n' + scripture + passage + '\n'
         
-        #print(p)
+        dash_split_verses = stringsplit.split_on_dash(scripture)    #--- returns a list
+
+        #--- convert array to string
+        new_scripture = stringsplit.convertListToString(dash_split_verses)  #--- returns a string
+
+        #print('\nreturn from convertListToString:\n', new_scripture)
+
+        number_split_verses = stringsplit.split_on_number(new_scripture)    # returns a list
+        final_scripture_list = final_scripture_list + number_split_verses
+        scripture = ''      #--- reset the string for holding the ESV passage lookup
     
-    #print('\nComplete passage lookup:\n')
-    #print(scripture)
-    return(scripture)
+    return(final_scripture_list)

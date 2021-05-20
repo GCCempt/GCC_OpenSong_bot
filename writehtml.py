@@ -2,11 +2,14 @@
 import filelist
 import webbrowser
 
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
+
 
 # --- retrieve the content to be included in the HTML file
 def readctw():
     # --- read the call to worship file
-    textFile = open(filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the first line from the file
     textFile.close()
 
@@ -20,7 +23,7 @@ def readctw():
 # --- retrieve the Scripture Reading file
 def readscripture():
     # --- read the Scripture Reading file
-    textFile = open(filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the first line from the file
     textFile.close()
 
@@ -34,7 +37,7 @@ def readscripture():
 # --- retrieve the songs to be included in the HTML file
 def readsongs():
     # --- read the songs file
-    textFile = open(filelist.SongsFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.SongsFileName, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the first line from the file
     textFile.close()
 
@@ -58,7 +61,7 @@ def readsongs():
 # --- retrieve the sermon text to be included in the HTML file
 def readsermon():
     # --- read the sermon text file
-    textFile = open(filelist.SermonInfoFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.SermonInfoFilename, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the file into a list
     textFile.close()
 
@@ -71,7 +74,7 @@ def readsermon():
 # --- retrieve the assurance of pardon text to be included in the HTML file
 def readassurance():
     # --- read the sermon text file
-    textFile = open(filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the file into a list
     textFile.close()
 
@@ -84,7 +87,7 @@ def readassurance():
 # --- retrieve the bulletin date to be included in the HTML file
 def readbulletindate():
     # --- read the sermon text file
-    textFile = open(filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
     status_message = textFile.readlines()  # --- read the first line from the file
     textFile.close()
 
@@ -152,12 +155,9 @@ def buildhtmlcontent():
     message = message.replace('temp', data)
 
     # --- Write the HTML file
-    f = open(filelist.HTMLBulletinFilename, 'w')
+    f = open(bulletin_path + filelist.HTMLBulletinFilename, 'w')
     f.write(message)
     f.close()
-
-    # --- open the default browser and display the HTML file
-    # webbrowser.open_new_tab(filelist.HTMLBulletinFilename)
 
     # --- Call the routine to build the HTML file for the sermon text
     buildSermonScriptureContent()
@@ -171,10 +171,12 @@ def buildSermonScriptureContent():
     import stringsplit
     import stringManip
     import sys
+    import utils
+    import stringsplit
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
     print('\nStarting BuildSermonScriptureContent')
 
-    textFile = open(filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
     text_lines = textFile.readlines()  # --- read the file into a list
     textFile.close()
     scripture_ref = text_lines[1]
@@ -182,7 +184,8 @@ def buildSermonScriptureContent():
     # --- FOR TESTING - OVERRIDE WITH DEFAULT VALUE
     # scripture_ref = 'Galatians 2:1–10; John 3:16'
 
-    passage = passagelookup.parse_passages(scripture_ref)  # --- return value is a string with newlines
+    verses = passagelookup.build_scripture_text(scripture_ref)  # --- returns a list of verses
+    scripture = stringsplit.convertListToString(verses) #--- convert the list to a string
 
     message = data = """<html>
     <head></head>
@@ -194,14 +197,11 @@ def buildSermonScriptureContent():
 
     # --- update the HTML text
     message = message.replace('reference', scripture_ref)
-    message = message.replace('temp', passage)
+    message = message.replace('temp', scripture)
 
     # --- Write the Bulletin Sermon Scripture HTML file
-    f = open(filelist.HTMLSermonScriptureFilename, 'w')
+    f = open(bulletin_path + filelist.HTMLSermonScriptureFilename, 'w')
     f.write(message)
     f.close()
-
-    # --- open the default browser and display the HTML file
-    # webbrowser.open_new_tab(filelist.HTMLSermonScriptureFilename)
 
 # --- end def buildhtmlcontent():

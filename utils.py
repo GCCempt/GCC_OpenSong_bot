@@ -1,5 +1,14 @@
 # Utility functions that could be re-used elsewhere
+import datetime
+import logging
+import re
+from abc import ABC
+from html.parser import HTMLParser
+from random import randint, choice
+from urllib import parse, request
+
 import discord
+import names
 
 
 def parse_songs_from_file(worship_schedule):
@@ -9,6 +18,7 @@ def parse_songs_from_file(worship_schedule):
     :param worship_schedule: The filename of worship schedule
     :return: python list of song names.
     """
+
     with open(worship_schedule) as file:
         worship_text = file.readlines()
     # Find the line with songs in the array. Assume everything after is a song per line.
@@ -21,12 +31,13 @@ def parse_songs_from_file(worship_schedule):
         return 'No songs found.'
     for index, song in enumerate(worship_text):
         # Build a list of elements after "Songs" is found.
-        if "Hymn" in song:
-            stripped_song = song.split("-")
-            stripped_song = stripped_song[0].strip("Hymn: ")
-            formatted_song_list.append(stripped_song)
+        if "Hymn:" in song:
+            if song.startswith("Hymn:"):
+                stripped_song = song.rsplit("-", 1)
+                stripped_song = stripped_song[0].strip("Hymn:")
+                formatted_song_list.append(stripped_song.strip())
         if index > worship_text.index('Songs\n'):
-            stripped_song = song.split("-")
+            stripped_song = song.rsplit("-", 1)
             stripped_song = stripped_song[0].strip("* ")
             formatted_song_list.append(stripped_song)
 
@@ -36,39 +47,266 @@ def parse_songs_from_file(worship_schedule):
 # Takes in a list of songs.
 def validate_songs(SongList, limit):
     """
-    Checks the website using the maintainsong.displaysong function to see if the songs are valid.
+    Performs a case-insensitive check on the given dictionary to find matching
+    if the passed songs have any matching keys in the dict.
 
     :param SongList: A python list of song names to check.
     :param limit: The maximum number of song suggestions to return
-    :return: embed data object to be used with discord.py's embed send.
+    :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
+    a success/fail message. You must iterate through the embed dict to send all the messages.
     """
-    import maintainsong
-
-    song_error = False
-    if SongList == "No songs found.":
-        song_error = discord.Embed(title="Songs not found.", color=0xe74c3c,
-                                   description="There must be at least one song.")
-        return song_error
+    url_to_search = 'http://gccpraise.com/opensongv2/xml/'
+    invalid_songs = []
+    valid_songs = []
+    source_data = generate_link_dict(url_to_search)
+    embed_messages = {}
+    # convert all dictionary keys to lowercase.
+    source_data_lower = {k.lower(): v for k, v in source_data.items()}
+    # find an exact match within the dictionary.
     for song in SongList:
-        display_song = maintainsong.displaysong(song)
-        if display_song == "Song Not Found" or "Error" in display_song:
-            possible_matches = maintainsong.search_songs(song)
-            if possible_matches:
-                # Build embed object
-                song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
-                                           description="Here are some suggestions of similar songs:")
 
-                for index, match in enumerate(possible_matches, 1):
-                    song_error.add_field(name=match, value=possible_matches[match], inline=False)
-                    if index == limit:
-                        break
-            else:
-                song_error = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
-                                           description="We are not able to find any similar song titles.")
+        if source_data_lower.get(song.lower()) is None:
+            invalid_songs.append(song)
         else:
-            embed_data = discord.Embed(title="All Songs are Valid!")
+            song_index = list(source_data_lower.keys()).index(song.lower())
+            correct_song_names = list(source_data.keys())
+            valid_songs.append(correct_song_names[song_index])
 
-    if song_error:
-        return song_error
-    else:
-        return embed_data
+    # Search for matches to build discord message.
+
+    for index, song in enumerate(invalid_songs):
+        results = search_songs(song)
+        # A Dictionary of Dictionaries
+        if not results:
+            embed_data = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
+                                       description="We weren't able to find any similar songs.")
+        else:
+            embed_data = discord.Embed(title="Song \'" + song + "\' not found.", color=0xe74c3c,
+                                       description="Did you mean one of these?")
+        for index_num, song_result in enumerate(results, 1):
+            if index_num < limit:
+                embed_data = embed_data.add_field(name=song_result, value=results[song_result], inline=False)
+        embed_messages[song] = embed_data
+
+    if not invalid_songs:
+        embed_messages['No Errors'] = discord.Embed(title="All Songs are Valid!", color=0x2ecc71)
+
+    return_dict = {
+        "embed": embed_messages,
+        "songs": valid_songs
+    }
+    return return_dict
+
+
+def generate_link_dict(url):
+    """
+    Creates a list of all links on a given page.
+
+    :param url: The url of the page to check.
+    :return: returns a dictionary of hyperlinks and their associated text.
+    """
+    log_message = 'URL to search received=' + url
+    logging.info(log_message)
+
+    index_url = url
+    # Some sites may deny python headers so we set it to Mozilla.
+    page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla'}))
+    # Read the content and decode it
+    content = page.read().decode()
+    # Initialize empty list for links.
+    link_list = []
+
+    # Subclass/Override HTMLParser and define the methods we need to change.
+    class Parse(HTMLParser, ABC):
+        def __init__(self):
+            # Since Python 3, we need to call the __init__() function of the parent class
+            super().__init__()
+            self.reset()
+
+        # override handle_starttag method to only return the contents of anchor tags as a searchable list.
+        def handle_starttag(self, tag, attrs):
+            # Only parse the 'anchor' tag.
+            if tag == "a":
+                for name, link in attrs:
+                    if name == "href":
+                        link_list.append(link)
+
+    # Create a new parse object.
+    page_parser = Parse()
+    # Call feed method. incomplete data is buffered until more data is fed or close() is called.
+    page_parser.feed(content)
+    # format the URL list by replacing the HTML safe %20
+    link_list = [my_set.replace("%20", " ") for my_set in link_list]
+    page_links = {}
+    for link in link_list:
+        set_name = link.replace("%20", " ")
+        link = parse.quote(link, safe='')
+        link = index_url + link
+        page_links[set_name] = link
+
+    return page_links
+
+
+def search_songs(query):
+    from abc import ABC
+    from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
+    from urllib import parse as uparse
+    from urllib.request import urlopen, Request
+    from fuzzywuzzy import fuzz
+
+    # Directory we're checking
+    url = 'http://gccpraise.com/opensongv2/xml/'
+    # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
+    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
+    # Read the content and decode it
+    content = page.read().decode()
+    # Initialize empty list for songs.
+    song_list = []
+    # URL Prefix
+    prefix = "http://gccpraise.com/os-viewer/preview_song.php?s="
+    # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
+    threshold = 80
+
+    # Subclass/Override HTMLParser and define the methods we need to change.
+    class Parse(HTMLParser, ABC):
+        def __init__(self):
+            # Since Python 3, we need to call the __init__() function of the parent class
+            super().__init__()
+            self.reset()
+
+        # override handle_starttag method to only return the contents of anchor tags as a searchable list.
+        def handle_starttag(self, tag, attrs):
+            # Only parse the 'anchor' tag.
+            if tag == "a":
+                for name, link in attrs:
+                    if name == "href":
+                        song_list.append(link)
+
+    # Create a new parse object.
+    directory_parser = Parse()
+    # Call feed method. incomplete data is buffered until more data is fed or close() is called.
+    directory_parser.feed(content)
+    # format the URL list by replacing the HTML safe %20
+    song_list = [song.replace("%20", " ") for song in song_list]
+    # TODO: Remove test query
+    # query = "the King of Heaven"
+    # Build empty dictionary to add matches to.
+    matches = {}
+    # Check the match ratio on each song in the song list. This is expensive using pure-python.
+    for song in song_list:
+        if fuzz.partial_ratio(song, query) >= threshold:
+            song_name = song.replace("%20", " ")
+            song = uparse.quote(song, safe='')
+            song = prefix + song
+            matches[song_name] = song
+
+    return matches
+
+
+def song_case_correction(song_file, song_list):
+    """
+    Reads the input file, checks to see if the case-insensitive names of any songs from song_list
+    can be found, then updates the text file to match the case given in song_list.
+    :param song_file: The name/path of the text file to update.
+    :param song_list: A list of the songs to be updated with correct case in the file.
+    :return: None
+    """
+    with open(song_file, 'r') as file:
+        file_text = file.readlines()
+        file.close()
+
+    for index, line in enumerate(file_text):
+        for song in song_list:
+            if song.lower() in line.lower():
+                file_text[index] = re.sub(song, song, file_text[index], flags=re.IGNORECASE)
+                logging.info("Updating the song-case of " + song)
+    with open(song_file, 'w') as file:
+        file.writelines(file_text)
+        file.close()
+
+    return None
+
+
+# --- ensure proper formatting of scripture references
+def parse_passages(input_passages):  # --- input is a scripture reference string
+    full_ref_passages = []  # --- list to hold the complete scripture references
+
+    passages = input_passages.replace(',', ';')  # --- standardize ';' as scripture separator
+    passages = passages.strip().split(';')  # --- split the string into an array
+
+    # --- get book, chapter, verse
+    hold_book_chapter = ''  # -- save the book and chapter reference
+    book = ''
+    chapter = ''
+    scripture = ''
+    for p in passages:
+        p = p.strip()
+        if ' ' in p:  # --- indicates a references includes book; e.g. 'john '
+            if ':' in p:  # --- indicates a complete references includes book; e.g. 'john 3:'
+                book_chapter, verse = p.split(':', 1)
+                book, chapter = book_chapter.split(' ', 1)
+                hold_book_chapter = book_chapter.strip()  # --- remove leading and trailing spaces
+                passage_ref = hold_book_chapter + ':' + verse
+                full_ref_passages.append(passage_ref)
+            else:
+                passage_ref = hold_book_chapter + ':' + verse
+                full_ref_passages.append(passage_ref)
+                book, chapter = hold_book_chapter.split(' ', 1)
+        else:
+            if ':' in p:  # --- no book; just chapter and verse(s), e.g. 5:1-3
+                passage_ref = book + ' ' + p
+                full_ref_passages.append(passage_ref)
+                book_chapter, ref = passage_ref.split(':', 1)
+                hold_book_chapter = str(book_chapter) + ':'
+
+            else:
+                verse = p
+                passage_ref = hold_book_chapter + ':' + verse
+                full_ref_passages.append(passage_ref)
+                book_chapter, ref = passage_ref.split(':', 1)
+                # hold_book_chapter = str(book_chapter) + ':'
+    return full_ref_passages
+
+
+def generate_song_name():
+    song_dict = generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    # Generate a Song
+    if '/opensongv2/' in song_dict:
+        song_dict.pop('/opensongv2/')
+    keys = list(song_dict.keys())
+    song_suffix = ' -'
+    chars = ['V', 'C', 'T', 'B', 'E', 'X', 'P', 'O', 'I']
+    # Generate pseudo-random opensong stuff
+    for char in range(randint(4, 8)):
+        song_suffix += " " + choice(chars) + str(randint(0, 9))
+    song_name = choice(keys) + song_suffix
+    # Reset the suffix
+    suffix = ' -'
+
+    return song_name
+
+
+def generate_random_worship_schedule(filename):
+    # Get a random date.
+    date = (datetime.date.today() + datetime.timedelta(randint(1, 1000))).strftime("%m/%d/%y")
+    text = "Worship Schedule " + str(date) + "\n\n"
+    prefix = ["Mr.", "Mrs", "Ms.", "Dr.", "Pastor"]
+    text += "Worship Leader: " + choice(prefix) + " " + names.get_full_name() + "\n"
+    text += "Speaker: " + choice(prefix) + " " + names.get_full_name() + "\n"
+    text += "Hymn: " + generate_song_name() + "\n"
+    text += "\n"
+    text += "Praise Team\n"
+    text += choice(prefix) + " " + names.get_first_name() + ", " + names.get_first_name() + "\n"
+    text += "\n"
+    text += "Computer: " + choice(prefix) + " " + names.get_last_name() + "\n"
+    text += "Sound: " + names.get_first_name() + "\n"
+    text += "Camera: " + names.get_first_name() + "\n"
+    text += "\n"
+    text += "Songs\n"
+    # Finish with random number of songs
+    for number in range(randint(1, 5)):
+        text += "* " + generate_song_name() + "\n"
+    f = open(filename, 'w')
+    f.writelines(text)
+    f.close()
+    return filename

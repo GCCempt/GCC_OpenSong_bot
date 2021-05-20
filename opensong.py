@@ -5,13 +5,18 @@ import getdatetime
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
 import sftp_files   #-- my module to call pysftp
 import dropbox_api_call #--- my module to call Dropbox API
+import monitorfiles
+
+set_path = 'sets/'
+bulletin_path = 'bulletin/'
+sample_set_path = 'sample_sets/'
 
 # ------------ Start Assemble Set function -
 def assembleset():
     import xml.etree.ElementTree as ET
 
-    # -------------- Get the set name form the setname file -----------------------------
-    textFile = open(filelist.SetFilename, 'r', encoding='utf-8',
+    # -------------- Get the set name from the setname file -----------------------------
+    textFile = open(bulletin_path + filelist.SetFilename, 'r', encoding='utf-8',
                     errors='ignore')  # --- read the file containing the selected Set name
     XMLsetName = textFile.readline()  # --- read the first line from the file
     textFile.close()
@@ -19,17 +24,7 @@ def assembleset():
     # -------------- Open the Template Set and load into XML document tree -----------------------------
     print('\nOpenSong.assembleset() Current Working Directory:', os.getcwd())
 
-    try:
-        #os.chdir(filelist.setpath)  # -- change to the Sets directory
-        path='../sample_sets'
-        os.chdir(path)  # -- change to the Sets directory
-        print('\nOpenSong.assembleset() change working Directory to:', os.getcwd())
-    except:
-        print('\nDirectory: {0} does not exit'.format(path))
-        return()
-        
-
-    datasource = open(XMLsetName, 'rb')
+    datasource = open(sample_set_path + XMLsetName, 'rb')
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
@@ -48,16 +43,9 @@ def processfiles(doctree):
     import addnode
     import os
 
-    current_working_directory = os.getcwd()
-    print('\nProcessFiles() Current Working Directory:', current_working_directory)
-    bulletin_path='../bulletin'
-    if 'sets' in current_working_directory:
-        os.chdir(bulletin_path)          #-- change to the bulletin director for reading files
-
     # -------------- Read the contents of the Call To Worship text file -----------------------------
-    textFile = open(filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
-    print('opensong.processfiles - call to worship body_text =', body_text)
 
     slide_group_name = 'Call to Worship'
     body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides
@@ -66,7 +54,7 @@ def processfiles(doctree):
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add confession text function
 
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
-    textFile = open(filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
     # print(body_text)
 
@@ -82,7 +70,7 @@ def processfiles(doctree):
     # -------------- Read the contents of the Confession of Sin text file -----------------------------
     slide_group_name = 'Confession of Sin'
 
-    textFile = open(filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the confession of sin file into a string
 
     # --- strip the text at the 3rd ':' to remove the intro words
@@ -92,7 +80,6 @@ def processfiles(doctree):
 
     # --- split the text based on period '.'
     body_text = split_keep(body_text)  # --- call my function to split the string into lines, delimited by '.'
-    # print('OpenSong.processfiles - body_text=', body_text)
     body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
 
     try:
@@ -103,7 +90,7 @@ def processfiles(doctree):
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
 
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
-    textFile = open(filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.readlines()  # --- read the file into a list
 
     # print('\nAssurance of Pardon\n', body_text)
@@ -123,7 +110,7 @@ def processfiles(doctree):
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    textFile = open(filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.readlines()  # --- read the file into a list
     # print(body_text)
 
@@ -140,7 +127,7 @@ def processfiles(doctree):
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
 
     # -------------- Read the contents of the Scripture Reading text file -----------------------------
-    textFile = open(filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
     body_text = body_text + '\n'
     # print('\nScripture Reading body text=', body_text)
@@ -155,7 +142,7 @@ def processfiles(doctree):
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
     # -------------- Read the contents of the Announcements text file -----------------------------
-    textFile = open(filelist.AnnouncementFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.AnnouncementFileName, 'r', encoding='utf-8', errors='ignore')
     # body_text = textFile.read()              #--- read the file into a string
     body_text = textFile.readlines()  # --- read the file into a list
 
@@ -171,75 +158,9 @@ def processfiles(doctree):
     # --- call the write xml set function to write the new xml set file
     status_message = writeXMLSet(doctree)
 
-    # ---- clean up the intermediary files after processing completes successfully
-    cleanup()
-
     return (status_message)
-
 
 # ------------End -  Process files with extracted bulletin information
-
-# ------------Start -  cleanup process i.e. rename / delete files
-def cleanup():
-    import os
-    import monitorfiles
-
-    current_working_directory = os.getcwd()
-    print('\nStart File Clean up process. Current Working Directory:', current_working_directory)
-    if not 'bulletin' in current_working_directory:
-        os.chdir('../bulletin')   
-
-    # --- clean up (or rename) the intermediate files to prepare for the next run
-    if not os.path.isfile(filelist.PDFBulletinFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.PDFBulletinFilename))
-    else:
-        os.replace(filelist.PDFBulletinFilename, filelist.OldPDFBulletinFilename)
-
-    if not os.path.isfile(filelist.TextBulletinFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.TextBulletinFilename))
-    else:
-        os.replace(filelist.TextBulletinFilename, filelist.OldTextBulletinFilename)
-
-    if not os.path.isfile(filelist.WorshipScheduleFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.WorshipScheduleFilename))
-    else:
-        os.replace(filelist.WorshipScheduleFilename, filelist.OldWorshipScheduleFilename)
-
-    if not os.path.isfile(filelist.AssuranceFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.AssuranceFilename))
-    else:
-        os.replace(filelist.AssuranceFilename, filelist.OldAssuranceFilename)
-
-    if not os.path.isfile(filelist.ConfessionFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.ConfessionFilename))
-    else:
-        os.replace(filelist.ConfessionFilename, filelist.OldConfessionFilename)
-    
-    if not os.path.isfile(filelist.SermonInfoFilename):
-        print("File {} does not exist. Wait for Discord post...".format(filelist.SermonInfoFilename))
-    else:
-        os.replace(filelist.SermonInfoFilename, filelist.OldSermonInfoFilename)
-
-    if os.path.isfile(filelist.CurrentStatusFilename):
-        os.remove(filelist.CurrentStatusFilename)
-    else: ## Show an error ##
-        print("File {} does not exist. Procesing will continue....".format(filelist.CurrentStatusFilename))
-
-    if os.path.isfile(filelist.DiscordMessageFilename):
-        os.remove(filelist.DiscordMessageFilename)
-    else: ## Show an error ##
-        print("File {} does not exist. Procesing will continue....".format(filelist.DiscordMessageFilename))
-
-    if os.path.isfile(filelist.OldWorshipScheduleFilename):
-        os.remove(filelist.OldWorshipScheduleFilename)
-    else: ## Show an error ##
-        print("File {} does not exist. Procesing will continue....".format(filelist.OldWorshipScheduleFilename))
-
-    #--- update the current status
-    status_message = monitorfiles.filechecker()  # --- update the status file
-
-    return (status_message)
-# ------------End  -  cleanup process
 
 # ------------Start -  Process Songs
 def processsongs(doctree):
@@ -248,10 +169,9 @@ def processsongs(doctree):
     import addnode
 
     # -------------- Read and process the songs text file -----------------------------
-    readworshipschedule.readWS()  # read the worship schedule file extracted from discord and store in a  "lists" file
     songs = []
 
-    with open(filelist.SongsFileName) as f:
+    with open(bulletin_path + filelist.SongsFileName) as f:
         songs = f.read().splitlines()  # read the songs.txt file into a list / array
 
     # --- process the Song of Approach
@@ -263,9 +183,9 @@ def processsongs(doctree):
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Approach - song name=', song_name, ' presentation order=', presentation_order)
+    # print('\nProcess Song of Approach - song name=', url, ' presentation order=', presentation_order)
 
-    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, song_name)
+    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process the Song of Response - last line in the list
@@ -277,19 +197,19 @@ def processsongs(doctree):
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Response - song name=', song_name, ' presentation order=', presentation_order)
+    # print('\nProcess Song of Response - song name=', url, ' presentation order=', presentation_order)
 
-    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, song_name)
+    doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process Praise Songs - order is based on the established set name
     # -------------- Get the set name form the setname file -----------------------------
-    textFile = open(filelist.SetFilename, 'r', encoding='utf-8',
+    textFile = open(bulletin_path + filelist.SetFilename, 'r', encoding='utf-8',
                     errors='ignore')  # --- read the file containing the selected Set name
     XMLsetName = textFile.readline()  # --- read the first line from the file
     textFile.close()
 
-    if 'No Gloria Patri' in XMLsetName:  # means use 1 song of praise and a song of assurance
+    if 'NoGloriaPatri' in XMLsetName:  # means use 1 song of praise and a song of assurance
         song_name, presentation_order = songs[2].rsplit('-', 1)  # split the line at '-'
         song_name = song_name.strip()  # remove leading and trailing spaces
         presentation_order = presentation_order.strip()  # remove leading and trailing spaces
@@ -298,10 +218,10 @@ def processsongs(doctree):
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
 
-        # print('\nProcess Song of Praise - song name=', song_name, ' presentation order=', presentation_order)
+        # print('\nProcess Song of Praise - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                  presentation_order)  # (slide_group_name, song_name)
+                                  presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
         # --- Song or Assurance
@@ -313,10 +233,10 @@ def processsongs(doctree):
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
 
-        # print('\nProcess Song of Assurance - song name=', song_name, ' presentation order=', presentation_order)
+        # print('\nProcess Song of Assurance - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                  presentation_order)  # (slide_group_name, song_name)
+                                  presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
     else:  # --- process body_text for 2 Songs of Praise
@@ -329,16 +249,16 @@ def processsongs(doctree):
             presentation_order = presentation_order.strip()  # remove leading and trailing spaces
             body_text = body_text + '\n' + song_name
 
-            # print('\nProcess Songs of Praise Body Text- song name=', song_name)
+            # print('\nProcess Songs of Praise Body Text- song name=', url)
             addnode.addbodytext(doctree, slide_group_name, body_text)
 
         for s in range(len(songs) - 2, 1, -1):  # --- process 2 Songs of Praise in reverse order
             song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
             song_name = song_name.strip()  # remove leading and trailing spaces
             presentation_order = presentation_order.strip()  # remove leading and trailing spaces
-            # print('\nProcess Songs of Praise - song name=', song_name, ' presentation order=', presentation_order)
+            # print('\nProcess Songs of Praise - song name=', url, ' presentation order=', presentation_order)
             doctree = addnode.addsong(doctree, slide_group_name, song_name,
-                                      presentation_order)  # (slide_group_name, song_name)
+                                      presentation_order)  # (slide_group_name, url)
 
     return ()
 
@@ -349,11 +269,13 @@ def processsongs(doctree):
 def writeXMLSet(doctree):
     import xml.etree.ElementTree as ET
 
+    set_path = 'sets/'
+
     # --- rename the template set "set" tag
     if os.environ['ENVIRON'] == 'PROD':
         setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
     else:           #--- running in TEST
-        setNameAttrib = '2021-01-01'        #--- set default dummy set name for TEST
+        setNameAttrib = os.environ['COMPUTERNAME']        #--- set default dummy set name for TEST
     
     setNameAttrib = setNameAttrib + ' GCCEM Sunday Worship'
 
@@ -363,20 +285,9 @@ def writeXMLSet(doctree):
     print(myroot.tag, myroot.attrib)
 
     # --- End of processing - write out the modified worship set
-    current_working_directory = os.getcwd()
-    print('\nProcessFiles() Current Working Directory:', current_working_directory)
-    set_path='../sets'
-    if not 'sets' in current_working_directory:
-        os.chdir(set_path)          #-- change to the bulletin director for reading files
 
-    #os.chdir(filelist.setpath)  # -- change to the Sets directory
-    outputset = setNameAttrib  # --- the set file name is the same as the set name
+    outputset = set_path + setNameAttrib  # --- the set file name is the same as the set name
     doctree.write(outputset)
-
-    # --- write the status complete file
-    bulletin_path='../bulletin'
-    if not 'bulletin' in bulletin_path:
-        os.chdir(bulletin_path)  # -- switch back to the default directory
 
     status_message = updatefinalstatus()  # --- update the current status file upon comletion of processing
 
@@ -391,14 +302,6 @@ def writeXMLSet(doctree):
         sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
         sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
 
-
-    #--- clean up the local set file
-    #current_working_directory = os.getcwd()
-    #if not 'sets' in current_working_directory:
-    #    os.chdir('../sets')  # -- switch back to the default directory
-    #os.remove(setNameAttrib)
-    
-    #print('\nClean-up processing completed')
     return (status_message)
 
 # ------------End -  Write the new XML set
@@ -432,7 +335,7 @@ def split_keep_after(string, char, count):  # --- input string, delimiter, occur
 # ------------Start Function to parse the call to worship
 def parsecalltoworship():
     # -------------- Read the contents of the Call To Worship text file -----------------------------
-    textFile = open(filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
     Lines = textFile.readlines()  # --- read the file into a list
     # print(body_text)
     leader_flag = ''
@@ -533,29 +436,20 @@ def process_responsivereading(Lines, body_text):
 
 # ------------Start Function post the completion status
 def updatefinalstatus():  # --- update the current status  file
-    current_working_directory = os.getcwd()
-    print('\nProcessFiles() Current Working Directory:', current_working_directory)
-    bulletin_path='../bulletin'
-    if not 'bulletin' in current_working_directory:
-        os.chdir(bulletin_path)          #-- change to the bulletin director for reading files
-
     # --- read the bulletin date file
-    textFile = open(filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
+    textFile = open(bulletin_path + filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
     filedate = textFile.read()  # --- read the file into a string
     textFile.close()
     status_message = '\nBulletin Processing completed for ' + filedate
 
     # --- Update the current status file
-    textFile = open(filelist.CurrentStatusFilename, 'a', encoding='utf-8',
+    textFile = open(bulletin_path + filelist.CurrentStatusFilename, 'a', encoding='utf-8',
                     errors='ignore')  # --- append to the current status file
     textFile.write(str(status_message))
     textFile.close()
 
     writehtml.buildhtmlcontent()  # --- create the HTML page to be uploaded to the website
 
-    #print('\nEnd of OpenSong processing - OpenSong Set created ', filelist.SundaySet, 'on ',
-    #      getdatetime.currentdatetime())
-    
     status_date = str(getdatetime.currentdatetime())
     status_message = status_message + '\nOpenSong Set created on: ' + status_date
     

@@ -39,6 +39,7 @@
 | FTP_PASSWORD         | Password for sFTP Access                                                                              |
 | ESV_API_KEY          | API key to https://api.esv.org                                                                        |
 | ENVIRON              | PROD or DEV                                                                                           |
+| COMPUTERNAME         | For use in Dev environements for creation of the set
 
 #### File Descriptions
 | Python   File Name     | Description                                                                                                                                                                |
