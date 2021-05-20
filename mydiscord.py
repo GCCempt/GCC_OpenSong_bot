@@ -41,14 +41,9 @@ def read_discord():
     async def on_ready():
         print('We have logged in as {0.user}'.format(client))
 
-        # --- display the current status
-        # status_message = statuscheck()  # --- status message returned as a 'list' ***********
-
-        # for x in status_message:  # --- print the status message
-        #    print(x)
-
-        #status_message = monitorfiles.filechecker()  # --- status message returned as a 'string' ***********
-        #print(status_message)
+    if os.environ['ENVIRON'] == 'DEV':
+            # --- call the test / validation script as the first thing before the bot starts
+        startup_validation.run_test_scripts()
 
     @client.event
     async def on_message(message):
@@ -210,9 +205,39 @@ def read_discord():
                                                                                                          '').replace(
                 '\t', '').lower():
                 print('\nDiscord Cleanup message received from ', message.author, ' on ', message.created_at)
-                monitorfiles.cleanup()  # ---cleanup residual files ******************************
+                status_message = monitorfiles.cleanup()  # ---cleanup residual files ******************************
+
+                # --- post status message
+                await message.channel.send(status_message)
                 return ()
 
+            # --- check for the /rerun command -----
+            elif '/rerun' in msg.replace(" ", '').replace('\t', '').lower():
+                print('\nOpenSong /rerun message received from ', message.author, ' on ', message.created_at)
+                status_message = monitorfiles.filechecker()  # *************************************
+                status_message = status_message + '/rerun processing completed!'
+                print(status_message)
+
+                return ()
+
+            elif '/setcleanup' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
+                                                                                                         '').replace(
+                '\t', '').lower():
+                print('\nDiscord Set Cleanup message received from ', message.author, ' on ', message.created_at)
+                status_message = monitorfiles.set_cleanup()  # ---cleanup set in DEV environment ******************************
+                
+                # --- post status message
+                await message.channel.send(status_message)
+                return ()
+
+            elif '/version' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
+                                                                                                         '').replace(
+                '\t', '').lower():
+                status_message = '\nOpenSong Discord Version 2.0.0\n'
+                 
+                # --- post status message
+                await message.channel.send(status_message)
+                return ()
             # --- check for the /rerun command -----
             elif '/rerun' in msg.replace(" ", '').replace('\t', '').lower():
                 print('\nOpenSong /rerun message received from ', message.author, ' on ', message.created_at)

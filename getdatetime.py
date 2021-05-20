@@ -93,19 +93,4 @@ def convertdate(receivedDate='2021-04-04'):
 
 # --- get the current day of the week (i.e. for today)
 def getDayOfWeek():
-    #print('\nFind Day of Week for Today')
-    date_format = '%Y,%m,%d'
-    returned_date = currentdatetime(date_format)       #--- get the current date
-    #print('Current Date', returned_date)
-
-    #--- convert date to integer format
-    my_year, my_month, my_date = returned_date.split(',')
-    my_year = int(my_year)
-    my_month = int(my_month)
-    my_date = int(my_date)
-    #print('\ndates=', my_year, my_month, my_date)
-
-    week_days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    weekday = calendar.weekday(my_year, my_month, my_date)
-    return(week_days[weekday])          #--- return the current day of the week
-# --- End getDayOfWeek function
+    return datetime.today().strftime('%A')

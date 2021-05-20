@@ -10,9 +10,6 @@ def main():
     # --- schedule the weekly file cleanup  on a separate thread
     #t1 = threading.Thread(target=scheduled_cleanup, name='cleanup')
 
-    # --- call the test / validation script as the first thing before the bot starts
-    startup_validation.run_test_scripts()
-   
     #---  start the discord Bot
     mydiscord.read_discord()
 

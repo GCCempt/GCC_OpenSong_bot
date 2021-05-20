@@ -1,21 +1,13 @@
 #--- routine to unit test independent functions
         
 def main():
-    import passagelookup
-    import monitorfiles
+    import utils
+    from monitorfiles import set_cleanup
 
-    status_message = monitorfiles.statusheck()
-    print('\nStatus Check=', status_message)
+    status_message = set_cleanup()
+    print('\nStatus =', status_message)
     return()
 
-    #---    test multi-part scripture ref
-
-    scripture_ref = 'Hebrews 1:1–2:4'
-    status_message = passagelookup.build_scripture_text(scripture_ref)
-
-    print('\nScripture Reference Lookup Test', scripture_ref)
-    for verse in status_message:
-        print(verse)
 
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
     #

@@ -155,11 +155,9 @@ def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a defaul
     from urllib import parse as uparse
     from urllib.request import urlopen, Request
     from fuzzywuzzy import fuzz
+    from utils import generate_set_name
 
-    if os.environ['ENVIRON'] == 'PROD':
-        setNameAttrib = str(getdatetime.nextSunday())  # --- get the "upcoming" Sunday date
-    else:           #--- running in TEST
-        setNameAttrib = os.environ['COMPUTERNAME'] 
+    setNameAttrib = generate_set_name()
 
     query = setNameAttrib  # --  this is the fuzzy varible for the the set search
     print('\nSet Lookup date=', query)
