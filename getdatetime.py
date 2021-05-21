@@ -51,11 +51,11 @@ def displayCalendar():
 
 
 # ------------ display the first Sunday of a month
-def firstSunday():
+def firstSunday(cal_month=5):
     print('\nFind First Sunday')
 
     cal = calendar.TextCalendar(calendar.SUNDAY)
-    print(cal.prmonth(2021, 2))
+    print(cal.prmonth(2021, cal_month))
     print(calendar.SUNDAY)
 
 
