@@ -186,6 +186,7 @@ def cleanup():
     set_path = 'sets/'
 
     status_message = '\nStart File Clean up processing started!\n'
+    print(status_message)
 
     file_name = bulletin_path + filelist.SongsFileName
     file_list.append(file_name)
@@ -254,6 +255,8 @@ def cleanup():
     #status_message = monitorfiles.filechecker()  # --- update the status file
     status_message = status_message + 'File Cleanup completed'
 
+    print(status_message)
+
     return (status_message)
 # ------------End  -  cleanup process
 
@@ -280,7 +283,7 @@ def set_cleanup():
     cleanup_status = cleanup()
     status_message = status_message + cleanup_status
 
-    print(status_message)
+    print('\nFile Cleanup Processing completed!')
 
     return(status_message)
  
