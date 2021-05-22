@@ -196,7 +196,11 @@ def read_discord():
                 status_message = monitorfiles.statuscheck()  # ---read the current status message returned as a 'list'
  
                 # --- post status message
-                await message.channel.send(status_message)
+                #await message.channel.send(status_message)
+                embed_data = discord.Embed(title="Build Set Status", color=0x2ECC71,
+                                    description="OpenSong Set Build Progress")
+                embed_data.add_field(name="Status:", value=status_message, inline=True)
+                await client.get_channel(int(POST_CHANNEL)).send(embed=embed_data)
 
                 return ()
 
