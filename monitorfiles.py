@@ -23,52 +23,52 @@ def filechecker():
     if not os.path.isfile(bulletin_path + filelist.SermonInfoFilename):
         file_status = str("File {} does not exist....".format(bulletin_path + filelist.SermonInfoFilename))
         #status_message = status_message + file_status
-        status_message = status_message + 'Waiting on Sermon Information message post!\n'
+        status_message = status_message + 'Sermon Information:' + '\u274C' + '\n'
     else:
         file_count += 1  # --- increment the file watcher count
         # print('\nFileChecker - Assurance.txt file found:', filelist.AssuranceFilename)
-        status_message = status_message + 'Sermon Information ready!\n'
+        status_message = status_message + 'Sermon Information:' + '\u2705' + '\n'
 
     # --- check if assurance file exists
     if not os.path.isfile(bulletin_path + filelist.AssuranceFilename):
         file_status = str("File {} does not exist....".format(bulletin_path + filelist.AssuranceFilename))
         #status_message = status_message + file_status
-        status_message = status_message + 'Waiting on Assurance of Pardon message post!\n'
+        status_message = status_message + 'Assurance of Pardon:' + '\u274C' + '\n'
     else:
         file_count += 1  # --- increment the file watcher count
         # print('\nFileChecker - Assurance.txt file found:', filelist.AssuranceFilename)
-        status_message = status_message + 'Assurance of Pardon ready!\n'
+        status_message = status_message + 'Assurance of Pardon:' + '\u2705' + '\n'
 
     # --- check if confession file exists
     if not os.path.isfile(bulletin_path + filelist.ConfessionFilename):
         file_status = str("File {} does not exist....".format(bulletin_path + filelist.ConfessionFilename))
         #status_message = status_message + file_status
-        status_message = status_message + 'Waiting on Confession of Sin message post!\n'
+        status_message = status_message + 'Confession of Sin:' + '\u274C' + '\n'
     else:
         file_count += 1  # --- increment the file watcher count
         # print('\nFileChecker - Confession.txt file found:', filelist.ConfessionFilename)
-        status_message = status_message + 'Confession of Sin ready!\n'
+        status_message = status_message + 'Confession of Sin:' + '\u2705' + '\n'
 
     # --- check if worshipschedule file exists
     if not os.path.isfile(bulletin_path + filelist.WorshipScheduleFilename):
         file_status = str( "File {} does not exist....".format(bulletin_path + filelist.WorshipScheduleFilename))
         #status_message = status_message + file_status
-        status_message = status_message + 'Waiting on Worship Schedule post!\n'
+        status_message = status_message + 'Worship Schedule:' + '\u274C' + '\n'
     else:
         file_count += 1  # --- increment the file watcher count
         # print('\nFileChecker - WorshipSchedule.txt file found:', filelist.WorshipScheduleFilename)
-        status_message = status_message + 'Worship Schedule ready!\n'
+        status_message = status_message + 'Worship Schedule:'  + '\u2705' + '\n'
 
     # --- check if bulletin file exists
     # print('\nFilechecker - looking for text bulletin file:', filelist.TextBulletinFilename)
     if not os.path.isfile(bulletin_path + filelist.TextBulletinFilename):  # --- if all prerequisites files exist, check for the bulletin file
         file_status = str( "File {} does not exist....".format(bulletin_path + filelist.TextBulletinFilename))
         #status_message = status_message + file_status
-        status_message = status_message + 'Waiting on Bulletin post!\n'
+        status_message = status_message + 'Bulletin:' + '\u274C' + '\n'
     else:
         # --- begin the main process - all requirements met
         file_count += 1  # --- increment the file watcher count
-        status_message = status_message + 'Bulletin ready!\n'
+        status_message = status_message + 'Bulletin:' + '\u2705' + '\n'
 
     # --- write the current status file
     textFile = open(bulletin_path + filelist.CurrentStatusFilename, 'w', encoding='utf-8', errors='ignore')
