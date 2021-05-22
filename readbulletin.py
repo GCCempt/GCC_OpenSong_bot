@@ -99,13 +99,16 @@ def parsebulletin():
                     if 'presbyterianchurch' in Lines[count].replace(" ", '').replace('\t', '').lower():
                         break
                     else:
-                        prefix, text = Lines[count].split(' ',
+                        try:
+                            prefix, text = Lines[count].split(' ',
                                                           1)  # --- split the line at the first space to remove the #'s
-                        result = any(([True if subStr in prefix else False for subStr in announcement_tag]))
-                        if result:
-                            body_text = body_text + text
-                        else:
-                            body_text = body_text + prefix + ' ' + text
+                            result = any(([True if subStr in prefix else False for subStr in announcement_tag]))
+                            if result:
+                                body_text = body_text + text
+                            else:
+                                body_text = body_text + prefix + ' ' + text
+                        except:
+                            body_text = Lines[count]
                     count += 1
 
                 # print('    ReadBulletin.ParseBulletin - end of Announcements.')

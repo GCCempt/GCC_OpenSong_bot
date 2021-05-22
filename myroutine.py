@@ -2,10 +2,11 @@
         
 def main():
     import utils
-    from monitorfiles import set_cleanup
+    import readbulletin
 
-    status_message = set_cleanup()
-    print('\nStatus =', status_message)
+    print('\nStart readbulletin!\n')
+    readbulletin.parsebulletin()
+
     return()
 
 
