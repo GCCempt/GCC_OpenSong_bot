@@ -3,7 +3,7 @@ def addsong(mytree, slide_group_name, song_name, presenation_order):
     import xml.etree.ElementTree as ET
 
     # --- remove invalid charactes from song name which are not supported by OpenSong
-    song_name = song_name.replace("'", '').replace(',', '')
+    #song_name = song_name.replace("'", '').replace(',', '')
     # --- Read Template set
 
     # mytree = ET.parse('C:\\Dropbox\\OpenSongV2\\OpenSong Data\\Sets\\TemplateSet')
