@@ -332,9 +332,26 @@ def generate_set_name():
 
 
 def convert_embed(var):
+    """
+    TODO: document this function
+    :param var:
+    :return:
+    """
     return discord.Embed(description=var)
 
 
-def get_message_id(message_id):
-    await ctx.fetch_message(message_id)
-    ()
+def status_embed(description, message):
+    """
+    TODO: Document this function
+    :param message:
+    :param description:
+    :return:
+    """
+    embed = discord.Embed(color=0x2ECC71, description=description)
+    embed.add_field(name="Time received:",
+                    value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
+                    inline=True)
+    embed.add_field(name="User:",
+                    value=message.author,
+                    inline=True)
+    return embed
