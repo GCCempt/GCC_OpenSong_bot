@@ -21,6 +21,7 @@ lxml = "*"
 names = "*"
 pytest = "*"
 schedule = "*"
+discord-py-slash-command = "*"
 
 [dev-packages]
 

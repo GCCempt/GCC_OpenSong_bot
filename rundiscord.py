@@ -10,22 +10,25 @@ import os
 import schedule
 import time
 
-#--- https://schedule.readthedocs.io/en/stable/
+
+# --- https://schedule.readthedocs.io/en/stable/
 # --- Schedule OpenSong file cleanup
-def scheduled_task(scheduled_time='13:30'):     #-schedule weekly file cleanup
+def scheduled_task(scheduled_time='13:30'):  # -schedule weekly file cleanup
 
     # Every Sunday at 13:30 am cleanup is called
-    #schedule.every().sunday.at("11:00").do(cleanup)
+    # schedule.every().sunday.at("11:00").do(cleanup)
     print("ID of process running on 1st thread: {}".format(threading.current_thread().name))
     schedule.every().sunday.at(scheduled_time).do(cleanup)
 
     # Loop so that the scheduling task keeps on running all time.
 
-    while True:  
+    while True:
         # Checks whether a scheduled task is pending to run or not
         schedule.run_pending()
         time.sleep(10)
-#--- end run_scheduled_task
+
+
+# --- end run_scheduled_task
 
 
 def main():
@@ -36,21 +39,20 @@ def main():
 
     # --- create thread for cleanup process
     t1 = threading.Thread(target=scheduled_task, name='cleanup')
-    
+
     # starting threads
     t1.start()
 
-
-    #---  start the discord Bot
+    # ---  start the discord Bot
     print("ID of process running Discord Bot: {}".format(threading.current_thread().name))
     mydiscord.read_discord()
 
     # wait until all threads finish
     t1.join()
 
+
 # --- End of function main()
 
 # ------------ Call the Main function to launch the process
 if __name__ == "__main__":
     main()
-

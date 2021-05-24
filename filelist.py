@@ -1,8 +1,7 @@
-import os
-
 # --- Definitions for files and directories used in the process
 # ---          Directories
 
+file_path = 'bulletin/'
 setpath = 'sets'  # --- default directory for writing set files
 songpath = 'songs'  # --- default directory for wring song files
 
