@@ -5,7 +5,7 @@ from dateparser.search import search_dates
 
 
 # --- Get the current date / time and format it
-def currentdatetime(dateformat='%m/%d/%Y %H:%M %p'):
+def currentdatetime(dateformat='%m/%d/%Y%H:%M %p'):
     received_dt = datetime.now()
     received_dt = received_dt.strftime(dateformat)
 

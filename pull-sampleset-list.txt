@@ -1,4 +1,0 @@
-http://gccpraise.com/opensongv2/sets/SampleSet
-http://gccpraise.com/opensongv2/sets/SampleSet-Communion
-http://gccpraise.com/opensongv2/sets/SampleSet-NoGloriaPatri
-http://gccpraise.com/opensongv2/sets/SampleSet-NoGloriaPatriWCommunion
