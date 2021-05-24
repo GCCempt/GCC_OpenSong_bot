@@ -1,50 +1,54 @@
-# -------- Read Discord Messages -last updated 03/02/2021 by Steve Rogers
-# ! python3
+import logging
 import os
-import subprocess  # --- for launching external shell commands
+import subprocess
 
 import discord
+from discord.ext import commands
+from discord_slash import SlashCommand
 
-import downloadbulletin  # --- my module for downloading the bulletin
-import filelist  # --- definition of list of files and directories used in the proces
-import getdatetime  # --- my module to get the current date / time
-import maintainsong  # --- module to add a new song to OpenSong
+import downloadbulletin
+import filelist
+import getdatetime
+import maintainsong
 import monitorfiles
-import opensong  # --- my modulue to build the OpenSong set based on bulletin content and Discord postings
-import utils
-import pandas as pd  # Python data analysis library
-import logging
-import startup_validation 
+import opensong
 import readworshipschedule
-logging.basicConfig(level=logging.ERROR)
+import startup_validation
+import utils
 
-client = discord.Client()  # --- create and instance of the Discord client to connect to Discord
+# -------------------------#
+#     SET CONSTANTS       #
+# -------------------------#
+logging.basicConfig(level=logging.ERROR)
+client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+slash = SlashCommand(client, sync_commands=True)
 TOKEN = os.environ['DISCORD_TOKEN']
 READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
-
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
+VERSION = '1.03'
 
-# print('MY TOKEN=', TOKEN)
-# print('READ CHANNEL=', READ_CHANNEL)
-# print('POST CHANNEL=', POST_CHANNEL)
-
-
-# ------------ How to code a Discord Bot
-# https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
 
 def read_discord():
     print("\n !!!Hello world - OpenSong Discord Client starting at", getdatetime.currentdatetime())
 
+    # -------------------------#
+    #     Run once on start    #
+    # -------------------------#
     @client.event
     async def on_ready():
         print('We have logged in as {0.user}'.format(client))
 
-    if os.environ['ENVIRON'] == 'DEV':
-            # --- call the test / validation script as the first thing before the bot starts
-        startup_validation.run_test_scripts()
+    # TODO: uncomment the below line.
+    # if os.environ['ENVIRON'] == 'DEV':
+    # --- call the test / validation script as the first thing before the bot starts
 
+    #    startup_validation.run_test_scripts()
+
+    # -----------------------------------#
+    #     Run on each message received   #
+    # -----------------------------------#
     @client.event
     async def on_message(message):
         if message.author == client.user:  # --- don't respond to messages from yourself
@@ -53,38 +57,38 @@ def read_discord():
         msg = message.content  # --- retrieve the Discord message and process below
         print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ',
               message.created_at, 'message =', msg, 'channel ID=', message.channel.id)
-     
-        if (message.channel.id == int(READ_CHANNEL)):  # --- accept messages posted on the READ Channel
+
+        if message.channel.id == int(READ_CHANNEL):  # --- accept messages posted on the READ Channel
 
             print('\nDiscord Message received on channel:', message.channel, ' from ', message.author, ' on ',
                   message.created_at)
             channel = client.get_channel(int(POST_CHANNEL))  # --- configure channel to receive reply messages
 
             # --- check the Discord message is for the Bulletin post -----
-            if 'bulletinhasbeenposted' in msg.replace(" ", '').replace('\t', '').lower():
+            if "bulletinhasbeenposted" in msg.replace(" ", '').replace('\t', '').lower():
                 status_message = 'Bulletin information received successfully!' + str(message.author) + ' on ' + str(
                     message.created_at)
- 
+
                 # --- Download the bulletin which was just posted
                 status_message = status_message + downloadbulletin.get_bulletin()
                 print(status_message)
-                
+
                 embed_data = discord.Embed(title="Bulletin", color=0x2ECC71,
-                                               description="Bulletin info posted successfully.")
+                                           description="Bulletin info posted successfully.")
                 embed_data.add_field(name="Time received:", value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
-                                         inline=True)
+                                     inline=True)
                 embed_data.add_field(name="User:", value=message.author, inline=True)
                 await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
 
                 status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
-                
+
                 if 'Set processing completed' in status_message:
                     embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
                                                description="OpenSong Set Processing")
                     embed_data.add_field(name="Status:", value=status_message, inline=True)
                     await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-
-                    set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
+                    # --- call the DisplaySet function and use the default date ***********************
+                    set_matches = maintainsong.displaySet()
 
                     if len(set_matches) == 0:
                         set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
@@ -92,21 +96,21 @@ def read_discord():
                         status_message = '\nNo sets matching: {} found!'.format(set_date)
                         await message.channel.send(status_message)
                     else:
-                        for myset, url in set_matches.items():
+                        for my_set, url in set_matches.items():
                             embed = discord.Embed()
-                            embed.description = '[' + myset + '](' + url + ')'
+                            embed.description = '[' + my_set + '](' + url + ')'
                             status_message = embed.description
                             # --- post embed message
                             await message.channel.send(embed=embed)
 
             else:
-                # --- write the Message to a file for later processingn
+                # --- write the Message to a file for later processing
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
                 textFile.writelines(msg)
                 textFile.close()
 
                 # --- parse the incoming Discord message
-                status_message = utils.parsemessage()
+                status_message = parse_message()
                 if 'Worship Schedule' in message.content:
                     # Create a list of songs from the text tile.
                     song_list = utils.parse_songs_from_file(bulletin_path + filelist.WorshipScheduleFilename)
@@ -152,11 +156,11 @@ def read_discord():
 
                     if 'Set processing completed' in status_message:
                         embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
-                                               description="OpenSong Set Processing")
+                                                   description="OpenSong Set Processing")
                         embed_data.add_field(name="Status:", value=status_message, inline=True)
                         await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-
-                        set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
+                        # --- call the DisplaySet function and use the default date ***********************
+                        set_matches = maintainsong.displaySet()
 
                         if len(set_matches) == 0:
                             set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
@@ -164,9 +168,9 @@ def read_discord():
                             status_message = '\nNo sets matching: {} found!'.format(set_date)
                             await message.channel.send(status_message)
                         else:
-                            for myset, url in set_matches.items():
+                            for my_set, url in set_matches.items():
                                 embed = discord.Embed()
-                                embed.description = '[' + myset + '](' + url + ')'
+                                embed.description = '[' + my_set + '](' + url + ')'
                                 status_message = embed.description
                                 # --- post embed message
                                 await message.channel.send(embed=embed)
@@ -194,11 +198,11 @@ def read_discord():
                     '\t', '').lower():
                 print('\nDiscord Check Status message received from ', message.author, ' on ', message.created_at)
                 status_message = monitorfiles.statuscheck()  # ---read the current status message returned as a 'list'
- 
+
                 # --- post status message
-                #await message.channel.send(status_message)
+                # await message.channel.send(status_message)
                 embed_data = discord.Embed(title="Build Set Status", color=0x2ECC71,
-                                    description="OpenSong Set Build Progress")
+                                           description="OpenSong Set Build Progress")
                 embed_data.add_field(name="Status:", value=status_message, inline=True)
                 await client.get_channel(int(POST_CHANNEL)).send(embed=embed_data)
 
@@ -225,20 +229,22 @@ def read_discord():
                 return ()
 
             elif '/setcleanup' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
-                                                                                                         '').replace(
+                                                                                                            '').replace(
                 '\t', '').lower():
                 print('\nDiscord Set Cleanup message received from ', message.author, ' on ', message.created_at)
-                status_message = monitorfiles.set_cleanup()  # ---cleanup set in DEV environment ******************************
-                
+
+                # ---cleanup set in DEV environment ******************************
+                status_message = monitorfiles.set_cleanup()
+
                 # --- post status message
                 await message.channel.send(status_message)
                 return ()
 
-            elif '/version' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
+            elif '$version' in msg.replace(" ", '').replace('\t', '').lower() or '/check' in msg.replace(" ",
                                                                                                          '').replace(
                 '\t', '').lower():
                 status_message = '\nOpenSong Discord Version 1.03\n'
-                 
+
                 # --- post status message
                 await message.channel.send(status_message)
                 return ()
@@ -273,7 +279,7 @@ def read_discord():
                     #    print(i, items[i])
 
                     server_id = int(items[4])
-                    # --- retrive the channelID from the parsed message link
+                    # --- retrieve the channelID from the parsed message link
                     channel_id = int(items[5])
                     # --- retrieve the messageID from the parsed message link
                     message_id = int(items[6])
@@ -289,7 +295,7 @@ def read_discord():
                     print(status_message)
                     return ()
 
-                # print('\nMessage retrived', message.content)
+                # print('\nMessage retrieved', message.content)
 
                 # --- write the Message to a file for later processingn
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
@@ -297,7 +303,7 @@ def read_discord():
                 textFile.close()
 
                 # --- parse the incoming Discord message
-                status_message = utils.parsemessage()
+                status_message = parse_message()
                 # --- check if a valid status message was received
                 if status_message:
                     # --- update the current processing status
@@ -306,7 +312,6 @@ def read_discord():
                 status_message = status_message + '\nOpenSong  {} command received'.format(message)
                 print(status_message)
                 await channel.send(status_message)
-
 
                 return ()
 
@@ -342,7 +347,7 @@ def read_discord():
                 message_text = message.content
                 if ' ' in message_text:
                     # --- split the line at the first space to retrieve the song name
-                    command, song_name = message.content.split(' ',1)
+                    command, song_name = message.content.split(' ', 1)
                     print('\nSong name =', song_name)
                     song_matches = {}
                     # --- call the searchsong function
@@ -373,12 +378,12 @@ def read_discord():
 
                 if ' ' in message_text:
                     # --- split the line at the first space to retrieve the song name
-                    command, set_date = message.content.split(' ',1)
+                    command, set_date = message.content.split(' ', 1)
                     print('\nInput Set Date =', set_date)
 
                     set_matches = maintainsong.displaySet(set_date)
                 else:
-                    #set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
+                    # set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
                     set_matches = maintainsong.displaySet()  # --- call the DisplaySet function and use the default date ***********************
 
                 if len(set_matches) == 0:
@@ -388,15 +393,15 @@ def read_discord():
                 else:
                     # print('\nSong {} Found)'. format(url))
                     # --- post returned URL
-                    for myset, url in set_matches.items():
+                    for my_set, url in set_matches.items():
                         embed = discord.Embed()
-                        embed.description = '[' + myset + '](' + url + ')'
+                        embed.description = '[' + my_set + '](' + url + ')'
                         status_message = embed.description
                         # --- post embed message
                         await message.channel.send(embed=embed)
 
                 if len(set_matches) == 1:
-                    returned_elements = maintainsong.bs4buildSetSummary(myset)
+                    returned_elements = maintainsong.bs4buildSetSummary(my_set)
                     status_message = '\n'.join(returned_elements)  # --- convert list to string
                     print(status_message)
                     await message.channel.send(status_message)
@@ -443,24 +448,236 @@ def read_discord():
                 await message.channel.send(reply_message)
                 return
 
-        return
+        await client.process_commands(message)
 
-    # --- Start the bot
-    client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
-    # --- End of Discord Bot
+    # -----------------------------------#
+    #     Process Bot Commands           #
+    # -----------------------------------#
 
-# ------------end of status checks
+    # TODO: Figure out if this needs to be calculated each run from the server the bots in.
+    guild_ids = [841103547924086844]  # Put your server ID in this array.
+
+    @slash.slash(name="ping", guild_ids=guild_ids)
+    async def ping(ctx):
+        await ctx.send(f"Pong! ({client.latency * 1000}ms)")
+
+    @slash.slash(name="file", guild_ids=guild_ids, description="Shows the text of the given file.")
+    async def show_file(ctx, filename):
+        try:
+            file = discord.File(filename)
+            await ctx.send(file=file)
+        except Exception as e:
+            embed = discord.Embed(title="Exception Error!", description=e)
+            await ctx.send(embed=embed)
+
+    @slash.slash(name="cleanup", guild_ids=guild_ids, description="Removes files from the bulletin directory")
+    async def cleanup(ctx):
+        await ctx.send(embed=utils.convert_embed(monitorfiles.cleanup()))
+
+    @slash.slash(
+        name="rerun",
+        guild_ids=guild_ids,
+        description="Triggers the set build and displays the current status."
+    )
+    async def rerun(ctx):
+        await ctx.send(embed=utils.convert_embed(monitorfiles.filechecker()))
+
+    @slash.slash(
+        name="set-cleanup",
+        guild_ids=guild_ids,
+        description="Deletes bulletin files and the set file."
+    )
+    async def set_cleanup(ctx):
+        await ctx.send(embed=utils.convert_embed(monitorfiles.set_cleanup()))
+
+    @slash.slash(
+        name="version",
+        guild_ids=guild_ids,
+        description="displays the current bot version."
+    )
+    async def version(ctx):
+        await ctx.send("OpenSong Discord Version " + VERSION)
+
+    @slash.slash(
+        name="repost-message",
+        guild_ids=guild_ids,
+        description="Reposts the message with the given ID"
+    )
 
 
+    async def repost(ctx, message_id):
+        msg = await ctx.fetch_message(message_id)
+        await ctx.send(msg)
+
+    @slash.slash(
+        name="add-song",
+        guild_ids=guild_ids,
+        description="Adds a song the website and dropbox with attached "
+                    "song.txt"
+    )
+    async def add_song(ctx):
+        await ctx.send("This command has not been implemented yet."
+                       )
+
+    @slash.slash(
+        name="display-song",
+        guild_ids=guild_ids,
+        description="Retrieves a song from the website"
+    )
+    async def display_song(ctx):
+        await ctx.send("This command has not been implemented yet."
+                       )
+
+    @slash.slash(
+        name="display-set",
+        guild_ids=guild_ids,
+        description="Retrieves a set from the website"
+    )
+    async def display_set(ctx):
+        await ctx.send("This command has not been implemented yet."
+                       )
+
+    @slash.slash(
+        name="sync",
+        guild_ids=guild_ids,
+        description="Description needed..."
+    )
+    async def sync(ctx):
+        await ctx.send("This command has not been implemented yet.")
+
+
+    @slash.slash(
+        name="sync",
+        guild_ids=guild_ids,
+        description="Description needed..."
+    )
+    async def sync(ctx):
+        await ctx.send("This command has not been implemented yet.")
+
+    # -----------------------------------#
+    #     Start the discord bot.         #
+    # -----------------------------------#
+    client.run(os.environ['DISCORD_TOKEN'])
+
+
+def parse_message():
+    status_message: list[str] = []
+    valid_message = ''
+
+    try:
+        # --- Read the Discord message file
+        textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
+        Lines = textFile.readlines()  # --- read the file into a list
+        textFile.close()
+        # TODO: Scope this exception (PEP 8: E722 do not use bare 'except')
+    except:
+        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(
+            bulletin_path + filelist.DiscordMessageFilename)
+        status_message.append(file_status)
+        return status_message
+
+    # TODO: Rewrite these into a singular function, removing magic numbers.
+    # https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Unnamed_numerical_constants
+    for i in range(0, len(Lines) - 1):
+        # --- check for worship schedule message
+        if 'worshipschedule' in Lines[i].replace(" ", '').replace('\t', '').lower():
+            valid_message = 'true'
+            worship_schedule = []
+            status_message.append('Worship Schedule message received')
+            for j in range(i, len(Lines)):
+                line = Lines[j]
+                worship_schedule.append(line)
+                j += 1
+            # --- write the worship schedule file
+            textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile.writelines(worship_schedule)
+            textFile.close()
+            # reset the line pointer in the file
+            i = j
+
+            # read the worship schedule file extracted from discord and store in a  "lists" file
+            readworshipschedule.readWS()
+
+        elif 'sermoninfo' in Lines[i].replace(" ", '').replace('\t', '').lower():
+            valid_message = 'true'
+            sermoninfo = []
+            status_message.append('Sermon Info message received')
+            for j in range(i, len(Lines)):
+                line = Lines[j]
+                sermoninfo.append(line)
+                if j + 1 == len(Lines):
+                    break
+                else:
+                    if '@here' in Lines[j + 1]:
+                        break
+                j += 1
+
+            # --- write the Sermon Info file
+            textFile = open(bulletin_path + filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile.writelines(sermoninfo)
+            textFile.close()
+            # reset the line pointer in the file
+            i = j
+
+        elif 'confessionofsin' in Lines[i].replace(" ", '').replace('\t', '').lower():
+            valid_message = 'true'
+            confessioninfo = []
+            status_message.append('Confession of Sin message received')
+
+            for j in range(i, len(Lines)):
+                line = Lines[j]
+                confessioninfo.append(line)
+                if j + 1 == len(Lines):
+                    break
+                else:
+                    if '@here' in Lines[j + 1]:
+                        break
+                j += 1
+
+            # write the Confession of Sin file
+            textFile = open(bulletin_path + filelist.ConfessionFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile.writelines(confessioninfo)
+            textFile.close()
+            # reset the line pointer in the file
+            i = j
+
+        elif 'assuranceofpardon' in Lines[i].replace(" ", '').replace('\t', '').lower():
+            valid_message = 'true'
+            assuranceinfo = []
+            status_message.append('Assurance of Pardon message received')
+
+            for j in range(i, len(Lines)):
+                line = Lines[j]
+                assuranceinfo.append(line)
+                if j + 1 == len(Lines):
+                    break
+                else:
+                    if '@here' in Lines[j + 1]:
+                        break
+                j += 1
+
+            # write the Assurance of Pardon
+            textFile = open(bulletin_path + filelist.AssuranceFilename, 'w', encoding='utf-8', errors='ignore')
+            textFile.writelines(assuranceinfo)
+            textFile.close()
+            # reset the line pointer in the file
+            i = j
+
+        i += 1
+    if valid_message:
+        return status_message
+    else:
+        status_message.append('\nUnrecognized message received')
+        return status_message
+
+    # ----------------------------#
+    #     Start the Bot           #
+    # ----------------------------#
+
+
+# -----------------------------------#
+#     Main Routine Call              #
+# -----------------------------------#
 def main():
-    # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
-    #--- Execute the main function
     read_discord()
     return ()
-
-    # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
-    #
-    if __name__ == "__main__":
-        main()
-#
-# ======================================================================================
