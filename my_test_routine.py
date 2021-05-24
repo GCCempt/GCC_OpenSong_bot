@@ -2,10 +2,10 @@
         
 def main():
     import utils
-    import readbulletin
+    import monitorfiles
 
-    print('\nStart readbulletin!\n')
-    readbulletin.parsebulletin()
+    print('\nMy Test Routing - Start Test!\n')
+    utils.generate_set_name()
 
     return()
 

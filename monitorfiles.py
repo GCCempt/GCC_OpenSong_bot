@@ -82,7 +82,7 @@ def filechecker():
         assemble_status_message = opensong.assembleset()  # --- all files exist, run the buildset process
         status_message = status_message + str(assemble_status_message)
 
-    return status_message
+    return (status_message)
 
 
 # --- function to read the key files, extract the date and very that the indidcated dates match
@@ -185,7 +185,7 @@ def cleanup():
     bulletin_path ='bulletin/'
     set_path = 'sets/'
 
-    status_message = '\n**Start File Clean up processing started!**\n'
+    status_message = '\nFile Clean up processing started!\n'
     print(status_message)
 
     file_name = bulletin_path + filelist.SongsFileName
@@ -253,7 +253,7 @@ def cleanup():
 
     #--- update the current status
     #status_message = monitorfiles.filechecker()  # --- update the status file
-    status_message = status_message + '\n**File Cleanup completed**'
+    status_message = status_message + 'File Cleanup completed'
 
     print(status_message)
 
@@ -266,7 +266,7 @@ def set_cleanup():
 
     #--- clean up the OpenSong set
     status_message = '\nSet Cleanup process started'
-    print(status_message)
+    #print(status_message)
     
     setNameAttrib = generate_set_name()
     file_name = set_path +  setNameAttrib
@@ -293,7 +293,7 @@ def set_cleanup():
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 def main():
     status_message = filechecker()
-    print('\nReturn from monitor files:\n', status_message)
+    print('\nFile status:\n', status_message)
 
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
