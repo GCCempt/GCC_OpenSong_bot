@@ -23,17 +23,17 @@ def run_test_scripts():
     #set_cleanup()     #--- clean up the OpenSong set file if running in DEV
 
     # --- Parse the incoming Discord message which is saved in a file
-    print('\nTest Script #1 - mydiscord.parsemessages')
+    print('\nTest Script #1 - parsemessages')
     status_message = str(utils.parsemessage())
     #print(status_message)
 
     if 'does not exist' in status_message:      #--- message.txt file does not exist
         status_message = build_message_file()   #--- create a dummy message file
-        status_message = str(mydiscord.parsemessage())
+        status_message = str(utils.parsemessage())
     
     print(status_message)
 
-    # --- test the restore files process to be able to rerun the entire process
+    # --- test the build worship schedule process
     print('\nTest Script #2 - build worship schedule')
     status_message = build_worship_schedule_file()
 
@@ -59,8 +59,13 @@ def run_test_scripts():
     print('\nTest Script #6 - /displayset\n')
     test_displayset(message='/displayset')
 
+ # --- test the /status functionality
+    print('\nTest Script #7 - /status\n')
+    status_message = monitorfiles.statuscheck()
+    print(status_message)
+
     #--- cleanup after yourself - remove files which were created for the validation process
-    print('\nTest Script #7 - Cleanup')
+    print('\nTest Script #8 - Cleanup')
     set_cleanup()
   
     #--- end testing script
