@@ -24,7 +24,7 @@ def run_test_scripts():
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - mydiscord.parsemessages')
-    status_message = str(mydiscord.parsemessage())
+    status_message = str(utils.parsemessage())
     #print(status_message)
 
     if 'does not exist' in status_message:      #--- message.txt file does not exist
