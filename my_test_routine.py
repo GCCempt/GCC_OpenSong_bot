@@ -1,11 +1,13 @@
+
+
 #--- routine to unit test independent functions
-        
 def main():
     import utils
-    import monitorfiles
+    import readworshipschedule
 
-    print('\nMy Test Routing - Start Test!\n')
-    utils.generate_set_name()
+    print('\nMy Test Routine - Start Test!\n')
+    status_message = readworshipschedule.readWS()
+    print(status_message)
 
     return()
 
