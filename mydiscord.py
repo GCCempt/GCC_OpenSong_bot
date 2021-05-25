@@ -106,7 +106,7 @@ def read_discord():
                 textFile.close()
 
                 # --- parse the incoming Discord message
-                status_message = parsemessage()
+                status_message = utils.parsemessage()
                 if 'Worship Schedule' in message.content:
                     # Create a list of songs from the text tile.
                     song_list = utils.parse_songs_from_file(bulletin_path + filelist.WorshipScheduleFilename)
@@ -297,7 +297,7 @@ def read_discord():
                 textFile.close()
 
                 # --- parse the incoming Discord message
-                status_message = parsemessage()
+                status_message = utils.parsemessage()
                 # --- check if a valid status message was received
                 if status_message:
                     # --- update the current processing status
@@ -448,112 +448,6 @@ def read_discord():
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
     # --- End of Discord Bot
-
-
-# --- Parse the incoming Discord message
-def parsemessage():
-    status_message = []
-    valid_message = ''
-
-    try:
-        # --- Read the Discord message file
-        textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
-        Lines = textFile.readlines()  # --- read the file into a list
-        textFile.close()
-    except:
-        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(bulletin_path + filelist.DiscordMessageFilename)
-        status_message.append(file_status)
-        return (status_message)
-
-    for i in range(0, len(Lines) - 1):
-        # --- check for worship schedule message
-        if 'worshipschedule' in Lines[i].replace(" ", '').replace('\t', '').lower():
-            valid_message = 'true'
-            worshipschedule = []
-            status_message.append('Worship Schedule message received')
-            for j in range(i, len(Lines)):
-                line = Lines[j]
-                worshipschedule.append(line)
-                j += 1
-            # --- write the worship schedule file
-            textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(worshipschedule)
-            textFile.close()
-            i = j  # --- reset the line pointer in the file
-
-            readworshipschedule.readWS()  # read the worship schedule file extracted from discord and store in a  "lists" file
-
-        elif 'sermoninfo' in Lines[i].replace(" ", '').replace('\t', '').lower():
-            valid_message = 'true'
-            sermoninfo = []
-            status_message.append('Sermon Info message received')
-            for j in range(i, len(Lines)):
-                line = Lines[j]
-                sermoninfo.append(line)
-                if j + 1 == len(Lines):
-                    break
-                else:
-                    if '@here' in Lines[j + 1]:
-                        break
-                j += 1
-
-            # print('\nWorship Schedule file name is:', filelist.WorshipScheduleFilename)
-            # --- write the Sermon Info file
-            textFile = open(bulletin_path + filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(sermoninfo)
-            textFile.close()
-            i = j  # --- reset the line pointer in the file
-
-        elif 'confessionofsin' in Lines[i].replace(" ", '').replace('\t', '').lower():
-            valid_message = 'true'
-            confessioninfo = []
-            status_message.append('Confession of Sin message received')
-
-            for j in range(i, len(Lines)):
-                line = Lines[j]
-                confessioninfo.append(line)
-                if j + 1 == len(Lines):
-                    break
-                else:
-                    if '@here' in Lines[j + 1]:
-                        break
-                j += 1
-
-            # --- write the Confession of Sin file
-            textFile = open(bulletin_path  + filelist.ConfessionFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(confessioninfo)
-            textFile.close()
-            i = j  # --- reset the line pointer in the file
-
-        elif 'assuranceofpardon' in Lines[i].replace(" ", '').replace('\t', '').lower():
-            valid_message = 'true'
-            assuranceinfo = []
-            status_message.append('Assurance of Pardon message received')
-
-            for j in range(i, len(Lines)):
-                line = Lines[j]
-                # print('\nAof line: j=', j, ' line=', line, ' len=', len(Lines))
-                assuranceinfo.append(line)
-                if j + 1 == len(Lines):
-                    break
-                else:
-                    if '@here' in Lines[j + 1]:
-                        break
-                j += 1
-
-            # --- write the Assurance of Pardon
-            textFile = open(bulletin_path + filelist.AssuranceFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(assuranceinfo)
-            textFile.close()
-            i = j  # --- reset the line pointer in the file
-
-        i += 1
-    if valid_message:
-        return(status_message)  # --- if a valid message was posted, return status message as a list
-    else:
-        status_message.append('\nUnrecognized message received')
-        return(status_message)
-
 
 # ------------end of status checks
 
