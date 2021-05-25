@@ -1,11 +1,13 @@
+
+
 #--- routine to unit test independent functions
-        
 def main():
     import utils
-    import readbulletin
+    import readworshipschedule
 
-    print('\nStart readbulletin!\n')
-    readbulletin.parsebulletin()
+    print('\nMy Test Routine - Start Test!\n')
+    status_message = readworshipschedule.readWS()
+    print(status_message)
 
     return()
 
