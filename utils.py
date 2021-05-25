@@ -398,15 +398,15 @@ def parsemessage():
                 next_line = items.__next__()
 
                 if next_line == None:
-                    print(message_text)
-                    print('\end of sermon info text')
+                    #print(message_text)
+                    #print('\end of sermon info text')
                     write_message_file(message_text, filelist.SermonInfoFilename)
                     item = next_line
                     break
 
                 if 'confessionofsin' in next_line.replace(" ", '').replace('\t', '').lower() or 'assuranceofpardon' in next_line.replace(" ", '').replace('\t', '').lower():   #--- get the next item
-                    print(message_text)
-                    print('\end of sermon info text')
+                    #print(message_text)
+                    #print('\end of sermon info text')
                     write_message_file(message_text, filelist.SermonInfoFilename)
                     item = next_line    #-- get the next item
                     break
@@ -422,15 +422,15 @@ def parsemessage():
                 next_line = items.__next__()
 
                 if next_line == None:
-                    print(message_text)
-                    print('\end of confession of sin text')
+                    #print(message_text)
+                    #print('\end of confession of sin text')
                     write_message_file(message_text, filelist.ConfessionFilename)
                     item = next_line
                     break
 
                 if 'sermoninfo' in next_line.replace(" ", '').replace('\t', '').lower() or 'assuranceofpardon' in next_line.replace(" ", '').replace('\t', '').lower():   #--- get the next item
-                    print(message_text)
-                    print('\end of confession of sin text')
+                    #print(message_text)
+                    #print('\end of confession of sin text')
                     write_message_file(message_text, filelist.ConfessionFilename)
                     item = next_line    #-- get the next item
                     break
@@ -446,15 +446,15 @@ def parsemessage():
                 next_line = items.__next__()
 
                 if next_line == None:
-                    print(message_text)
-                    print('\end of assurance of pardon text')
+                    #print(message_text)
+                    #print('\end of assurance of pardon text')
                     write_message_file(message_text, filelist.AssuranceFilename)
                     item = next_line
                     break
 
                 if 'sermoninfo' in next_line.replace(" ", '').replace('\t', '').lower() or 'confessionofsin' in next_line.replace(" ", '').replace('\t', '').lower():   #--- get the next item
-                    print(message_text)
-                    print('\end of assurance of pardon text')
+                    #print(message_text)
+                    #print('\end of assurance of pardon text')
                     write_message_file(message_text, filelist.AssuranceFilename)
                     item = next_line    #-- get the next item
                     break
@@ -470,8 +470,8 @@ def parsemessage():
                 next_line = items.__next__()
 
                 if next_line == None:
-                    print(message_text)
-                    print('\end of worship schedule text')
+                    #print(message_text)
+                    #print('\end of worship schedule text')
                     write_message_file(message_text, filelist.WorshipScheduleFilename)
                     item = next_line
                     
