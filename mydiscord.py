@@ -1,22 +1,34 @@
-import logging
 import os
-
 import discord
 from discord.ext import commands
 from discord_slash import SlashCommand
-
 import downloadbulletin
 import filelist
 import getdatetime
 import maintainsong
 import monitorfiles
 import readworshipschedule
+import startup_validation
 import utils
+import logging
+import logging.config
+# ----------------------------#
+#     CONFIGURE LOGGING       #
+# ----------------------------#
+import logging
+# Create logging directory
+if not os.path.exists('logs/'):
+    os.makedirs('logs/')
+
+# TODO: Add "Handlers=[]" argument to write to stdout and the file.
+logging.basicConfig(filename='logs/debug.log',
+                    level=logging.DEBUG,
+                    format="%(asctime)s [%(levelname)s] [%(filename)s] --> %(message)s",
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
 
 # -------------------------#
 #     SET CONSTANTS       #
 # -------------------------#
-logging.basicConfig(level=logging.INFO)
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
 TOKEN = os.environ['DISCORD_TOKEN']
@@ -28,7 +40,7 @@ VERSION = '1.03'
 
 
 def read_discord():
-    logging.info("\n !!!Hello world - OpenSong Discord Client starting at", getdatetime.currentdatetime())
+    logging.info("Hello world - OpenSong Discord Client starting at" + getdatetime.currentdatetime())
 
     # -------------------------#
     #     Run once on start    #
@@ -47,7 +59,7 @@ def read_discord():
     #     Run on each message received   #
     # -----------------------------------#
     @client.event
-    async def on_message(message):        
+    async def on_message(message):
         if message.author == client.user:  # don't respond to messages from yourself
             return ()
 
@@ -113,31 +125,15 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("sermon info", message))
                 if 'confession of sin' in message.content:
                     await message.channel.send(embed=utils.status_embed("confession of sin", message))
-                    
+
                 if 'assurance of pardon' in message.content:
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
-                    
+
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
                     # status_message = statuscheck()  # --- Post the current status on the opensong channel
                     logging.info(status_message)
                     await channel.send(status_message)
-                    if 'Set processing completed' in status_message:
-                        embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
-                                                   description="OpenSong Set Processing")
-                        embed_data.add_field(name="Status:", value=status_message, inline=True)
-                        await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-                        set_matches = maintainsong.displaySet()
-                        if len(set_matches) == 0:
-                            set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
-                            status_message = '\nNo sets matching: {} found!'.format(set_date)
-                            await message.channel.send(status_message)
-                        else:
-                            for my_set, url in set_matches.items():
-                                embed = discord.Embed()
-                                embed.description = '[' + my_set + '](' + url + ')'
-                                # --- post embed message
-                                await message.channel.send(embed=embed)
 
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
                 textFile.writelines(message)
@@ -145,7 +141,8 @@ def read_discord():
                 status_message = parse_message()
                 if status_message:
                     status_message = monitorfiles.filechecker()
-                status_message = status_message + '\nOpenSong  {} command received'.format(message)
+
+                status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
                 logging.info(status_message)
                 await channel.send(utils.convert_embed(status_message))
         await client.process_commands(message)
@@ -154,33 +151,30 @@ def read_discord():
     #     Process Bot Commands           #
     # -----------------------------------#
 
-    # TODO: Figure out if this needs to be calculated each run from the server the bots in.
-    guild_ids = [841103547924086844]  # Put your server ID in this array.
-
-    @slash.slash(name="ping", guild_ids=guild_ids)
+    @slash.slash(name="ping")
     async def ping(ctx):
         await ctx.send(f"Pong! ({client.latency * 1000}ms)")
 
-    @slash.slash(name="hello", guild_ids=guild_ids)
+    @slash.slash(name="hello")
     async def hello(ctx):
         await ctx.send("Hello right back at you!")
 
-    @slash.slash(name="file", guild_ids=guild_ids, description="Shows the text of the given file.")
+    @slash.slash(name="file", description="Shows the text of the given file.")
     async def show_file(ctx, filename):
         try:
             file = discord.File(filename)
             await ctx.send(file=file)
         except Exception as e:
+            logging.warning(e)
             embed = discord.Embed(title="Exception Error!", description=e)
             await ctx.send(embed=embed)
 
-    @slash.slash(name="cleanup", guild_ids=guild_ids, description="Removes files from the bulletin directory")
+    @slash.slash(name="cleanup", description="Removes files from the bulletin directory")
     async def cleanup(ctx):
         await ctx.send(embed=utils.convert_embed(monitorfiles.cleanup()))
 
     @slash.slash(
         name="rerun",
-        guild_ids=guild_ids,
         description="Triggers the set build and displays the current status."
     )
     async def rerun(ctx):
@@ -188,7 +182,6 @@ def read_discord():
 
     @slash.slash(
         name="set-cleanup",
-        guild_ids=guild_ids,
         description="Deletes bulletin files and the set file."
     )
     async def set_cleanup(ctx):
@@ -196,7 +189,6 @@ def read_discord():
 
     @slash.slash(
         name="version",
-        guild_ids=guild_ids,
         description="displays the current bot version."
     )
     async def version(ctx):
@@ -204,48 +196,51 @@ def read_discord():
 
     @slash.slash(
         name="repost-message",
-        guild_ids=guild_ids,
         description="Reposts the message with the given ID"
     )
     async def repost(ctx, message_id):
-        msg = await ctx.fetch_message(message_id)
+        msg = await ctx.channel.fetch_message(int(message_id))
         await ctx.send(msg)
 
     @slash.slash(
         name="add-song",
-        guild_ids=guild_ids,
         description="Adds a song the website and dropbox with attached "
                     "song.txt"
     )
-    async def add_song(ctx):
-        await ctx.send("This command has not been implemented yet."
-                       )
+    async def add_song(ctx, song_name):
+        await ctx.send(utils.convert_embed(maintainsong.addsong(song_name)))
 
     @slash.slash(
         name="display-song",
-        guild_ids=guild_ids,
         description="Retrieves a song from the website"
     )
-    async def display_song(ctx):
-        await ctx.send("This command has not been implemented yet."
-                       )
+    async def display_song(ctx, song_name):
+        song_matches = utils.search_songs(song_name)
+        content = ""
+        for song in song_matches:
+            content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
+        embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s).",
+                                   description=content)
+        await ctx.send(embed=embed_data)
 
     @slash.slash(
         name="display-set",
-        guild_ids=guild_ids,
         description="Retrieves a set from the website"
     )
-    async def display_set(ctx):
-        await ctx.send("This command has not been implemented yet."
-                       )
+    async def display_set(ctx, set_name):
+        set_matches = maintainsong.displaySet(set_name)
+        content = ""
+        for sets in set_matches:
+            content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", description=content)
+        await ctx.send(embed=embed_data)
 
     @slash.slash(
-        name="sync",
-        guild_ids=guild_ids,
-        description="Description needed..."
+        name="validate",
+        description="Runs the startup validation script."
     )
     async def sync(ctx):
-        await ctx.send("This command has not been implemented yet.")
+        await ctx.send(utils.convert_embed(startup_validation.run_test_scripts()))
 
     # -----------------------------------#
     #     Start the discord bot.         #
@@ -256,14 +251,13 @@ def read_discord():
 def parse_message():
     status_message: list[str] = []
     valid_message = ''
-
     try:
         # --- Read the Discord message file
         textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
         Lines = textFile.readlines()  # --- read the file into a list
         textFile.close()
-        # TODO: Scope this exception (PEP 8: E722 do not use bare 'except')
-    except:
+    except OSError as e:
+        logging.critical(e)
         file_status = "Discord Message file {} does not exist. Unable to process messages...".format(
             bulletin_path + filelist.DiscordMessageFilename)
         status_message.append(file_status)

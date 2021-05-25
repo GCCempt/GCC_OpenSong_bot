@@ -28,7 +28,7 @@ def parse_songs_from_file(worship_schedule):
     try:
         worship_text.index('Songs\n')
     except ValueError as error:
-
+        logging.warning(error)
         return 'No songs found.'
     for index, song in enumerate(worship_text):
         # Build a list of elements after "Songs" is found.
@@ -238,8 +238,6 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
     # --- get book, chapter, verse
     hold_book_chapter = ''  # -- save the book and chapter reference
     book = ''
-    chapter = ''
-    scripture = ''
     for p in passages:
         p = p.strip()
         if ' ' in p:  # --- indicates a references includes book; e.g. 'john '
@@ -264,8 +262,7 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
                 verse = p
                 passage_ref = hold_book_chapter + ':' + verse
                 full_ref_passages.append(passage_ref)
-                book_chapter, ref = passage_ref.split(':', 1)
-                # hold_book_chapter = str(book_chapter) + ':'
+
     return full_ref_passages
 
 
@@ -277,12 +274,11 @@ def generate_song_name():
     keys = list(song_dict.keys())
     song_suffix = ' -'
     chars = ['V', 'C', 'T', 'B', 'E', 'X', 'P', 'O', 'I']
-    # Generate pseudo-random opensong stuff
+    # Generate pseudo-random open song stuff
     for char in range(randint(4, 8)):
         song_suffix += " " + choice(chars) + str(randint(0, 9))
     song_name = choice(keys) + song_suffix
     # Reset the suffix
-    suffix = ' -'
 
     return song_name
 
@@ -326,9 +322,9 @@ def generate_set_name():
     else:  # --- running in TEST
         setNameAttrib = computer_name  # --- set default dummy set name for NON-PROD environments
 
-    setname = setNameAttrib + ' GCCEM Sunday Worship'
+    set_name = setNameAttrib + ' GCCEM Sunday Worship'
 
-    return setname  # --- return the generated set name
+    return set_name  # --- return the generated set name
 
 
 def convert_embed(var):
@@ -347,7 +343,7 @@ def status_embed(description, message):
     :param description:
     :return:
     """
-    embed = discord.Embed(color=0x2ECC71, description=description)
+    embed = discord.Embed(color=0x2ECC71, description=description + " was successfully received!")
     embed.add_field(name="Time received:",
                     value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
                     inline=True)
