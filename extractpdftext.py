@@ -2,7 +2,7 @@
 # ! python3
 # ---- using pyMuPDF; https://stackoverflow.com/questions/55767511/how-to-extract-text-from-pdf-in-python-3-7
 def fitz_extract_text(bulletin_path, OutputtextFilename):
-    import fitz # pymupdf package
+    import fitz  # pymupdf package
     import filelist
     set_path = 'sets/'
     bulletin_dir = 'bulletin/'

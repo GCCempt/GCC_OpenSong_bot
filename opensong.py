@@ -1,16 +1,17 @@
 # ------------ Start Build OpenSong Set function - last updated 03/02/2021 by Steve Rogers
-from utils import generate_set_name
-import filelist  # --- definition of list of files and directories used in the proces
+import logging
 import os
+
+import dropbox_api_call  # --- my module to call Dropbox API
+import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime
+import sftp_files  # -- my module to call pysftp
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
-import sftp_files   #-- my module to call pysftp
-import dropbox_api_call #--- my module to call Dropbox API
-import monitorfiles
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 sample_set_path = 'sample_sets/'
+
 
 # ------------ Start Assemble Set function -
 def assembleset():
@@ -34,15 +35,14 @@ def assembleset():
     # -------------- call the process files function to process the files with the extracted bulletin information
     status_message = processfiles(doctree)  # --- pass the XML set document tree
 
-    return(status_message)
+    return (status_message)
+
 
 # ------------ End Assemble Set function -
 
 # ------------Start -  Process files with extracted bulletin information
 def processfiles(doctree):
-    import xml.etree.ElementTree as ET
     import addnode
-    import os
 
     # -------------- Read the contents of the Call To Worship text file -----------------------------
     textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
@@ -85,7 +85,8 @@ def processfiles(doctree):
 
     try:
         body_text.remove('.')  # --- remove list element which is just a period
-    except:
+    except Exception as e:
+        logging.WARNING(e)
         pass
 
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
@@ -159,14 +160,13 @@ def processfiles(doctree):
     # --- call the write xml set function to write the new xml set file
     status_message = writeXMLSet(doctree)
 
-    return (status_message)
+    return status_message
+
 
 # ------------End -  Process files with extracted bulletin information
 
 # ------------Start -  Process Songs
 def processsongs(doctree):
-    import xml.etree.ElementTree as ET
-    import readworshipschedule
     import addnode
 
     # -------------- Read and process the songs text file -----------------------------
@@ -268,7 +268,6 @@ def processsongs(doctree):
 
 # ------------Start -  Write the new XML set
 def writeXMLSet(doctree):
-    import xml.etree.ElementTree as ET
     from utils import generate_set_name
 
     set_path = 'sets/'
@@ -287,18 +286,19 @@ def writeXMLSet(doctree):
 
     status_message = updatefinalstatus()  # --- update the current status file upon comletion of processing
 
-    #--- push the set to the website and to Dropbox
+    # --- push the set to the website and to Dropbox
     file_type = 'set'
-    sftp_files.pushfiles(file_type, setNameAttrib)              #--- sftp the set to the website
-    dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
+    sftp_files.pushfiles(file_type, setNameAttrib)  # --- sftp the set to the website
+    dropbox_api_call.dropboxsync(file_type, setNameAttrib)  # --- sync the set to Dropbox
 
-    #--- push the html files to the website
-    if os.environ['ENVIRON'] == 'PROD'or os.environ['ENVIRON'] == 'MAINDEV':
+    # --- push the html files to the website
+    if os.environ['ENVIRON'] == 'PROD' or os.environ['ENVIRON'] == 'MAINDEV':
         file_type = 'bulletin'
-        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
-        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
+        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)  # --- sftp the bulletin.html file
+        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)  # --- sftp the sermonscripture.html file
 
-    return (status_message)
+    return status_message
+
 
 # ------------End -  Write the new XML set
 
@@ -310,7 +310,7 @@ def split_keep(string):
         string[i] = string[i] + '.'
         # print(string[i])
     del string[-1]  # --- remove the last item from the list
-    return (string)  # --- return a list of sentences with '.'
+    return string  # --- return a list of sentences with '.'
 
 
 # -----------End Function to split string into list by '.'
@@ -323,7 +323,7 @@ def split_keep_after(string, char, count):  # --- input string, delimiter, occur
 
     # print("The extracted string : " + str(res))
 
-    return (res)  # --- return the remaining string
+    return res  # --- return the remaining string
 
 
 # -----------End Function to extract residual characters in string
@@ -336,8 +336,7 @@ def parsecalltoworship():
     # print(body_text)
     leader_flag = ''
     congregation_flag = ''
-    body_text = []
-    body_text.append(Lines[0] + Lines[1])  # --- get the first 2 lines as the first slide
+    body_text = [Lines[0] + Lines[1]]
     # print(body_text)
 
     # --- determine if this is a responsive reading
@@ -359,7 +358,7 @@ def parsecalltoworship():
             body_text.append(Lines[line_count])
             line_count += 1
 
-    return (body_text)
+    return body_text
 
 
 # --- end parsecalltoworship
@@ -425,7 +424,7 @@ def process_responsivereading(Lines, body_text):
     #    print('\nj=', j, 'line=', i)
     #    j +=1
 
-    return (body_text)  # --- return the body_text array
+    return body_text  # --- return the body_text array
 
 
 # -----------End Function to parse call to worship
@@ -448,8 +447,8 @@ def updatefinalstatus():  # --- update the current status  file
 
     status_date = str(getdatetime.currentdatetime())
     status_message = status_message + '\nOpenSong Set created on: ' + status_date
-    
+
     print(status_message)
 
-    return (status_message)  # --- return the remaining string
+    return status_message  # --- return the remaining string
 # -----------End Function to extract residual characters in string

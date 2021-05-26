@@ -1,14 +1,16 @@
 # -------- Read bulletin file -------------------------------
 # ! python3
+import logging
 import os
-from datetime import datetime, timedelta
-import sys, getopt
-import downloadbulletin  # --- my module to download PDF bulletin from website and save locally
+import sys
+
 import extractpdftext  # --- my module to convert PDF bulletin to .txt file
 import filelist  # --- definition of list of files and directories used in the proces
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
+
+
 # ------------ Read bulletin text file function -
 def selectset():
     # --- read and parse the text bulletin file to select a template set for processing
@@ -100,14 +102,15 @@ def parsebulletin():
                         break
                     else:
                         try:
-                            prefix, text = Lines[count].split(' ',
-                                                          1)  # --- split the line at the first space to remove the #'s
+                            prefix, text = Lines[count].split(' ', 1)
+                            # --- split the line at the first space to remove the #'s
                             result = any(([True if subStr in prefix else False for subStr in announcement_tag]))
                             if result:
                                 body_text = body_text + text
                             else:
                                 body_text = body_text + prefix + ' ' + text
-                        except:
+                        except Exception as e:
+                            logger.WARNING(e)
                             body_text = Lines[count]
                     count += 1
 
@@ -170,7 +173,8 @@ def parsebulletin():
 
         # --- extract Affirmation of Faith "tag" from bulletin
         if 'affirmationoffaith' in Lines[count].replace(" ", '').replace('\t', '').lower():
-            # print('\nReadbulletin.parsebulletin Affirmation of Faith header - found; count =', count, ' bulletin line=', Lines[count])
+            # print('\nReadbulletin.parsebulletin Affirmation of Faith header - found;
+            # count =', count, ' bulletin line=', Lines[count])
             count += 1  # ---get the actual Confession title which is stored in the suceeding line
             aof_tag = Lines[count].replace(" ", '').replace('\t', '').lower()
             # print('\nAffirmation of Faith tag added; count =', count, ' bulletin line=', aof_tag)
@@ -221,7 +225,8 @@ def aofextract(aof_tag, count, Lines):
                 if 'gracechristianchurch' in Lines[j + 1].replace(" ", '').replace('\t', '').lower():
                     # print('\nReadBulletin.aofextrct - Write the Affirmation of Faith to text file')
                     # print('\nAffirmation of Faith body text=', body_text)
-                    textFile = open(bulletin_path + filelist.AffirmationFileName, 'w', encoding='utf-8', errors='ignore')
+                    textFile = open(bulletin_path + filelist.AffirmationFileName, 'w', encoding='utf-8',
+                                    errors='ignore')
                     textFile.write(str(body_text))
                     textFile.close()
                     return ()

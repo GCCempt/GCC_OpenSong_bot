@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # --- program to launch the Discord OpenSong Processing
-import sys
-import startup_validation
-import mydiscord
-import threading
-from monitorfiles import cleanup
-import threading
 import os
-import schedule
+import threading
 import time
+
+import schedule
+
+import mydiscord
+from monitorfiles import cleanup
 
 
 # --- https://schedule.readthedocs.io/en/stable/

@@ -1,6 +1,5 @@
 # write-html.py
 import filelist
-import webbrowser
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
@@ -169,10 +168,6 @@ def buildhtmlcontent():
 def buildSermonScriptureContent():
     import passagelookup
     import stringsplit
-    import stringManip
-    import sys
-    import utils
-    import stringsplit
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
     print('\nStarting BuildSermonScriptureContent')
 
@@ -185,7 +180,7 @@ def buildSermonScriptureContent():
     # scripture_ref = 'Galatians 2:1–10; John 3:16'
 
     verses = passagelookup.build_scripture_text(scripture_ref)  # --- returns a list of verses
-    scripture = stringsplit.convertListToString(verses) #--- convert the list to a string
+    scripture = stringsplit.convertListToString(verses)  # --- convert the list to a string
 
     message = data = """<html>
     <head></head>

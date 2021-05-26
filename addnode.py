@@ -1,14 +1,14 @@
 # --- https://stackabuse.com/reading-and-writing-xml-files-in-python/
-def addsong(mytree, slide_group_name, song_name, presenation_order):
+def addsong(mytree, slide_group_name, song_name, presentation_order):
     import xml.etree.ElementTree as ET
 
     # --- remove invalid charactes from song name which are not supported by OpenSong
-    #song_name = song_name.replace("'", '').replace(',', '')
+    # song_name = song_name.replace("'", '').replace(',', '')
     # --- Read Template set
 
     # mytree = ET.parse('C:\\Dropbox\\OpenSongV2\\OpenSong Data\\Sets\\TemplateSet')
-    myroot = mytree.getroot()
-    mynode = mytree.find('./slide_groups')
+    my_root = mytree.getroot()
+    my_node = mytree.find('./slide_groups')
     j = 0  # --- index used to count the slide groups
 
     # print('\nLength of XML document', len(myroot[0]))
@@ -17,7 +17,7 @@ def addsong(mytree, slide_group_name, song_name, presenation_order):
     # print('Adding a song Slide Group=', slide_group_name)
 
     # find all "slide_group" objects and print their "name" attribute
-    for elem in myroot:
+    for elem in my_root:
         for subelem in elem.findall('slide_group'):
             j += 1  # ----- increment the index for counting the slide groups
             # print(elem.tag, elem.text, elem.attrib)
@@ -27,11 +27,11 @@ def addsong(mytree, slide_group_name, song_name, presenation_order):
 
                 # ----------- Build New Slide Group
                 new_slide_group = ET.Element('slide_group')
-                slide_attrib = {'name': song_name, 'type': 'song', 'presentation': presenation_order, 'path': ''}
+                slide_attrib = {'name': song_name, 'type': 'song', 'presentation': presentation_order, 'path': ''}
                 new_slide_group.attrib = slide_attrib
 
                 # --- add the new element to the set
-                mynode.insert(j, new_slide_group)  # ----------- insert the new slide_group
+                my_node.insert(j, new_slide_group)  # ----------- insert the new slide_group
 
     return mytree
 
@@ -42,13 +42,12 @@ def addsong(mytree, slide_group_name, song_name, presenation_order):
 def addscripture(mytree, slide_group_name, scripture_ref):
     import xml.etree.ElementTree as ET
     import passagelookup  # --- modulue to do API lookup for ESV passage from Crossway
-    import stringsplit  # --- modulue to split a string by a number followed by a space
 
     # --- parse the input passage(s) and create a list of the verse text -------
     verses = []
 
-    verses = passagelookup.build_scripture_text(scripture_ref) #--- returns a list of scripture verses
- 
+    verses = passagelookup.build_scripture_text(scripture_ref)  # --- returns a list of scripture verses
+
     # --- Read Template set to be updated
     myroot = mytree.getroot()
     mynode = mytree.find('./slide_groups')
@@ -109,8 +108,6 @@ def addscripture(mytree, slide_group_name, scripture_ref):
 
 # --- Start of findnode function to locate the position to insert a new XML element
 def findnode(mytree, slide_group_name):
-    import xml.etree.ElementTree as ET
-
     myroot = mytree.getroot()  # --- XML document tree passed as a parameter
     # mynode = mytree.find('./slide_groups')          #--- select the starting point in the XMLTree
     j = 0  # --- index used to find the position to insert the new element
@@ -130,7 +127,6 @@ def findnode(mytree, slide_group_name):
 
 # --- Start of Add Body text Function to add body text to a slide group
 def addbodytext(doctree, slide_group_name, body_text):
-    import xml.etree.ElementTree as ET
     root = doctree.getroot()
     # --- find the matching slide group
     try:

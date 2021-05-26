@@ -5,14 +5,14 @@ import filelist  # --- definition of list of files and directories used in the p
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 
+
 def readWS():
-    import pickle
     import numpy as np
-    import os
 
     # print('\nReadWorshipSchedule - file name: ' + filelist.WorshipScheduleFilename)
-    songs = []  # --- array to hold the worship songs and presentation order for each song extracted from Discord into a file
- 
+    # --- array to hold the worship songs and presentation order for each song extracted from Discord into a file
+    songs = []
+
     # ----- read the worship schedule file extracted from Discord into a list / array
 
     textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'r')
@@ -44,7 +44,7 @@ def readWS():
                 parsesong(songs, line)
             else:
                 line = line.strip()  # --- remove leading and trailing spaces
-                #print('\nLooking for hymn - line=', line)
+                # print('\nLooking for hymn - line=', line)
                 # line = ws_hymn
 
                 parsesong(songs, line)
@@ -62,9 +62,9 @@ def readWS():
     np.savetxt(bulletin_path + filelist.SongsFileName, songs,
                fmt='%s')  # --- use numpy module to write 2-dimensional list of songs to file
 
-    #textFile = open(bulletin_path + filelist.SongsFileName, 'r')
-    #lines = textFile.readlines()
-    #textFile.close()
+    # textFile = open(bulletin_path + filelist.SongsFileName, 'r')
+    # lines = textFile.readlines()
+    # textFile.close()
 
     # print('\nSongs File read=',lines)
     # for i in lines:
@@ -74,7 +74,6 @@ def readWS():
 
 # ------------ ParseSong - Split the line into song name and presentation order
 def parsesong(songs, line):
-
     # print('\nParseSong - line: ', line)
     song_name, presentation_order = line.rsplit('-', 1)  # --- split line at 2nd occurrence of '-'
 
@@ -96,4 +95,4 @@ def parsesong(songs, line):
     # print('\nParseSong - Song Name:', url, ' Presentation Order:', presentation_order)
     # print(songs)
 
-    return (songs)
+    return songs

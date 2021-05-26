@@ -1,21 +1,22 @@
+# ----------------------------#
+#     CONFIGURE LOGGING       #
+# ----------------------------#
+import logging
+import logging.config
 import os
+
 import discord
 from discord.ext import commands
 from discord_slash import SlashCommand
+
 import downloadbulletin
 import filelist
 import getdatetime
 import maintainsong
 import monitorfiles
-import readworshipschedule
 import startup_validation
 import utils
-import logging
-import logging.config
-# ----------------------------#
-#     CONFIGURE LOGGING       #
-# ----------------------------#
-import logging
+
 # Create logging directory
 if not os.path.exists('logs/'):
     os.makedirs('logs/')
@@ -248,10 +249,10 @@ def read_discord():
     # -----------------------------------#
     client.run(os.environ['DISCORD_TOKEN'])
 
-
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
     # --- End of Discord Bot
+
 
 # ------------end of status checks
 
