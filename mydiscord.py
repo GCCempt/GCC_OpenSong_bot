@@ -97,7 +97,6 @@ def read_discord():
                         for my_set, url in set_matches.items():
                             embed = discord.Embed()
                             embed.description = '[' + my_set + '](' + url + ')'
-                            status_message = embed.description
                             # --- post embed message
                             await message.channel.send(embed=embed)
 
@@ -307,12 +306,12 @@ def parse_message():
 
         elif 'confessionofsin' in Lines[i].replace(" ", '').replace('\t', '').lower():
             valid_message = 'true'
-            confessioninfo = []
+            confession_info = []
             status_message.append('Confession of Sin message received')
 
             for j in range(i, len(Lines)):
                 line = Lines[j]
-                confessioninfo.append(line)
+                confession_info.append(line)
                 if j + 1 == len(Lines):
                     break
                 else:
@@ -322,19 +321,19 @@ def parse_message():
 
             # write the Confession of Sin file
             textFile = open(bulletin_path + filelist.ConfessionFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(confessioninfo)
+            textFile.writelines(confession_info)
             textFile.close()
             # reset the line pointer in the file
             i = j
 
         elif 'assuranceofpardon' in Lines[i].replace(" ", '').replace('\t', '').lower():
             valid_message = 'true'
-            assuranceinfo = []
+            assurance_info = []
             status_message.append('Assurance of Pardon message received')
 
             for j in range(i, len(Lines)):
                 line = Lines[j]
-                assuranceinfo.append(line)
+                assurance_info.append(line)
                 if j + 1 == len(Lines):
                     break
                 else:
@@ -344,7 +343,7 @@ def parse_message():
 
             # write the Assurance of Pardon
             textFile = open(bulletin_path + filelist.AssuranceFilename, 'w', encoding='utf-8', errors='ignore')
-            textFile.writelines(assuranceinfo)
+            textFile.writelines(assurance_info)
             textFile.close()
             # reset the line pointer in the file
             i = j
