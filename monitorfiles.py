@@ -293,7 +293,7 @@ def set_cleanup():
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 def main():
     status_message = filechecker()
-    print('\nReturn from monitor files:\n', status_message)
+    print('\nFile status:\n', status_message)
 
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
