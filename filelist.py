@@ -3,8 +3,9 @@ import os
 # --- Definitions for files and directories used in the process
 # ---          Directories
 
-setpath = 'sets'  # --- default directory for writing set files
-songpath = 'songs'  # --- default directory for wring song files
+set_path = 'sets/'  # --- default directory for writing set files
+song_path = 'songs/'  # --- default directory for wring song files
+bulletin_path = 'bulletin/'
 
 # ----------- Files used for processing
 WorshipScheduleFilename = 'worshipschedule.txt'
