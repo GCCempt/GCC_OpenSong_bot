@@ -185,7 +185,7 @@ def cleanup():
     bulletin_path = 'bulletin/'
     set_path = 'sets/'
 
-    status_message = '\n**Start File Clean up processing started!**\n'
+    status_message = '\n**File Clean up processing started!\n**'
     print(status_message)
 
     file_name = bulletin_path + filelist.SongsFileName
@@ -269,8 +269,8 @@ def set_cleanup():
 
     # --- clean up the OpenSong set
     status_message = '\nSet Cleanup process started'
-    print(status_message)
-
+    # print(status_message)
+    
     setNameAttrib = generate_set_name()
     file_name = set_path + setNameAttrib
 

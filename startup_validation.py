@@ -23,12 +23,12 @@ def run_test_scripts():
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - parsemessages')
     status_message = str(utils.parsemessage())
-    # print(status_message)
+    #print(status_message)
 
-    if 'does not exist' in status_message:  # --- message.txt file does not exist
-        status_message = build_message_file()  # --- create a dummy message file
+    if 'does not exist' in status_message:      #--- message.txt file does not exist
+        status_message = build_message_file()   #--- create a dummy message file
         status_message = str(utils.parsemessage())
-
+    
     print(status_message)
 
     # --- test the build worship schedule process
@@ -57,12 +57,12 @@ def run_test_scripts():
     print('\nTest Script #6 - /displayset\n')
     test_displayset(message='/displayset')
 
-    # --- test the /status functionality
+ # --- test the /status functionality
     print('\nTest Script #7 - /status\n')
     status_message = monitorfiles.statuscheck()
     print(status_message)
 
-    # --- cleanup after yourself - remove files which were created for the validation process
+    #--- cleanup after yourself - remove files which were created for the validation process
     print('\nTest Script #8 - Cleanup')
     set_cleanup()
 

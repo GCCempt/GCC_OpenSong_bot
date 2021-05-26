@@ -253,7 +253,6 @@ def read_discord():
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
     # --- End of Discord Bot
 
-
 # ------------end of status checks
 
 # -----------------------------------#
