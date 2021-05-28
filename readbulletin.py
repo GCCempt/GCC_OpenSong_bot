@@ -73,6 +73,12 @@ def getfiles():
 
 # --------------- Parse the text bulletin, extract relevant text, write to individual files  ---------------------------
 def parsebulletin():
+    import process_announcements
+
+    # --- extract Announcements from bulletin and create announcements.txt file
+    status_message = process_announcements.extract_announcement()
+    print(status_message)
+        
     # --- read the bulletin text file Using readlines()
     file1 = open(bulletin_path + filelist.TextBulletinFilename, 'r', encoding='utf-8', errors='ignore')
     Lines = file1.readlines()
@@ -82,44 +88,8 @@ def parsebulletin():
     aof_tag = 'aof'  # --- set default value for affirmation of faith tag
     for line in Lines:
         count += 1
-        # --- extract Announcements from bulletin
-        if 'announcements' in Lines[count].lower():
-            # print('\nAnnouncements  - found; count =', count, ' bulletin line=', Lines[count])
-            if 'Doxology' in Lines[count + 1]:
-                # print('\n    ReadBulletinParseBulletin - Doxology line follows Announcements bulletin line=', Lines[count+1])
-                continue
-            else:
-                announcement_tag = ['1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.', '11.', '12.']
 
-                body_text = 'Announcements\n'
-                # print('\nLine Count=', count, ' line=', Lines[count].encode('utf-8'))
-
-                count += 1  # --- advance one line to skip the worship leader name
-                for count in range(count, len(Lines) - 1):
-                    if 'presbyterianchurch' in Lines[count].replace(" ", '').replace('\t', '').lower():
-                        break
-                    else:
-                        try:
-                            prefix, text = Lines[count].split(' ',
-                                                          1)  # --- split the line at the first space to remove the #'s
-                            result = any(([True if subStr in prefix else False for subStr in announcement_tag]))
-                            if result:
-                                body_text = body_text + text
-                            else:
-                                body_text = body_text + prefix + ' ' + text
-                        except:
-                            body_text = Lines[count]
-                    count += 1
-
-                # print('    ReadBulletin.ParseBulletin - end of Announcements.')
-                # --- write the corporate confession to text file
-                textFile = open(bulletin_path + filelist.AnnouncementFileName, 'w', encoding='utf-8',
-                                errors='ignore')  # --- output announcement text file
-                textFile.write(str(body_text))
-                textFile.close()
-                continue
-
-                # --- extract Call To Worship from bulletin
+        # --- extract Call To Worship from bulletin
         if 'calltoworship' in line.replace(" ", '').replace('\t', '').lower():
             # print('\nCall To Worship  - found; count =', count, ' bulletin line=', Lines[count])
             body_text = 'Call To Worship\n'
@@ -153,7 +123,8 @@ def parsebulletin():
             continue
 
         # --- extract sermon information from bulletin
-        if 'sermon' in Lines[count].replace(" ", '').replace('\t', '').lower():
+        #if 'sermon' in Lines[count].replace(" ", '').replace('\t', '').lower():
+        if Lines[count] == 'Sermon \n':
             # print('\nSermon Info  - found; count =', count, ' bulletin line=', Lines[count])
             body_text = 'Sermon    '
             count += 1
