@@ -67,12 +67,12 @@ def read_discord():
             return ()
 
         msg = message.content  # retrieve the Discord message and process below
-        logging.info('Discord Message received on channel:' + message.channel + ' from ' + message.author + ' on ' +
+        print('Discord Message received on channel:' + message.channel + ' from ' + message.author + ' on ' +
                      message.created_at + 'message =' + msg + 'channel ID=' + message.channel.id)
 
         if message.channel.id == int(READ_CHANNEL):  # --- accept messages posted on the READ Channel
 
-            logging.info('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
+            print('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
                          message.created_at)
             channel = client.get_channel(int(POST_CHANNEL))  # --- configure channel to receive reply messages
 
@@ -133,7 +133,7 @@ def read_discord():
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
                     status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
-                    logging.info(status_message)
+                    print(status_message)
                     await channel.send(embed=utils.convert_embed(status_message))
 
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
@@ -147,7 +147,7 @@ def read_discord():
                     status_message = monitorfiles.filechecker()
 
                 status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
-                logging.info(status_message)
+                print(status_message)
                 await channel.send(utils.convert_embed(status_message))
         await client.process_commands(message)
 
