@@ -67,8 +67,8 @@ def read_discord():
             return ()
 
         msg = message.content  # retrieve the Discord message and process below
-        logging.info('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
-                     message.created_at, 'message =', msg, 'channel ID=', message.channel.id)
+        logging.info('Discord Message received on channel:' + message.channel + ' from ' + message.author + ' on ' +
+                     message.created_at + 'message =' + msg + 'channel ID=' + message.channel.id)
 
         if message.channel.id == int(READ_CHANNEL):  # --- accept messages posted on the READ Channel
 
