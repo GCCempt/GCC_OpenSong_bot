@@ -410,7 +410,7 @@ def parsemessage():
 
                 if 'confessionofsin' in next_line.replace(" ", '').replace('\t',
                                                                            '').lower() or 'assuranceofpardon' in next_line.replace(
-                        " ", '').replace('\t', '').lower():  # --- get the next item
+                    " ", '').replace('\t', '').lower():  # --- get the next item
                     # print(message_text)
                     # print('\end of sermon info text')
                     write_message_file(message_text, filelist.SermonInfoFilename)
@@ -436,7 +436,7 @@ def parsemessage():
 
                 if 'sermoninfo' in next_line.replace(" ", '').replace('\t',
                                                                       '').lower() or 'assuranceofpardon' in next_line.replace(
-                        " ", '').replace('\t', '').lower():  # --- get the next item
+                    " ", '').replace('\t', '').lower():  # --- get the next item
                     # print(message_text)
                     # print('\end of confession of sin text')
                     write_message_file(message_text, filelist.ConfessionFilename)
@@ -460,9 +460,9 @@ def parsemessage():
                     item = next_line
                     break
 
-                if 'sermoninfo' in next_line.replace(" ", '').replace('\t',
-                                                                      '').lower() or 'confessionofsin' in next_line.replace(
-                        " ", '').replace('\t', '').lower():  # --- get the next item
+                if 'sermoninfo' in next_line.replace(" ", '').replace('\t', '').lower() or \
+                        'confessionofsin' in next_line.replace(
+                    " ", '').replace('\t', '').lower():  # --- get the next item
                     # print(message_text)
                     # print('\end of assurance of pardon text')
                     write_message_file(message_text, filelist.AssuranceFilename)
@@ -660,5 +660,28 @@ def parsemessage():
     return status_message
     # --- end Parse the incoming Discord message
 
+
 def convert_embed(var):
+    """
+    TODO: document this function
+    :param var:
+    :return:
+    """
     return discord.Embed(description=var)
+
+
+def status_embed(description, message):
+    """
+    TODO: Document this function
+    :param message:
+    :param description:
+    :return:
+    """
+    embed = discord.Embed(color=0x2ECC71, description=description + " was successfully received!")
+    embed.add_field(name="Time received:",
+                    value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
+                    inline=True)
+    embed.add_field(name="User:",
+                    value=message.author,
+                    inline=True)
+    return embed

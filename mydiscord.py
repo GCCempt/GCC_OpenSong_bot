@@ -27,6 +27,8 @@ logging.basicConfig(filename='logs/debug.log',
                     format="%(asctime)s [%(levelname)s] [%(filename)s] --> %(message)s",
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
+
+
 # -------------------------#
 #     SET CONSTANTS       #
 # -------------------------#
