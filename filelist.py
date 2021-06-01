@@ -1,7 +1,4 @@
-import os
-
 # --- Definitions for files and directories used in the process
-# ---          Directories
 
 set_path = 'sets/'  # --- default directory for writing set files
 song_path = 'songs/'  # --- default directory for wring song files

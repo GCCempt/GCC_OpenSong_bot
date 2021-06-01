@@ -10,6 +10,8 @@ import readbulletin
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
+
+
 # --- using urllib2
 def get_bulletin():  # --- function to download bulletin
 
@@ -25,13 +27,13 @@ def get_bulletin():  # --- function to download bulletin
 
     current_bulletin = max(bulletins)  # --- get the current bulletin
     current_bulletin = bulletinurl + current_bulletin
-                            #--- retrieve the bulletin and write to local file
+    # --- retrieve the bulletin and write to local file
     urlretrieve(current_bulletin, bulletin_path + filelist.PDFBulletinFilename)
 
     readbulletin.getfiles()  # --- process the downloaded bulletin file
     status_message = monitorfiles.filechecker()  # --- check if all files are ready to be processed
 
-    return (status_message)
+    return status_message
 
 
 # --- end of get_bulltine function
@@ -39,10 +41,12 @@ def get_bulletin():  # --- function to download bulletin
 # --- https://stackoverflow.com/questions/11023530/python-to-list-http-files-and-directories/34718858
 def get_current_bulletin(bulletinurl):  # --- function to find the most recent bulletin
     # bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/2021/02/'  #-- bulletin URL
-    # bulletinurl = build_directory_name()                #-- call my module getdate() to build the bulletin directory URL
+    # bulletinurl = build_directory_name()
+    # -- call my module getdate() to build the bulletin directory URL
 
     print('\nDownloadBulletin.get_current_bulletin - Bulletin file path: ', bulletinurl)
-    # outputfile = 'C:\\Dropbox\\OpenSongV2\\Bulletin\\bulletin.pdf'              #---  path for downloaded bulletin
+    # outputfile = 'C:\\Dropbox\\OpenSongV2\\Bulletin\\bulletin.pdf'
+    # #---  path for downloaded bulletin
 
     # url = url.replace(" ","%20")
     bulletins = []
@@ -57,7 +61,7 @@ def get_current_bulletin(bulletinurl):  # --- function to find the most recent b
         file_name = i.extract().get_text()
         url_new = url + file_name
         url_new = url_new.replace(" ", "%20")
-        if (file_name[-1] == '/' and file_name[0] != '.'):
+        if file_name[-1] == '/' and file_name[0] != '.':
             # read_url(url_new)          # call this function recursively for each subdirectory
             break
         # print(url_new)
@@ -65,11 +69,12 @@ def get_current_bulletin(bulletinurl):  # --- function to find the most recent b
             # print(file_name)
             bulletins.append(file_name)
 
-    return (bulletins)
+    return bulletins
 
 
 # --- https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
-def build_directory_name():  # --- function to get the current year and month to build the correct bulletin directory URL
+# --- function to get the current year and month to build the correct bulletin directory URL
+def build_directory_name():
     current_month = datetime.now().strftime('%m')  # ---// 02 //This is 0 padded
     current_year_full = datetime.now().strftime('%Y')  # ---// 2018
 
@@ -77,7 +82,7 @@ def build_directory_name():  # --- function to get the current year and month to
     bulletin_directory = 'http://graceem.gccvapca.org/wp-content/uploads/' + current_year_full + '/' + current_month + '/'
     print('Bulletin Directory:', bulletin_directory)
 
-    return (bulletin_directory)
+    return bulletin_directory
 
 
 # --- https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
@@ -92,4 +97,4 @@ def build_prev_month_directory_name():  # --- function to build the bulletin dir
     bulletin_directory = 'http://graceem.gccvapca.org/wp-content/uploads/' + current_year_full + '/' + current_month + '/'
     print('Bulletin Directory:', bulletin_directory)
 
-    return (bulletin_directory)
+    return bulletin_directory

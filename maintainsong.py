@@ -6,9 +6,12 @@ import xml.etree.ElementTree as ET
 import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime
 
+# TODO: These should be variables from filelist.py
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 song_path = 'songs/'
+
+
 # ------------ Start Add Song function -
 def addsong(songname):
     # -------------- Read the contents of the new song lyrics into a list -----------------------------
@@ -58,7 +61,7 @@ def addsong(songname):
         status_message = 'This song already exists: {} Try a different name...'.format(songname)
         # print("This song already exists: {} Try a different name...".format(songname))
         print(status_message)
-        return (status_message)
+        return status_message
     else:
         # doctree.write(songname, xml_declaration=True)
         # --- https://stackoverflow.com/questions/39262455/how-to-write-xml-declaration-into-xml-file
@@ -73,7 +76,7 @@ def addsong(songname):
     subprocess.Popen(
         '/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process to upload the set to the website
 
-    return (status_message)
+    return status_message
 
 
 # ------------ End Build Song function -
@@ -149,7 +152,8 @@ def updatesong(songname):
 
 
 # ------------ Start Dislay Set function -  send link to song
-def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
+def displaySet(
+        setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
     from abc import ABC
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
@@ -214,7 +218,6 @@ def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a defaul
 
 # ------------ Use Beautiful Soup to extract summary of OpenSong XML Set
 def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
-    import os
     from bs4 import BeautifulSoup
     import xml.etree.ElementTree as ET
 
@@ -290,6 +293,6 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
         display_element = str(i) + ' ' + display_element
         returned_elements.append(display_element)
 
-    return (returned_elements)
+    return returned_elements
 
 # --- end bs4 build Set Summary

@@ -51,5 +51,3 @@ def test_parse_songs_from_file():
         assert song_result == expectation, "Result: {result} \n Expectation: {expectation}\n".format(result=song_result,
                                                                                                      expectation=
                                                                                                      expectation)
-
-

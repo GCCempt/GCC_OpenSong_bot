@@ -1,14 +1,14 @@
 
 #--- routine to unit test independent functions
 def main():
-    import process_announcements
-    #import utils
-    #import readworshipschedule
+    import processAffirmationOfFaith
 
     print('\nMy Test Routine - Start Test!\n')
-    status_message = process_announcements.extract_announcement()
+    status_message = processAffirmationOfFaith.read_affirmation_of_faith()
     print(status_message)
 
+    for message in status_message:
+        print(message)
     return()
 
 
