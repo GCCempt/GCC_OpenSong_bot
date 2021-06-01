@@ -111,7 +111,7 @@ def sentenceSplit(string):  # --- input to the function is a string
             sentenceSplit = sentence.split(stringDelim)  # --- 3rd pass, break sentences by ','
             sentence = ''
             for phrase in sentenceSplit:
-                print('\nphrase=', phrase)
+                #print('\nphrase=', phrase)
                 if len(sentence) + len(phrase) > MAX_CHARACTER_LENGTH_PER_LINE:
                     finalList.append(sentence)
                     sentence = phrase + ', '
@@ -448,7 +448,7 @@ def reJoin(sentenceList):  # --- function is called with a list of sentences to 
     for i in range(0, len(sentenceList)):
         sentence = sentenceList[i]
         for j in range(i, len(sentenceList)):
-            print('\nlength of sentence=', len(sentence), 'sentence=', sentence)
+            #print('\nlength of sentence=', len(sentence), 'sentence=', sentence)
             nextSentence = sentenceList[i + 1]
             if sentence[-1] == '.' and len(sentence) + len(nextSentence) < MAX_CHARACTER_LENGTH_PER_LINE:
                 sentence = sentence + ' ' + nextSentence

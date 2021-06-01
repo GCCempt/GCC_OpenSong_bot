@@ -43,15 +43,12 @@ def assembleset():
 # ------------Start -  Process files with extracted bulletin information
 def processfiles(doctree):
     import addnode
+    import processAffirmationOfFaith
 
     # -------------- Read the contents of the Call To Worship text file -----------------------------
-    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the file into a string
-
     slide_group_name = 'Call to Worship'
-    body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides
+    body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides / list
 
-    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add confession text function
 
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
@@ -65,46 +62,26 @@ def processfiles(doctree):
     # -- Add the Sermon Scripture to the XML document
     scripture = body_text.splitlines()
     scripture_ref = scripture[1].strip()
-    print('\nOpenSong.processfiles - Sermon Scripture Reference=', scripture_ref)
+    #print('\nOpenSong.processfiles - Sermon Scripture Reference=', scripture_ref)
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
-    # -------------- Read the contents of the Confession of Sin text file -----------------------------
+    # -------------- Process the contents of the Confession of Sin text file -----------------------------
     slide_group_name = 'Confession of Sin'
 
     textFile = open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the confession of sin file into a string
+    body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
 
-    # --- strip the text at the 3rd ':' to remove the intro words
-    char = ':'
-    count = 3
-    body_text = split_keep_after(body_text, char, count)
-
-    # --- split the text based on period '.'
-    body_text = split_keep(body_text)  # --- call my function to split the string into lines, delimited by '.'
     body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
 
-    try:
-        body_text.remove('.')  # --- remove list element which is just a period
-    except Exception as e:
-        logging.WARNING(e)
-        pass
-
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
-
+    
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
     textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.readlines()  # --- read the file into a list
 
-    # print('\nAssurance of Pardon\n', body_text)
-    # i = 0
-    # for x in body_text:
-    #    print('\ni=', i, 'x=', x)
-    #    i +=1
-
-    # -------------Modified Assurance of Pardon
     slide_group_name = 'Assurance of Pardon'
     scripture_ref = str(body_text[1].strip())
-    print('\nScripture Reference:', scripture_ref)
+    #print('\nScripture Reference:', scripture_ref)
     body_text = slide_group_name + '\n' + scripture_ref
     # print('\nBODY TEXT for Assurance of Pardon:\n', body_text)
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
@@ -112,27 +89,15 @@ def processfiles(doctree):
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    textFile = open(bulletin_path + filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()  # --- read the file into a list
-    # print(body_text)
-
     slide_group_name = 'Affirmation of Faith'
-    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
-    # --- split the text based on period '.'
-    # body_text = split_keep(body_text)           #--- call my function to split the string into lines, delimited by '.'
-    # body_text.insert(0, slide_group_name)       #--- insert the title at the beginning of the list
-    temp_text = body_text[0] + body_text[1]
-    del body_text[1]  # --- remove the 1st and second list items
-    del body_text[0]  # --- remove the 1st and second list items
-    body_text.insert(0, temp_text)  # --- insert the title at the beginning of the list
 
+    body_text = processAffirmationOfFaith.read_affirmation_of_faith()
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
 
     # -------------- Read the contents of the Scripture Reading text file -----------------------------
     textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
     body_text = body_text + '\n'
-    # print('\nScripture Reading body text=', body_text)
 
     slide_group_name = 'Scripture Reading'
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
@@ -145,10 +110,7 @@ def processfiles(doctree):
 
     # -------------- Read the contents of the Announcements text file -----------------------------
     textFile = open(bulletin_path + filelist.AnnouncementFileName, 'r', encoding='utf-8', errors='ignore')
-    # body_text = textFile.read()              #--- read the file into a string
     body_text = textFile.readlines()  # --- read the file into a list
-
-    # print(body_text)
 
     slide_group_name = 'Announcements'
     # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
@@ -359,11 +321,14 @@ def parsecalltoworship():
             line_count += 1
 
     return body_text
-
-
 # --- end parsecalltoworship
 
+#--- Process responsive reading
 def process_responsivereading(Lines, body_text):
+    from stringManip import sentenceSplit, periodSplit
+    from stringsplit import convertListToString
+    import re
+
     count = 1  # --- position the index after the header lines
     end = len(Lines)
     leader_text = ''
@@ -376,7 +341,7 @@ def process_responsivereading(Lines, body_text):
         # line = Lines[count].lower()
 
         # --- Look for responsive reading -----------------------------
-        if 'leader:' in Lines[count].lower():
+        if 'leader' in Lines[count].lower():
             for j in range(count, end):
                 # print('\nIn leader section - j=', j,  ' text=', Lines[j], ' end=', end)
                 leader_text = leader_text + Lines[j]
@@ -384,7 +349,7 @@ def process_responsivereading(Lines, body_text):
                     body_text.append(leader_text)
                     break
                 else:
-                    if 'congregation:' in Lines[j + 1].lower() or 'alltogether:' in Lines[j + 1].lower().replace(" ",
+                    if 'congregation' in Lines[j + 1].lower() or 'alltogether' in Lines[j + 1].lower().replace(" ",
                                                                                                                  ''):
                         # print('\nLeader Body Text =', leader_text)
                         body_text.append(leader_text)
@@ -393,7 +358,7 @@ def process_responsivereading(Lines, body_text):
                         break
                 j += 1
 
-        elif "congregation:" in Lines[count].lower():
+        elif "congregation" in Lines[count].lower():
             # print('\nMatched congregation section - count =', count)
             for j in range(count, end):
                 congregation_text = congregation_text + Lines[j]
@@ -401,9 +366,14 @@ def process_responsivereading(Lines, body_text):
                     body_text.append(congregation_text)
                     break
                 else:
-                    if 'leader:' in Lines[j + 1].lower() or 'alltogether:' in Lines[count + 1].lower().replace(" ", ''):
-                        # print('\nCongregation Body Text =', congregation_text)
-                        body_text.append(congregation_text)
+                    if 'leader' in Lines[j + 1].lower() or 'alltogether' in Lines[count + 1].lower().replace(" ", ''):
+                        congregation_text = congregation_text.replace('\n', ' ')        #--- remove unwanted newline
+                        #congregation_text = re.sub('(\.)\s\w', '(\.)\s\n', congregation_text)
+                        #congregation_text = congregation_text.replace('.', '. \n')      #-- add newlines after each sentence
+                        congregation_text = congregation_text.splitlines(True)      #--- split string based on newline
+                        for line in congregation_text:
+                            body_text.append(line)
+                        
                         congregation_text = ''
                         count = j
                         break
@@ -413,9 +383,21 @@ def process_responsivereading(Lines, body_text):
             # print('\nMatched Alltogether section')
             for j in range(count, end):
                 all_text = all_text + Lines[j]
+                
+                if j + 1 == end:
+                    body_text.append(all_text)
+                    break
+                else:
+                    if 'leader' in Lines[j + 1].lower() or 'congregation' in Lines[count + 1].lower().replace(" ", ''):
+                        # print('\nCongregation Body Text =', congregation_text)
+                        body_text.append(all_text)
+                        all_text = ''
+                        count = j
+                        break
+
                 j += 1
             # print('\nAlltogether Body Text =', all_text)
-            body_text.append(all_text)
+            #body_text.append(all_text)
             count = j
         count += 1
 

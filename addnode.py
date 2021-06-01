@@ -158,11 +158,15 @@ def addbodyslides(doctree, slide_group_name, body_text):
         return ()
 
     # ----------- Build Slide and body text for each sentence in the body text
-    for p in range(0, len(body_text)):
-        # print('\naddnode.addbodyslides - p=', p, 'body_text=', body_text[p])
+    #for p in range(0, len(body_text)):
+        #print('\naddnode.addbodyslides - p=', p, 'body_text=', body_text[p])
+        #new_slide = ET.SubElement(tree, 'slide')
+    for p in body_text:
+        print('\naddnode.addbodyslides - p=', p)
         new_slide = ET.SubElement(tree, 'slide')
         new_body = ET.SubElement(new_slide, 'body')
-        new_body.text = body_text[p]
+        #new_body.text = body_text[p]
+        new_body.text = p
 
     return ()
 # --- end of add confession text function

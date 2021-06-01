@@ -11,10 +11,10 @@ def dropboxsync(file_type, file_name):
     local_computer_path = file_name
 
     current_working_directory = os.getcwd()
-    print('\nDropbox Api() Current Working Directory listing:', current_working_directory, 'input file_name=',
-          file_name)
+    #print('\nDropbox Api() Current Working Directory listing:', current_working_directory, 'input file_name=',
+    #      file_name)
 
-    print(os.listdir())
+    #print(os.listdir())
 
     # --- set the path to destination dropbox folder
     if file_type == 'set':
@@ -27,9 +27,9 @@ def dropboxsync(file_type, file_name):
     dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)  # --- instantiate a Dropbox token
     dbx.users_get_current_account()
 
-    print('\nDropbox folder list\n')
-    for entry in dbx.files_list_folder('').entries:
-        print(entry.name)
+    #print('\nDropbox folder list\n')
+    #for entry in dbx.files_list_folder('').entries:
+    #    print(entry.name)
 
     # --- upload the file to Dropbox from the local file
 

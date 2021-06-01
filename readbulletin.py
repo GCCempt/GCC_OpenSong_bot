@@ -75,10 +75,10 @@ def getfiles():
 
 # --------------- Parse the text bulletin, extract relevant text, write to individual files  ---------------------------
 def parsebulletin():
-    import process_announcements
+    import processAnnouncements
 
     # --- extract Announcements from bulletin and create announcements.txt file
-    status_message = process_announcements.extract_announcement()
+    status_message = processAnnouncements.extract_announcement()
     print(status_message)
 
     # --- read the bulletin text file Using readlines()

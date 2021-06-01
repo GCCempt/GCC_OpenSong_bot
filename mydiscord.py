@@ -67,9 +67,10 @@ def read_discord():
             return ()
 
         msg = message.content  # retrieve the Discord message and process below
-        print('Discord Message received on channel:' + message.channel + ' from ' + message.author + ' on ' +
-                     message.created_at + 'message =' + msg + 'channel ID=' + message.channel.id)
-
+        print('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
+                         message.created_at)
+        channel = client.get_channel(int(POST_CHANNEL))  # --- configure channel to receive reply messages
+        
         if message.channel.id == int(READ_CHANNEL):  # --- accept messages posted on the READ Channel
 
             print('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
@@ -137,7 +138,7 @@ def read_discord():
                     await channel.send(embed=utils.convert_embed(status_message))
 
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
-                textFile.writelines(message)
+                textFile.writelines(message.content)
                 textFile.close()
 
                 # --- parse the incoming Discord message
@@ -172,6 +173,12 @@ def read_discord():
             logging.warning(e)
             embed = discord.Embed(title="Exception Error!", description=e)
             await ctx.send(embed=embed)
+
+    @slash.slash(
+        name="status",
+        description="Displays the status of the build process for this weeks set")
+    async def status(ctx):
+        await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
 
     @slash.slash(name="cleanup", description="Removes files from the bulletin directory")
     async def cleanup(ctx):
