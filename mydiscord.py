@@ -142,7 +142,7 @@ def read_discord():
                 textFile.close()
 
                 # --- parse the incoming Discord message
-                status_message = utils.parsemessage()
+                #status_message = utils.parsemessage()
                 # --- check if a valid status message was received
                 if status_message:
                     status_message = monitorfiles.filechecker()
@@ -215,11 +215,56 @@ def read_discord():
 
     @slash.slash(
         name="add-song",
-        description="Adds a song the website and dropbox with attached "
-                    "song.txt"
+        description="Copies a new song from OpeonSong  to the website"
     )
     async def add_song(ctx, song_name):
-        await ctx.send(utils.convert_embed(maintainsong.addsong(song_name)))
+        status_message = maintainsong.addsong(song_name)   #--- validates song against Dropbox
+        if 'no matching song found' in status_message:
+            embed_data = discord.Embed(title="Song Not Found: " + song_name,
+                                description='no matching song found')
+            await ctx.send(embed=embed_data)
+            return()
+
+        else:  
+            song_matches = utils.search_songs(song_name)            #--- validate song name against website
+            content = ""
+            for song in song_matches:
+                content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
+                song_name = song
+        
+            if len(song_matches) == 1:      # --- found exact match
+                status_message = maintainsong.updatesong(song_name)
+
+                embed_data = discord.Embed(title="Update Song ",
+                                   description=content)
+                await ctx.send(embed=embed_data)
+            else:
+                embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
+                                   description=content)
+                await ctx.send(embed=embed_data)
+
+    @slash.slash(
+        name="update-song",
+        description="Copies an existing song from OpenSong and SFTPs to the website "
+    )
+    async def update_song(ctx, song_name):
+        song_matches = utils.search_songs(song_name)            #--- validate song name against website
+        content = ""
+        for song in song_matches:
+            content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
+            song_name = song
+        
+        if len(song_matches) == 1:      # --- found exact match
+            #song_name = song_matches[song]
+            status_message = maintainsong.updatesong(song_name)
+
+            embed_data = discord.Embed(title="Update Song ",
+                                   description=content)
+            await ctx.send(embed=embed_data)
+        else:
+            embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
+                                   description=content)
+            await ctx.send(embed=embed_data)
 
     @slash.slash(
         name="display-song",
