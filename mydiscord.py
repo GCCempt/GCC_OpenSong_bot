@@ -27,8 +27,6 @@ logging.basicConfig(filename='logs/debug.log',
                     format="%(asctime)s [%(levelname)s] [%(filename)s] --> %(message)s",
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
-
-
 # -------------------------#
 #     SET CONSTANTS       #
 # -------------------------#
@@ -68,13 +66,13 @@ def read_discord():
 
         msg = message.content  # retrieve the Discord message and process below
         print('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
-                         message.created_at)
+              message.created_at)
         channel = client.get_channel(int(POST_CHANNEL))  # --- configure channel to receive reply messages
-        
+
         if message.channel.id == int(READ_CHANNEL):  # --- accept messages posted on the READ Channel
 
             print('Discord Message received on channel:', message.channel, ' from ', message.author, ' on ',
-                         message.created_at)
+                  message.created_at)
             channel = client.get_channel(int(POST_CHANNEL))  # --- configure channel to receive reply messages
 
             # check the Discord message is for the Bulletin post -----
@@ -141,8 +139,6 @@ def read_discord():
                 textFile.writelines(message.content)
                 textFile.close()
 
-                # --- parse the incoming Discord message
-                status_message = utils.parsemessage()
                 # --- check if a valid status message was received
                 if status_message:
                     status_message = monitorfiles.filechecker()
@@ -261,6 +257,7 @@ def read_discord():
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
     # --- End of Discord Bot
+
 
 # ------------end of status checks
 

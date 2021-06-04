@@ -46,12 +46,12 @@ def parse_songs_from_file(worship_schedule):
 
 
 # Takes in a list of songs.
-def validate_songs(SongList, limit):
+def validate_songs(song_list, limit):
     """
     Performs a case-insensitive check on the given dictionary to find matching
     if the passed songs have any matching keys in the dict.
 
-    :param SongList: A python list of song names to check.
+    :param song_list: A python list of song names to check.
     :param limit: The maximum number of song suggestions to return
     :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
     a success/fail message. You must iterate through the embed dict to send all the messages.
@@ -64,7 +64,7 @@ def validate_songs(SongList, limit):
     # convert all dictionary keys to lowercase.
     source_data_lower = {k.lower(): v for k, v in source_data.items()}
     # find an exact match within the dictionary.
-    for song in SongList:
+    for song in song_list:
 
         if source_data_lower.get(song.lower()) is None:
             invalid_songs.append(song)
