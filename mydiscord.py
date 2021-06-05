@@ -27,8 +27,6 @@ logging.basicConfig(filename='logs/debug.log',
                     format="%(asctime)s [%(levelname)s] [%(filename)s] --> %(message)s",
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
-
-
 # -------------------------#
 #     SET CONSTANTS       #
 # -------------------------#
@@ -141,7 +139,6 @@ def read_discord():
                 textFile.writelines(message.content)
                 textFile.close()
 
-                
                 # --- check if a valid status message was received
                 if status_message:
                     status_message = monitorfiles.filechecker()
