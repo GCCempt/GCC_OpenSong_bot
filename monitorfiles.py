@@ -188,9 +188,6 @@ def cleanup():
     status_message = '\n**File Clean up processing started!\n**'
     print(status_message)
 
-    file_name = bulletin_path + filelist.SongsFileName
-    file_list.append(file_name)
-
     file_name = bulletin_path + filelist.PDFBulletinFilename
     file_list.append(file_name)
 
@@ -277,7 +274,7 @@ def set_cleanup():
     if os.path.exists(file_name):
         try:
             os.remove(file_name)
-            status_message = status_message + '\nSet removed {}'.fornat(file_name)
+            status_message = status_message + '\nSet removed {}'.format(file_name)
         except OSError as e:
             logging.warning(e)
             status_message = status_message + '\nUnable to remove file {}..'.format(file_name)

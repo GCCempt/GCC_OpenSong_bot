@@ -119,7 +119,7 @@ def findnode(mytree, slide_group_name):
             # print(elem.tag, elem.text, elem.attrib)
 
             if subelem.get('name').lower() == slide_group_name.lower():
-                print('\nSuccess - Slide Group Found', 'Name:', subelem.get('name'), ' Attrib:', subelem.attrib)
+                #print('\nSuccess - Slide Group Found', 'Name:', subelem.get('name'), ' Attrib:', subelem.attrib)
                 return j  # return the position where the new slide group content will be insterted
 
 
@@ -162,7 +162,7 @@ def addbodyslides(doctree, slide_group_name, body_text):
         #print('\naddnode.addbodyslides - p=', p, 'body_text=', body_text[p])
         #new_slide = ET.SubElement(tree, 'slide')
     for p in body_text:
-        print('\naddnode.addbodyslides - p=', p)
+        #print('\naddnode.addbodyslides - p=', p)
         new_slide = ET.SubElement(tree, 'slide')
         new_body = ET.SubElement(new_slide, 'body')
         #new_body.text = body_text[p]

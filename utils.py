@@ -485,7 +485,6 @@ def parsemessage():
                     write_message_file(message_text, filelist.WorshipScheduleFilename)
                     item = next_line
 
-                    readWS()  # --- process the Worship Schedule file
                     break
                 else:
                     item = next_line
@@ -644,7 +643,6 @@ def parsemessage():
                     write_message_file(message_text, filelist.WorshipScheduleFilename)
                     item = next_line
 
-                    readWS()  # --- process the Worship Schedule file
                     break
                 else:
                     item = next_line
