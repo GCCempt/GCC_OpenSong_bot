@@ -141,8 +141,7 @@ def read_discord():
                 textFile.writelines(message.content)
                 textFile.close()
 
-                # --- parse the incoming Discord message
-                #status_message = utils.parsemessage()
+                
                 # --- check if a valid status message was received
                 if status_message:
                     status_message = monitorfiles.filechecker()
