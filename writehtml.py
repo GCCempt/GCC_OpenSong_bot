@@ -1,6 +1,5 @@
 # write-html.py
 import filelist
-import webbrowser
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
@@ -36,26 +35,16 @@ def readscripture():
 
 # --- retrieve the songs to be included in the HTML file
 def readsongs():
-    # --- read the songs file
-    textFile = open(bulletin_path + filelist.SongsFileName, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the first line from the file
-    textFile.close()
+    import readworshipschedule
+    # --- get the list of worship songs
+    songs = readworshipschedule.readWS()
 
-    song_name, presentation_order = status_message[1].rsplit('-', 1)  # split the line at last '-'
-    soa = song_name  # --- get the Song of Approach
-
-    song_name, presentation_order = status_message[4].rsplit('-', 1)  # split the line at last '-'
-    sor = song_name  # --- get the Song of Response
-
-    song_name, presentation_order = status_message[2].rsplit('-', 1)  # split the line at last '-'
-    sop1 = song_name  # --- get the 1st Song of Praise
-
-    song_name, presentation_order = status_message[3].rsplit('-', 1)  # split the line at last '-'
-    sop2 = song_name  # --- get the 2nd Song of Praise
+    soa = songs[1][0]
+    sor = songs[4][0]
+    sop1 = songs[2][0]
+    sop2 = songs[3][0]
 
     return (soa, sop1, sop2, sor)
-
-
 # --- end retrieve songs
 
 # --- retrieve the sermon text to be included in the HTML file
@@ -169,10 +158,6 @@ def buildhtmlcontent():
 def buildSermonScriptureContent():
     import passagelookup
     import stringsplit
-    import stringManip
-    import sys
-    import utils
-    import stringsplit
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
     print('\nStarting BuildSermonScriptureContent')
 
@@ -185,7 +170,7 @@ def buildSermonScriptureContent():
     # scripture_ref = 'Galatians 2:1–10; John 3:16'
 
     verses = passagelookup.build_scripture_text(scripture_ref)  # --- returns a list of verses
-    scripture = stringsplit.convertListToString(verses) #--- convert the list to a string
+    scripture = stringsplit.convertListToString(verses)  # --- convert the list to a string
 
     message = data = """<html>
     <head></head>

@@ -1,5 +1,6 @@
-from datetime import datetime
 import calendar
+from datetime import datetime
+
 import datefinder
 from dateparser.search import search_dates
 
@@ -9,7 +10,9 @@ def currentdatetime(dateformat='%m/%d/%Y %H:%M %p'):
     received_dt = datetime.now()
     received_dt = received_dt.strftime(dateformat)
 
-    return(received_dt)
+    return received_dt
+
+
 # --- End Get the current date / time
 
 # --- Get the current date and format it
@@ -19,6 +22,8 @@ def currentdate():
     received_dt = received_dt.strftime('%m/%d/%Y')
 
     return received_dt
+
+
 # --- End Get the current date / time
 
 
@@ -89,6 +94,8 @@ def convertdate(receivedDate='2021-04-04'):
 
     print('\nConverted Date=', convertedDateObject)
     return convertedDateObject
+
+
 # --- End Get the current date / time
 
 # --- get the current day of the week (i.e. for today)

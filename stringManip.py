@@ -21,7 +21,7 @@ TEST_STRING3 = \
 MAX_CHARACTER_LENGTH_PER_LINE = 130
 WORD_FUDGE_LENGTH = 30
 MAX_CHARACTER_LENGTH_PER_SPLIT_LINE = (
-                                                  MAX_CHARACTER_LENGTH_PER_LINE / 2) + WORD_FUDGE_LENGTH  # --- for lines without any punctuation which must be split
+                                              MAX_CHARACTER_LENGTH_PER_LINE / 2) + WORD_FUDGE_LENGTH  # --- for lines without any punctuation which must be split
 
 
 def stringSplit(string, max_character_length_per_line):
@@ -111,7 +111,7 @@ def sentenceSplit(string):  # --- input to the function is a string
             sentenceSplit = sentence.split(stringDelim)  # --- 3rd pass, break sentences by ','
             sentence = ''
             for phrase in sentenceSplit:
-                print('\nphrase=', phrase)
+                #print('\nphrase=', phrase)
                 if len(sentence) + len(phrase) > MAX_CHARACTER_LENGTH_PER_LINE:
                     finalList.append(sentence)
                     sentence = phrase + ', '
@@ -225,7 +225,6 @@ def lengthSplit(thirdList):
 
 # --- start Recursive split
 def paragraphSplit(sentenceList):  # --- function is called with a list of sentences
-    import re
     import stringsplit
 
     mysentenceList = []
@@ -257,7 +256,6 @@ def paragraphSplit(sentenceList):  # --- function is called with a list of sente
 # --- start period split
 def periodSplit(string):  # --- function is called with a string
     import re
-    import stringsplit
 
     mysentenceList = []
     mystring = string.replace('\n', ' ')  # --- replace newline characters with spaces
@@ -280,7 +278,6 @@ def periodSplit(string):  # --- function is called with a string
 # --- start semicolon split
 def semicolonSplit(sentenceList):  # --- function is called with a list of sentences
     import re
-    import stringsplit
 
     segmentList = []
     finalList = []
@@ -312,9 +309,6 @@ def semicolonSplit(sentenceList):  # --- function is called with a list of sente
 
 # --- start general split
 def generalSplit(sentenceList, stringDelim='?'):  # --- function is called with a list of sentences
-    import re
-    import stringsplit
-    import sys
 
     segmentList = []
     finalList = []
@@ -408,7 +402,6 @@ def commaSplit(sentenceList):
 
 # --- start final split
 def finalSplit(sentenceList):  # --- function is called with a list of sentences to split sentences based on threshold
-    import re
     finalList = []
     print('\nStart Final Split - Max character per line:', MAX_CHARACTER_LENGTH_PER_LINE)
     for sentence in sentenceList:
@@ -455,7 +448,7 @@ def reJoin(sentenceList):  # --- function is called with a list of sentences to 
     for i in range(0, len(sentenceList)):
         sentence = sentenceList[i]
         for j in range(i, len(sentenceList)):
-            print('\nlength of sentence=', len(sentence), 'sentence=', sentence)
+            #print('\nlength of sentence=', len(sentence), 'sentence=', sentence)
             nextSentence = sentenceList[i + 1]
             if sentence[-1] == '.' and len(sentence) + len(nextSentence) < MAX_CHARACTER_LENGTH_PER_LINE:
                 sentence = sentence + ' ' + nextSentence

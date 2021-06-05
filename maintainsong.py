@@ -1,155 +1,82 @@
 # ------------ Add new song to OpenSong
 import os
+import logging
 import subprocess  # --- for launching external shell commands
 import xml.etree.ElementTree as ET
 
 import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime
+import dropbox_api_call
 
+# TODO: These should be variables from filelist.py
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 song_path = 'songs/'
-# ------------ Start Add Song function -
-def addsong(songname):
-    # -------------- Read the contents of the new song lyrics into a list -----------------------------
-    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
-    Lines = textFile.readlines()  # --- read the file into a list
+new_song_path = bulletin_path + filelist.NewSongTextFilename
 
-    # --- ensure the text lines start with ' '; other lines remain as is
-    i = 0
-    for line in Lines:
-        if line[0] == '.' or line[0] == ' ' or line[0] == '[':
-            Lines[i] = line
-        else:
-            line = ' ' + line
-            Lines[i] = line
-        i += 1
-    # print(Lines)
-    lyrics_text = ''.join(Lines)
-    # print(lyrics_text)
 
-    # --- Open the Template Song and load into XML document tree -----------------------------
-    print('\nMaintainSong.buildsong() ', songname, 'Current Working Directory:', os.getcwd())
+# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
+def addsong(song_name):
+    import dropbox_api_call
+    import sftp_files
+    song_dir = 'songs/'
 
-    datasource = open(song_path + filelist.SongTemplate, 'rb')  # --- read the XML song template
+    status_message, file_name = dropbox_api_call.dropboxread('song', song_name)        #--- download song from Dropbox
+    if 'file downloaded' in status_message:
+        song_name = file_name   #--- convert the song_name to the validated file metadata from DropBox
+        song_path = song_dir + song_name
 
-    doctree = ET.parse(datasource)
-    root = doctree.getroot()
+        #--- push song to website
+        sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
 
-    # --- Read the contents of the lyrics text file -----------------------------
-    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
-    newsong_lyrics = textFile.read()  # --- read the file into a string
-
-    root = doctree.getroot()
-    # --- add the lyrics to the song template
-    for lyrics in root.iter('lyrics'):
-        lyrics.text = lyrics_text
-
-    for title in root.iter('title'):
-        title.text = songname
-
-    for child in root:
-        print(child.tag, child.attrib, child.text)
-
-    # --- write the new song to the OpenSong songs folder
-    os.chdir(song_path + filelist.songpath)  # -- change to the Songs directory
-    # --- check if the song already exists
-    if os.path.isfile(songname):
-        status_message = 'This song already exists: {} Try a different name...'.format(songname)
-        # print("This song already exists: {} Try a different name...".format(songname))
+        status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
         print(status_message)
-        return (status_message)
+
+        #--- remove the temporary copy of the file in the local directory
+        if os.path.exists(song_path):
+            try:
+                os.remove(song_path)
+                print('\nTemporary Song removed: ', song_path)
+            except OSError as e:
+                logging.warning(e)
+                print('\nUnable to remove file: ', song_path)
     else:
-        # doctree.write(songname, xml_declaration=True)
-        # --- https://stackoverflow.com/questions/39262455/how-to-write-xml-declaration-into-xml-file
-        with open(songname, 'wb') as f:
-            f.write(b'<?xml version="1.0" encoding="UTF-8"?>')
-            doctree.write(f, xml_declaration=False, encoding='utf-8')
-            status_message = 'New Song created: {}...'.format(songname)
-            # print("New Song created: {}...".format(songname))
-            print(status_message)
-
-    # --- execute the rsync process to upload the song to the website
-    subprocess.Popen(
-        '/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process to upload the set to the website
-
-    return (status_message)
-
-
-# ------------ End Build Song function -
-
-# ------------Start -  Write Song
-def updatesong(songname):
-    # -------------- Read the contents of the new song lyrics into a list -----------------------------
-    textFile = open(song_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
-    Lines = textFile.readlines()  # --- read the file into a list
-
-    # --- ensure the text lines start with ' '; other lines remain as is
-    i = 0
-    for line in Lines:
-        if line[0] == '.' or line[0] == ' ' or line[0] == '[':
-            Lines[i] = line
-        else:
-            line = ' ' + line
-            Lines[i] = line
-        i += 1
-    # print(Lines)
-    lyrics_text = ''.join(Lines)
-    # print(lyrics_text)
-
-    # --- Open the Template Song and load into XML document tree -----------------------------
-    print('\nMaintainSong.buildsong() ', songname, 'Current Working Directory:', os.getcwd())
-
-    datasource = open(bulletin_path + filelist.SongTemplate, 'rb')  # --- read the XML song template
-
-    doctree = ET.parse(datasource)
-    root = doctree.getroot()
-
-    # --- Read the contents of the lyrics text file -----------------------------
-    textFile = open(bulletin_path + filelist.NewSongTextFilename, 'r', encoding='utf-8', errors='ignore')
-    newsong_lyrics = textFile.read()  # --- read the file into a string
-
-    root = doctree.getroot()
-    # --- add the lyrics to the song template
-    for lyrics in root.iter('lyrics'):
-        lyrics.text = lyrics_text
-
-    for title in root.iter('title'):
-        title.text = songname
-
-    for child in root:
-        print(child.tag, child.attrib, child.text)
-
-    # --- write the new song to the OpenSong songs folder
-
-    # --- check if the song already exists
-    if not os.path.exists(song_path + songname):
-        status_message = 'Unable to update - this song does not exists: {} Try a different name...'.format(songname)
-        print(status_message)
-        return (status_message)
-    else:
-        # --- https://stackoverflow.com/questions/39262455/how-to-write-xml-declaration-into-xml-file
-        with open(song_path + songname, 'wb') as f:
-            f.write(b'<?xml version="1.0" encoding="UTF-8"?>')
-            doctree.write(f, xml_declaration=False, encoding='utf-8')
-            status_message = 'Song updated: {}...'.format(songname)
-            print(status_message)
-
-    # --- execute the rsync process to upload the song to the website
-    subprocess.Popen(
-        '/root/Dropbox/OpenSongV2/rclone-cron.sh')  # --- run the rclone sync process to upload the set to the website
-
-    return (status_message)
-
-
+        status_message = '\nError in Dropbox Song Download - no matching song found'
+    
+    return(status_message)
 # ------------End -  Update Song function
 
 
-# ------------ Start Search Song function -
+# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
+def updatesong(song_name):
+    import dropbox_api_call
+    import sftp_files
+    song_dir = 'songs/'
+    song_path = song_dir + song_name
 
+    status_message = dropbox_api_call.dropboxread('song', song_name)        #--- download song from Dropbox
+
+    #--- push song to website
+    sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
+
+    status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
+    print(status_message)
+
+    #--- remove the temporary copy of the file in the local directory
+    if os.path.exists(song_path):
+        try:
+            os.remove(song_path)
+            print('\nTemporary Song removed: ', song_path)
+        except OSError as e:
+            logging.warning(e)
+            print('\nUnable to remove file: ', song_path)
+    
+    return(status_message)
+# ------------End -  Update Song function
 
 # ------------ Start Dislay Set function -  send link to song
-def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
+def displaySet(
+        setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
     from abc import ABC
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
@@ -214,7 +141,6 @@ def displaySet(setNameAttrib=str(getdatetime.nextSunday())):  # --- get a defaul
 
 # ------------ Use Beautiful Soup to extract summary of OpenSong XML Set
 def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
-    import os
     from bs4 import BeautifulSoup
     import xml.etree.ElementTree as ET
 
@@ -290,6 +216,6 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
         display_element = str(i) + ' ' + display_element
         returned_elements.append(display_element)
 
-    return (returned_elements)
+    return returned_elements
 
 # --- end bs4 build Set Summary

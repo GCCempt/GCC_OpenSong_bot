@@ -1,26 +1,24 @@
 # ---- function to perform basic test Discord Bot functionality
-import utils
 import readworshipschedule
+import utils
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 
 
 def run_test_scripts():
-    import mydiscord
     import downloadbulletin
     import monitorfiles
     import os
-    import filelist
-    from monitorfiles import cleanup, set_cleanup
+    from monitorfiles import set_cleanup
 
     # --- test functionality outside the Discord bot
     print('\nStart End-to-end Testing Script for Discord Bot processing\n')
     print('\nRuntime Environment=', os.environ['ENVIRON'])
 
-    #--- cleanup any residual files before beginning processing
-    #cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
-    #set_cleanup()     #--- clean up the OpenSong set file if running in DEV
+    # --- cleanup any residual files before beginning processing
+    # cleanup()       #--- call the cleanup routine to remove files and reset state for real processing
+    # set_cleanup()     #--- clean up the OpenSong set file if running in DEV
 
     # --- Parse the incoming Discord message which is saved in a file
     print('\nTest Script #1 - parsemessages')
@@ -37,12 +35,10 @@ def run_test_scripts():
     print('\nTest Script #2 - build worship schedule')
     status_message = build_worship_schedule_file()
 
-    readworshipschedule.readWS()  # read the worship schedule file extracted from discord and write the songs.txtfile
-
     print(status_message)
 
     print('\nTest Script #3 - Post the bulletin')
-    status_message = downloadbulletin.get_bulletin()    #--- download the latest bulletin file if one does not exit
+    status_message = downloadbulletin.get_bulletin()  # --- download the latest bulletin file if one does not exit
     print('\nReturn from Download bulletin:\n', status_message)
 
     # --- test the monitor files function to check the overall satus of processing
@@ -67,24 +63,25 @@ def run_test_scripts():
     #--- cleanup after yourself - remove files which were created for the validation process
     print('\nTest Script #8 - Cleanup')
     set_cleanup()
-  
-    #--- end testing script
+
+    # --- end testing script
     status_message = '\nEnd-to-end Testing Script completed!'
     print(status_message)
-    return(status_message)
+    return (status_message)
 
-# ---- end of testscript functionality 
+
+# ---- end of testscript functionality
 
 
 def test_displaysong(message='$display_song'):
     # --- Test the $display_song functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
- 
+
     if ' ' in message:
         # --- split the line at the first space to retrieve the song name
-        command, song_name = message.split(' ',1)
-        #print('\nSong name =', url)
+        command, song_name = message.split(' ', 1)
+        # print('\nSong name =', url)
         song_matches = {}
         # --- call the searchsong function
         song_matches = utils.search_songs(song_name)
@@ -98,19 +95,19 @@ def test_displaysong(message='$display_song'):
     else:
         status_message = '\nAt least a partial Song name is required for lookup\n'
         print(status_message)
+
+
 # ---- end of test /displaysong functionality
 
 def test_displayset(message='/displayset'):
     import maintainsong
-    import getdatetime
-    import os
 
- # --- Test the /displaysong functionality -----
+    # --- Test the /displaysong functionality -----
     status_text = '\nStart {} command received'.format(message)
     print(status_text)
     set_matches = {}
 
-    setNameAttrib = utils.generate_set_name()        #--- get the generated set name
+    setNameAttrib = utils.generate_set_name()  # --- get the generated set name
 
     set_matches = maintainsong.displaySet(setNameAttrib)
 
@@ -121,7 +118,9 @@ def test_displayset(message='/displayset'):
         for myset in set_matches.items():
             print(myset)
 
-    #print(status_message)
+    # print(status_message)
+
+
 # ---- end of test /displaysong functionality
 
 def build_message_file():
@@ -141,15 +140,17 @@ def build_message_file():
             as far as the east is from the west, so far does he remove our transgressions from us. \
                 As a father shows compassion to his children, so the LORD shows compassion to those who fear him."
 
- # --- write a dummy message.txt file -----
+    # --- write a dummy message.txt file -----
     textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(message_text)
     textFile.close()
 
-    status_message ='\nMessage text file created'
+    status_message = '\nMessage text file created'
 
-    return(status_message)
- # ---- end of build Message File functionality 
+    return (status_message)
+
+
+# ---- end of build Message File functionality
 
 def build_worship_schedule_file():
     import filelist
@@ -173,11 +174,13 @@ def build_worship_schedule_file():
     textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(worship_text)
     textFile.close()
-   
-    status_message ='\nWorship Schedule text file created'
 
-    return(status_message)
- # ---- end of build Worship Schedule functionality 
+    status_message = '\nWorship Schedule text file created'
+
+    return (status_message)
+
+
+# ---- end of build Worship Schedule functionality
 
 def build_sermon_info_file():
     import filelist
@@ -190,18 +193,21 @@ def build_sermon_info_file():
     textFile = open(bulletin_path + filelist.SermonInfoFilename, 'w', encoding='utf-8', errors='ignore')
     textFile.write(sermon_info_text)
     textFile.close()
-   
-    status_message ='\nSermon Info text file created'
 
-    return(status_message)
- # ---- end of build Worship Schedule functionality 
+    status_message = '\nSermon Info text file created'
+
+    return (status_message)
+
+
+# ---- end of build Worship Schedule functionality
 
 def main():
-    #--- =============================
+    # --- =============================
     status_message = run_test_scripts()
 
     print(status_message)
-    return()
+    return ()
+
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 #

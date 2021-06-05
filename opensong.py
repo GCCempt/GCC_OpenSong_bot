@@ -1,16 +1,17 @@
 # ------------ Start Build OpenSong Set function - last updated 03/02/2021 by Steve Rogers
-from utils import generate_set_name
-import filelist  # --- definition of list of files and directories used in the proces
+import logging
 import os
+
+import dropbox_api_call  # --- my module to call Dropbox API
+import filelist  # --- definition of list of files and directories used in the proces
 import getdatetime
+import sftp_files  # -- my module to call pysftp
 import writehtml  # --- my module to create the HTML page with the bulletin info for the "livestream" page
-import sftp_files   #-- my module to call pysftp
-import dropbox_api_call #--- my module to call Dropbox API
-import monitorfiles
 
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 sample_set_path = 'sample_sets/'
+
 
 # ------------ Start Assemble Set function -
 def assembleset():
@@ -34,24 +35,20 @@ def assembleset():
     # -------------- call the process files function to process the files with the extracted bulletin information
     status_message = processfiles(doctree)  # --- pass the XML set document tree
 
-    return(status_message)
+    return (status_message)
+
 
 # ------------ End Assemble Set function -
 
 # ------------Start -  Process files with extracted bulletin information
 def processfiles(doctree):
-    import xml.etree.ElementTree as ET
     import addnode
-    import os
+    import processAffirmationOfFaith
 
     # -------------- Read the contents of the Call To Worship text file -----------------------------
-    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the file into a string
-
     slide_group_name = 'Call to Worship'
-    body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides
+    body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides / list
 
-    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add confession text function
 
     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
@@ -65,45 +62,26 @@ def processfiles(doctree):
     # -- Add the Sermon Scripture to the XML document
     scripture = body_text.splitlines()
     scripture_ref = scripture[1].strip()
-    print('\nOpenSong.processfiles - Sermon Scripture Reference=', scripture_ref)
+    #print('\nOpenSong.processfiles - Sermon Scripture Reference=', scripture_ref)
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
-    # -------------- Read the contents of the Confession of Sin text file -----------------------------
+    # -------------- Process the contents of the Confession of Sin text file -----------------------------
     slide_group_name = 'Confession of Sin'
 
     textFile = open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the confession of sin file into a string
+    body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
 
-    # --- strip the text at the 3rd ':' to remove the intro words
-    char = ':'
-    count = 3
-    body_text = split_keep_after(body_text, char, count)
-
-    # --- split the text based on period '.'
-    body_text = split_keep(body_text)  # --- call my function to split the string into lines, delimited by '.'
     body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
 
-    try:
-        body_text.remove('.')  # --- remove list element which is just a period
-    except:
-        pass
-
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
-
+    
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
     textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.readlines()  # --- read the file into a list
 
-    # print('\nAssurance of Pardon\n', body_text)
-    # i = 0
-    # for x in body_text:
-    #    print('\ni=', i, 'x=', x)
-    #    i +=1
-
-    # -------------Modified Assurance of Pardon
     slide_group_name = 'Assurance of Pardon'
     scripture_ref = str(body_text[1].strip())
-    print('\nScripture Reference:', scripture_ref)
+    #print('\nScripture Reference:', scripture_ref)
     body_text = slide_group_name + '\n' + scripture_ref
     # print('\nBODY TEXT for Assurance of Pardon:\n', body_text)
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
@@ -111,27 +89,15 @@ def processfiles(doctree):
     addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    textFile = open(bulletin_path + filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()  # --- read the file into a list
-    # print(body_text)
-
     slide_group_name = 'Affirmation of Faith'
-    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
-    # --- split the text based on period '.'
-    # body_text = split_keep(body_text)           #--- call my function to split the string into lines, delimited by '.'
-    # body_text.insert(0, slide_group_name)       #--- insert the title at the beginning of the list
-    temp_text = body_text[0] + body_text[1]
-    del body_text[1]  # --- remove the 1st and second list items
-    del body_text[0]  # --- remove the 1st and second list items
-    body_text.insert(0, temp_text)  # --- insert the title at the beginning of the list
 
+    body_text = processAffirmationOfFaith.read_affirmation_of_faith()
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
 
     # -------------- Read the contents of the Scripture Reading text file -----------------------------
     textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
     body_text = textFile.read()  # --- read the file into a string
     body_text = body_text + '\n'
-    # print('\nScripture Reading body text=', body_text)
 
     slide_group_name = 'Scripture Reading'
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
@@ -144,10 +110,7 @@ def processfiles(doctree):
 
     # -------------- Read the contents of the Announcements text file -----------------------------
     textFile = open(bulletin_path + filelist.AnnouncementFileName, 'r', encoding='utf-8', errors='ignore')
-    # body_text = textFile.read()              #--- read the file into a string
     body_text = textFile.readlines()  # --- read the file into a list
-
-    # print(body_text)
 
     slide_group_name = 'Announcements'
     # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
@@ -159,46 +122,40 @@ def processfiles(doctree):
     # --- call the write xml set function to write the new xml set file
     status_message = writeXMLSet(doctree)
 
-    return (status_message)
+    return status_message
+
 
 # ------------End -  Process files with extracted bulletin information
 
 # ------------Start -  Process Songs
 def processsongs(doctree):
-    import xml.etree.ElementTree as ET
-    import readworshipschedule
     import addnode
+    import readworshipschedule
 
     # -------------- Read and process the songs text file -----------------------------
     songs = []
-
-    with open(bulletin_path + filelist.SongsFileName) as f:
-        songs = f.read().splitlines()  # read the songs.txt file into a list / array
+    songs = readworshipschedule.readWS()        #-- retrieve a list of songs and presentation orders
 
     # --- process the Song of Approach
-    song_name, presentation_order = songs[1].rsplit('-', 1)  # split the line at '-'
-    song_name = song_name.strip()  # remove leading and trailing spaces
-    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+    song_name = songs[1][0]
+    presentation_order = songs[1][1]
+    song_name, presentation_order = trim_text(song_name, presentation_order)
 
     slide_group_name = 'Song of Approach'
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Approach - song name=', url, ' presentation order=', presentation_order)
-
     doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process the Song of Response - last line in the list
-    song_name, presentation_order = songs[len(songs) - 1].rsplit('-', 1)  # split the line at '-'
-    song_name = song_name.strip()  # remove leading and trailing spaces
-    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+    song_name = songs[len(songs)-1][0]
+    presentation_order = songs[len(songs)-1][1]  # split the line at '-'
+    song_name, presentation_order = trim_text(song_name, presentation_order)
 
     slide_group_name = 'Song of Response'
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
-
-    # print('\nProcess Song of Response - song name=', url, ' presentation order=', presentation_order)
 
     doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
@@ -211,30 +168,26 @@ def processsongs(doctree):
     textFile.close()
 
     if 'NoGloriaPatri' in XMLsetName:  # means use 1 song of praise and a song of assurance
-        song_name, presentation_order = songs[2].rsplit('-', 1)  # split the line at '-'
-        song_name = song_name.strip()  # remove leading and trailing spaces
-        presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+        song_name = songs[2][0]
+        presentation_order = songs[2][1]
+        song_name, presentation_order = trim_text(song_name, presentation_order)
 
         slide_group_name = 'Song of Praise'
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
-
-        # print('\nProcess Song of Praise - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                   presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
         # --- Song or Assurance
-        song_name, presentation_order = songs[3].rsplit('-', 1)  # split the line at '-'
-        song_name = song_name.strip()  # remove leading and trailing spaces
-        presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+        song_name = songs[3][0]
+        presentation_order = songs[3][1]
+        song_name, presentation_order = trim_text(song_name, presentation_order)
 
         slide_group_name = 'Song of Assurance'
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
-
-        # print('\nProcess Song of Assurance - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                   presentation_order)  # (slide_group_name, url)
@@ -245,30 +198,35 @@ def processsongs(doctree):
         body_text = slide_group_name
 
         for s in range(2, len(songs) - 1):  # --- process body_text for 2 Songs of Praise
-            song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
-            song_name = song_name.strip()  # remove leading and trailing spaces
-            presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+            song_name = songs[s][0]
+            presentation_order = songs[s][1]
+            song_name, presentation_order = trim_text(song_name, presentation_order)
+
             body_text = body_text + '\n' + song_name
 
-            # print('\nProcess Songs of Praise Body Text- song name=', url)
             addnode.addbodytext(doctree, slide_group_name, body_text)
 
         for s in range(len(songs) - 2, 1, -1):  # --- process 2 Songs of Praise in reverse order
-            song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
-            song_name = song_name.strip()  # remove leading and trailing spaces
-            presentation_order = presentation_order.strip()  # remove leading and trailing spaces
-            # print('\nProcess Songs of Praise - song name=', url, ' presentation order=', presentation_order)
+            song_name = songs[s][0]
+            presentation_order = songs[s][1]
+            song_name, presentation_order = trim_text(song_name, presentation_order)
+
             doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                       presentation_order)  # (slide_group_name, url)
-
     return ()
+#---  End process songs routine
 
+# ------------Start -  extrqact song and presentation order
+def trim_text(song_name, presentation_order):
+    song_name = song_name.strip().rstrip('-')  # remove trailing '-'
+    song_name = song_name.strip()  # remove leading and trailing spaces
+    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
 
-# -------------- End Read and process the songs text file -----------------------------
+    return(song_name, presentation_order)
+# -------------- End extract song and presentation order -----------------------------
 
 # ------------Start -  Write the new XML set
 def writeXMLSet(doctree):
-    import xml.etree.ElementTree as ET
     from utils import generate_set_name
 
     set_path = 'sets/'
@@ -287,18 +245,19 @@ def writeXMLSet(doctree):
 
     status_message = updatefinalstatus()  # --- update the current status file upon comletion of processing
 
-    #--- push the set to the website and to Dropbox
+    # --- push the set to the website and to Dropbox
     file_type = 'set'
-    sftp_files.pushfiles(file_type, setNameAttrib)              #--- sftp the set to the website
-    dropbox_api_call.dropboxsync(file_type, setNameAttrib)      #--- sync the set to Dropbox
+    sftp_files.pushfiles(file_type, setNameAttrib)  # --- sftp the set to the website
+    dropbox_api_call.dropboxsync(file_type, setNameAttrib)  # --- sync the set to Dropbox
 
-    #--- push the html files to the website
-    if os.environ['ENVIRON'] == 'PROD'or os.environ['ENVIRON'] == 'MAINDEV':
+    # --- push the html files to the website
+    if os.environ['ENVIRON'] == 'PROD' or os.environ['ENVIRON'] == 'MAINDEV':
         file_type = 'bulletin'
-        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)              #--- sftp the bulletin.html file
-        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)       #--- sftp the sermonscripture.html file
+        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)  # --- sftp the bulletin.html file
+        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)  # --- sftp the sermonscripture.html file
 
-    return (status_message)
+    return status_message
+
 
 # ------------End -  Write the new XML set
 
@@ -310,7 +269,7 @@ def split_keep(string):
         string[i] = string[i] + '.'
         # print(string[i])
     del string[-1]  # --- remove the last item from the list
-    return (string)  # --- return a list of sentences with '.'
+    return string  # --- return a list of sentences with '.'
 
 
 # -----------End Function to split string into list by '.'
@@ -323,7 +282,7 @@ def split_keep_after(string, char, count):  # --- input string, delimiter, occur
 
     # print("The extracted string : " + str(res))
 
-    return (res)  # --- return the remaining string
+    return res  # --- return the remaining string
 
 
 # -----------End Function to extract residual characters in string
@@ -336,8 +295,7 @@ def parsecalltoworship():
     # print(body_text)
     leader_flag = ''
     congregation_flag = ''
-    body_text = []
-    body_text.append(Lines[0] + Lines[1])  # --- get the first 2 lines as the first slide
+    body_text = [Lines[0] + Lines[1]]
     # print(body_text)
 
     # --- determine if this is a responsive reading
@@ -359,12 +317,15 @@ def parsecalltoworship():
             body_text.append(Lines[line_count])
             line_count += 1
 
-    return (body_text)
-
-
+    return body_text
 # --- end parsecalltoworship
 
+#--- Process responsive reading
 def process_responsivereading(Lines, body_text):
+    from stringManip import sentenceSplit, periodSplit
+    from stringsplit import convertListToString
+    import re
+
     count = 1  # --- position the index after the header lines
     end = len(Lines)
     leader_text = ''
@@ -377,7 +338,7 @@ def process_responsivereading(Lines, body_text):
         # line = Lines[count].lower()
 
         # --- Look for responsive reading -----------------------------
-        if 'leader:' in Lines[count].lower():
+        if 'leader' in Lines[count].lower():
             for j in range(count, end):
                 # print('\nIn leader section - j=', j,  ' text=', Lines[j], ' end=', end)
                 leader_text = leader_text + Lines[j]
@@ -385,7 +346,7 @@ def process_responsivereading(Lines, body_text):
                     body_text.append(leader_text)
                     break
                 else:
-                    if 'congregation:' in Lines[j + 1].lower() or 'alltogether:' in Lines[j + 1].lower().replace(" ",
+                    if 'congregation' in Lines[j + 1].lower() or 'alltogether' in Lines[j + 1].lower().replace(" ",
                                                                                                                  ''):
                         # print('\nLeader Body Text =', leader_text)
                         body_text.append(leader_text)
@@ -394,7 +355,7 @@ def process_responsivereading(Lines, body_text):
                         break
                 j += 1
 
-        elif "congregation:" in Lines[count].lower():
+        elif "congregation" in Lines[count].lower():
             # print('\nMatched congregation section - count =', count)
             for j in range(count, end):
                 congregation_text = congregation_text + Lines[j]
@@ -402,9 +363,14 @@ def process_responsivereading(Lines, body_text):
                     body_text.append(congregation_text)
                     break
                 else:
-                    if 'leader:' in Lines[j + 1].lower() or 'alltogether:' in Lines[count + 1].lower().replace(" ", ''):
-                        # print('\nCongregation Body Text =', congregation_text)
-                        body_text.append(congregation_text)
+                    if 'leader' in Lines[j + 1].lower() or 'alltogether' in Lines[count + 1].lower().replace(" ", ''):
+                        congregation_text = congregation_text.replace('\n', ' ')        #--- remove unwanted newline
+                        #congregation_text = re.sub('(\.)\s\w', '(\.)\s\n', congregation_text)
+                        #congregation_text = congregation_text.replace('.', '. \n')      #-- add newlines after each sentence
+                        congregation_text = congregation_text.splitlines(True)      #--- split string based on newline
+                        for line in congregation_text:
+                            body_text.append(line)
+                        
                         congregation_text = ''
                         count = j
                         break
@@ -414,9 +380,21 @@ def process_responsivereading(Lines, body_text):
             # print('\nMatched Alltogether section')
             for j in range(count, end):
                 all_text = all_text + Lines[j]
+                
+                if j + 1 == end:
+                    body_text.append(all_text)
+                    break
+                else:
+                    if 'leader' in Lines[j + 1].lower() or 'congregation' in Lines[count + 1].lower().replace(" ", ''):
+                        # print('\nCongregation Body Text =', congregation_text)
+                        body_text.append(all_text)
+                        all_text = ''
+                        count = j
+                        break
+
                 j += 1
             # print('\nAlltogether Body Text =', all_text)
-            body_text.append(all_text)
+            #body_text.append(all_text)
             count = j
         count += 1
 
@@ -425,7 +403,7 @@ def process_responsivereading(Lines, body_text):
     #    print('\nj=', j, 'line=', i)
     #    j +=1
 
-    return (body_text)  # --- return the body_text array
+    return body_text  # --- return the body_text array
 
 
 # -----------End Function to parse call to worship
@@ -448,8 +426,8 @@ def updatefinalstatus():  # --- update the current status  file
 
     status_date = str(getdatetime.currentdatetime())
     status_message = status_message + '\nOpenSong Set created on: ' + status_date
-    
+
     print(status_message)
 
-    return (status_message)  # --- return the remaining string
+    return status_message  # --- return the remaining string
 # -----------End Function to extract residual characters in string

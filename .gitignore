@@ -184,3 +184,15 @@ fabric.properties
 /bulletin
 /sets
 /songs
+
+# logs
+logs/
+/logs/
+logs/*
+*.log
+debug.log
+/logs
+/logs/debug.log
+
+# testfiles
+my_test_routine.py
