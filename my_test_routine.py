@@ -1,16 +1,12 @@
 
 #--- routine to unit test independent functions
 def main():
-    import processAffirmationOfFaith
+    import opensong
 
     print('\nMy Test Routine - Start Test!\n')
-    status_message = processAffirmationOfFaith.read_affirmation_of_faith()
+    status_message = opensong.assembleset()
+
     print(status_message)
-
-    for message in status_message:
-        print(message)
-    return()
-
 
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
     #

@@ -35,8 +35,6 @@ def run_test_scripts():
     print('\nTest Script #2 - build worship schedule')
     status_message = build_worship_schedule_file()
 
-    readworshipschedule.readWS()  # read the worship schedule file extracted from discord and write the songs.txtfile
-
     print(status_message)
 
     print('\nTest Script #3 - Post the bulletin')

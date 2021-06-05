@@ -130,37 +130,32 @@ def processfiles(doctree):
 # ------------Start -  Process Songs
 def processsongs(doctree):
     import addnode
+    import readworshipschedule
 
     # -------------- Read and process the songs text file -----------------------------
     songs = []
-
-    with open(bulletin_path + filelist.SongsFileName) as f:
-        songs = f.read().splitlines()  # read the songs.txt file into a list / array
+    songs = readworshipschedule.readWS()        #-- retrieve a list of songs and presentation orders
 
     # --- process the Song of Approach
-    song_name, presentation_order = songs[1].rsplit('-', 1)  # split the line at '-'
-    song_name = song_name.strip()  # remove leading and trailing spaces
-    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+    song_name = songs[1][0]
+    presentation_order = songs[1][1]
+    song_name, presentation_order = trim_text(song_name, presentation_order)
 
     slide_group_name = 'Song of Approach'
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
 
-    # print('\nProcess Song of Approach - song name=', url, ' presentation order=', presentation_order)
-
     doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
 
     # --- process the Song of Response - last line in the list
-    song_name, presentation_order = songs[len(songs) - 1].rsplit('-', 1)  # split the line at '-'
-    song_name = song_name.strip()  # remove leading and trailing spaces
-    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+    song_name = songs[len(songs)-1][0]
+    presentation_order = songs[len(songs)-1][1]  # split the line at '-'
+    song_name, presentation_order = trim_text(song_name, presentation_order)
 
     slide_group_name = 'Song of Response'
     body_text = slide_group_name
     body_text = body_text + '\n' + song_name
-
-    # print('\nProcess Song of Response - song name=', url, ' presentation order=', presentation_order)
 
     doctree = addnode.addsong(doctree, slide_group_name, song_name, presentation_order)  # (slide_group_name, url)
     addnode.addbodytext(doctree, slide_group_name, body_text)
@@ -173,30 +168,26 @@ def processsongs(doctree):
     textFile.close()
 
     if 'NoGloriaPatri' in XMLsetName:  # means use 1 song of praise and a song of assurance
-        song_name, presentation_order = songs[2].rsplit('-', 1)  # split the line at '-'
-        song_name = song_name.strip()  # remove leading and trailing spaces
-        presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+        song_name = songs[2][0]
+        presentation_order = songs[2][1]
+        song_name, presentation_order = trim_text(song_name, presentation_order)
 
         slide_group_name = 'Song of Praise'
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
-
-        # print('\nProcess Song of Praise - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                   presentation_order)  # (slide_group_name, url)
         addnode.addbodytext(doctree, slide_group_name, body_text)
 
         # --- Song or Assurance
-        song_name, presentation_order = songs[3].rsplit('-', 1)  # split the line at '-'
-        song_name = song_name.strip()  # remove leading and trailing spaces
-        presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+        song_name = songs[3][0]
+        presentation_order = songs[3][1]
+        song_name, presentation_order = trim_text(song_name, presentation_order)
 
         slide_group_name = 'Song of Assurance'
         body_text = slide_group_name
         body_text = body_text + '\n' + song_name
-
-        # print('\nProcess Song of Assurance - song name=', url, ' presentation order=', presentation_order)
 
         doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                   presentation_order)  # (slide_group_name, url)
@@ -207,26 +198,32 @@ def processsongs(doctree):
         body_text = slide_group_name
 
         for s in range(2, len(songs) - 1):  # --- process body_text for 2 Songs of Praise
-            song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
-            song_name = song_name.strip()  # remove leading and trailing spaces
-            presentation_order = presentation_order.strip()  # remove leading and trailing spaces
+            song_name = songs[s][0]
+            presentation_order = songs[s][1]
+            song_name, presentation_order = trim_text(song_name, presentation_order)
+
             body_text = body_text + '\n' + song_name
 
-            # print('\nProcess Songs of Praise Body Text- song name=', url)
             addnode.addbodytext(doctree, slide_group_name, body_text)
 
         for s in range(len(songs) - 2, 1, -1):  # --- process 2 Songs of Praise in reverse order
-            song_name, presentation_order = songs[s].rsplit('-', 1)  # split the line at '-'
-            song_name = song_name.strip()  # remove leading and trailing spaces
-            presentation_order = presentation_order.strip()  # remove leading and trailing spaces
-            # print('\nProcess Songs of Praise - song name=', url, ' presentation order=', presentation_order)
+            song_name = songs[s][0]
+            presentation_order = songs[s][1]
+            song_name, presentation_order = trim_text(song_name, presentation_order)
+
             doctree = addnode.addsong(doctree, slide_group_name, song_name,
                                       presentation_order)  # (slide_group_name, url)
-
     return ()
+#---  End process songs routine
 
+# ------------Start -  extrqact song and presentation order
+def trim_text(song_name, presentation_order):
+    song_name = song_name.strip().rstrip('-')  # remove trailing '-'
+    song_name = song_name.strip()  # remove leading and trailing spaces
+    presentation_order = presentation_order.strip()  # remove leading and trailing spaces
 
-# -------------- End Read and process the songs text file -----------------------------
+    return(song_name, presentation_order)
+# -------------- End extract song and presentation order -----------------------------
 
 # ------------Start -  Write the new XML set
 def writeXMLSet(doctree):

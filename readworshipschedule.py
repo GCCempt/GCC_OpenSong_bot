@@ -1,4 +1,4 @@
-# ------------ ReadWS - Read the file containing the Wosrship Schedule extracted from Discord
+# ------------ ReadWS - Read the file containing the validated Wosrship Schedule 
 # --- Definitions for files and directories used in the process
 import filelist  # --- definition of list of files and directories used in the proces
 
@@ -59,17 +59,9 @@ def readWS():
 
         count += 1
 
-    np.savetxt(bulletin_path + filelist.SongsFileName, songs,
-               fmt='%s')  # --- use numpy module to write 2-dimensional list of songs to file
+    #--- return a list of songs and presentation orders
 
-    # textFile = open(bulletin_path + filelist.SongsFileName, 'r')
-    # lines = textFile.readlines()
-    # textFile.close()
-
-    # print('\nSongs File read=',lines)
-    # for i in lines:
-    #    print(i, end = ' ')
-    return ()
+    return (songs)
 
 
 # ------------ ParseSong - Split the line into song name and presentation order
