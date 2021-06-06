@@ -131,21 +131,21 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
-                    status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
+                    #status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
                     print(status_message)
                     await channel.send(embed=utils.convert_embed(status_message))
 
-                textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
-                textFile.writelines(message.content)
-                textFile.close()
+                #textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+                #textFile.writelines(message.content)
+                #textFile.close()
 
                 # --- check if a valid status message was received
-                if status_message:
+                elif status_message:
                     status_message = monitorfiles.filechecker()
 
-                status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
-                print(status_message)
-                await channel.send(utils.convert_embed(status_message))
+                    status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
+                    print(status_message)
+                    await channel.send(utils.convert_embed(status_message))
         await client.process_commands(message)
 
     # -----------------------------------#
