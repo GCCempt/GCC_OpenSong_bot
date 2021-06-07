@@ -288,6 +288,29 @@ def read_discord():
         await ctx.send(embed=embed_data)
 
     @slash.slash(
+        name="update-set",
+        description="Copies a set from OpenSong / DropBox to the website"
+    )
+    async def update_set(ctx, set_name):
+        set_matches = maintainsong.updateset(set_name) #--- push the set to the website        
+
+        content = ""
+        error_message = 'not_found'
+
+        if error_message in set_matches[0]:
+            status_message = '\nUpdate Set:', set_name
+            embed_data = discord.Embed(title="Update Set: " + set_name,
+                            description="set not found")
+            await ctx.send(embed=embed_data)
+        else:
+            set_matches = maintainsong.displaySet(set_name)
+            content = ""
+            for sets in set_matches:
+                content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+                embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", description=content)
+                await ctx.send(embed=embed_data)
+
+    @slash.slash(
         name="validate",
         description="Runs the startup validation script."
     )
@@ -297,7 +320,7 @@ def read_discord():
     # -----------------------------------#
     #     Start the discord bot.         #
     # -----------------------------------#
-    client.run(os.environ['DISCORD_TOKEN'])
+    #client.run(os.environ['DISCORD_TOKEN'])
 
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable
