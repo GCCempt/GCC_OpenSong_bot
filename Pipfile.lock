@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e62ca09f9f71fd87f0397458576097b88e090ab1f2e54b80fdadf007a7a6b8a4"
+            "sha256": "7047cd974c59738a7524126456a226ef2053dd64b6ccd31010f7cacb08ffcae2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -58,6 +58,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==3.7.4.post0"
+        },
+        "apscheduler": {
+            "hashes": [
+                "sha256:1cab7f2521e107d07127b042155b632b7a1cd5e02c34be5a28ff62f77c900c6a",
+                "sha256:c06cc796d5bb9eb3c4f77727f6223476eb67749e7eea074d1587550702a7fbe3"
+            ],
+            "index": "pypi",
+            "version": "==3.7.0"
         },
         "async-timeout": {
             "hashes": [
