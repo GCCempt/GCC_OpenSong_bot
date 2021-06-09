@@ -39,6 +39,45 @@ def run_Discord_Bot():
 
 # --- end of Discord thread
 
+#--- Scheduled Task Trigger
+def task_trigger():
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from datetime import datetime
+    from time import sleep
+    import monitorfiles
+
+    # The "apscheduler." prefix is hard coded
+    scheduler = BackgroundScheduler({
+        'apscheduler.executors.default': {
+            'class': 'apscheduler.executors.pool:ThreadPoolExecutor',
+            'max_workers': '20'
+        },
+        'apscheduler.executors.processpool': {
+            'type': 'processpool',
+            'max_workers': '5'
+        },
+        'apscheduler.job_defaults.coalesce': 'false',
+        'apscheduler.job_defaults.max_instances': '3',
+    })
+
+
+    if not scheduler.running:   #-- check if scheduler is currently running
+        my_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', day_of_week='wed', minute='20')
+        scheduler.start() 
+    
+    scheduler.print_jobs()
+
+    print("Added - {}".format(my_job))
+
+    try:
+        while True:
+            sleep(10)
+
+    except(KeyboardInterrupt, SystemExit):
+        SystemExit
+
+# --- end of Scheduled Task Trigger
+
 def main():
     # --- single threaded scheduled task
 

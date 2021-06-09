@@ -8,6 +8,7 @@ import schedule
 
 import mydiscord
 from monitorfiles import cleanup
+from schedule_tasks import task_trigger
 
 
 # --- https://schedule.readthedocs.io/en/stable/
@@ -41,6 +42,9 @@ def main():
 
     # starting threads
     t1.start()
+
+    #--- schedule the task for for the failsafe bulletin posting check
+    task_trigger()    
 
     # ---  start the discord Bot
     print("ID of process running Discord Bot: {}".format(threading.current_thread().name))
