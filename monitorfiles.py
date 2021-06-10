@@ -325,7 +325,7 @@ def check_for_latest_bulletin():
         next_bulletin_date = next_bulletin_date.replace('-', '')     #--- remove dashes
 
         #### TESTING OVERRIDE
-        next_bulletin_date = '210606'
+        #next_bulletin_date = '210606'
         #### END TESTING OVERRIEDE
     
         if next_bulletin_date in latest_bulletin: #--- next week's bulletin ready to download
@@ -338,22 +338,19 @@ def check_for_latest_bulletin():
             status_message = monitorfiles.filechecker()
             monitorfiles.send_discord_message('Processing Status', status_message)
 
+            #-- check if the set for next week has already been built
+            set_matches = maintainsong.displaySet()	#--- check the website for next Sunday's set
+            if len(set_matches) == 1:      # --- found exact match; set alredy created
+                status_message = ('\nSet already created: ', next_bulletin_date)
+                print(status_message)
+                monitorfiles.send_discord_message('Set Status', status_message)
+
         else:
             status_message = '\nMext week Bulletin has not been uploaded as yet for: ', save_next_bulletin_date
             #--- send message
             monitorfiles.send_discord_message('Bulletin Status', status_message)
     
-    #-- check if the set for next week has already been built
-    set_matches = maintainsong.displaySet()	#--- check the website for next Sunday's set
-    if len(set_matches) == 1:      # --- found exact match; set alredy created
-        status_message = ('\nSet already created: ', next_bulletin_date)
-        print(status_message)
-        monitorfiles.send_discord_message('Set Status', status_message)
 
-    else:
-        status_message = monitorfiles.filechecker()
-        print(status_message)
-        monitorfiles.send_discord_message('Processing Status:', status_message)
 #--- end check for latest bulletin
 
 #--- Use Webhook to post Discord message
