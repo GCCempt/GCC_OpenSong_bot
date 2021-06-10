@@ -41,10 +41,12 @@ def run_Discord_Bot():
 
 #--- Scheduled Task Trigger
 def task_trigger():
+    #--- https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
     from apscheduler.schedulers.background import BackgroundScheduler
     from datetime import datetime
     from time import sleep
     import monitorfiles
+    from mydiscord import read_discord
 
     # The "apscheduler." prefix is hard coded
     scheduler = BackgroundScheduler({
@@ -58,16 +60,24 @@ def task_trigger():
         },
         'apscheduler.job_defaults.coalesce': 'false',
         'apscheduler.job_defaults.max_instances': '3',
-    })
+    }, daemon=True)
 
-
+    #--- schedule the automated bulletin check process
     if not scheduler.running:   #-- check if scheduler is currently running
-        my_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', day_of_week='wed', minute='20')
+        my_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', 
+            day_of_week='thu, fri, sat', 
+            hour='18',
+            minute='15')
+        
         scheduler.start() 
     
     scheduler.print_jobs()
 
     print("Added - {}".format(my_job))
+
+    # ---  start the discord Bot
+    print("ID of process running Discord Bot: {}".format(threading.current_thread().name))
+    read_discord()
 
     try:
         while True:

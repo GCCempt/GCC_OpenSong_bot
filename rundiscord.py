@@ -43,12 +43,10 @@ def main():
     # starting threads
     t1.start()
 
-    #--- schedule the task for for the failsafe bulletin posting check
+    #--- use apscheduler to schedule the task for for the failsafe bulletin posting check
     task_trigger()    
 
-    # ---  start the discord Bot
-    print("ID of process running Discord Bot: {}".format(threading.current_thread().name))
-    mydiscord.read_discord()
+    # ---  note the Discord Bot is started out of the task_trigger function
 
     # wait until all threads finish
     t1.join()

@@ -298,7 +298,8 @@ def check_for_latest_bulletin():
     import monitorfiles
 
     bulletin_path = 'bulletin/'
-    next_bulletin_date = str(getdatetime.nextSunday()) 
+    next_bulletin_date = str(getdatetime.nextSunday())
+    save_next_bulletin_date = next_bulletin_date 
 
 	#--- check if bulletin message has been posted (i.e. bulletin.txt file exists)
     if os.path.isfile(
@@ -306,6 +307,7 @@ def check_for_latest_bulletin():
         file_status = str("Bulletin File {} already downloaded....".format(bulletin_path + filelist.TextBulletinFilename))
         status_message = 'Bulletin: ' + '\u2705' + '\n'
         print(status_message)
+        monitorfiles.send_discord_message('Bulletin Status', status_message)
     else:
         # check if there is a  new buleltin to download
 
@@ -328,22 +330,49 @@ def check_for_latest_bulletin():
     
         if next_bulletin_date in latest_bulletin: #--- next week's bulletin ready to download
             print('\nNext Bulletin Date matches=', next_bulletin_date)
+            status_message = 'Bulletin file found and will be processed for', save_next_bulletin_date
+            status_message = monitorfiles.send_discord_message('Bulletin Status', status_message)
+            
             get_bulletin()
-            monitorfiles.filechecker()
+            
+            status_message = monitorfiles.filechecker()
+            monitorfiles.send_discord_message('Processing Status', status_message)
+
         else:
-            print('\nMext week Bulletin has not been uploaded as yet')
+            status_message = '\nMext week Bulletin has not been uploaded as yet for: ', save_next_bulletin_date
             #--- send message
+            monitorfiles.send_discord_message('Bulletin Status', status_message)
     
     #-- check if the set for next week has already been built
     set_matches = maintainsong.displaySet()	#--- check the website for next Sunday's set
     if len(set_matches) == 1:      # --- found exact match; set alredy created
         status_message = ('\nSet already created: ', next_bulletin_date)
         print(status_message)
-        return()
+        monitorfiles.send_discord_message('Set Status', status_message)
+
     else:
         status_message = monitorfiles.filechecker()
         print(status_message)
+        monitorfiles.send_discord_message('Processing Status:', status_message)
 #--- end check for latest bulletin
+
+#--- Use Webhook to post Discord message
+#--- https://pypi.org/project/discord-webhook/
+def send_discord_message(msg_title='Test Message', msg_description='Lorem ipsum dolor sit', msg_color='03b2f8'):
+    #-- post Status messages to Discord
+    from discord_webhook import DiscordWebhook, DiscordEmbed
+
+    WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
+
+    webhook = DiscordWebhook(url=WEBHOOK_URL)
+    embed = DiscordEmbed(title=msg_title, description=msg_description, color=msg_color)
+
+    # add embed object to webhook
+    webhook.add_embed(embed)
+
+    response = webhook.execute()
+
+#--- end send discord webhook message
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 def main():

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7047cd974c59738a7524126456a226ef2053dd64b6ccd31010f7cacb08ffcae2"
+            "sha256": "8141f84328be33ce09a9e1d633c59bdf8462b48a2bad3117431c41885d1f3e2c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -244,6 +244,14 @@
             ],
             "index": "pypi",
             "version": "==1.2.2"
+        },
+        "discord-webhook": {
+            "hashes": [
+                "sha256:17e475d8a52fe0bfa26b071925f55087600e9bb96e821b611dc463f4b4998c89",
+                "sha256:f3d660df572caaa9c2621edd7e8634a70d6d8295ce9256c365838312457069a1"
+            ],
+            "index": "pypi",
+            "version": "==0.14.0"
         },
         "discord.py": {
             "hashes": [

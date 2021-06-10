@@ -84,9 +84,6 @@ def task_trigger():
 
 #--- end task trigger
 
-
-
-
 #--- main routine to unit test independent functions
 def main():
     import downloadbulletin
@@ -94,7 +91,7 @@ def main():
 
     print('\nMy Test Routine - Start Test!\n')
 
-    task_trigger()
+    monitorfiles.check_for_latest_bulletin()
 
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
     #

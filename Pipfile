@@ -23,6 +23,7 @@ pytest = "*"
 schedule = "*"
 discord-py-slash-command = "*"
 apscheduler = "*"
+discord-webhook = "*"
 
 [dev-packages]
 
