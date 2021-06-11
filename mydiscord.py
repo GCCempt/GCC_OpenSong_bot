@@ -37,7 +37,7 @@ READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
-VERSION = '2.00 - All Under Heaven'
+VERSION = '2.01 - Allegiance'
 
 
 def read_discord():
@@ -131,21 +131,21 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
-                    status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
+                    #status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
                     print(status_message)
                     await channel.send(embed=utils.convert_embed(status_message))
 
-                textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
-                textFile.writelines(message.content)
-                textFile.close()
+                #textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+                #textFile.writelines(message.content)
+                #textFile.close()
 
                 # --- check if a valid status message was received
-                if status_message:
+                elif status_message:
                     status_message = monitorfiles.filechecker()
 
-                status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
-                print(status_message)
-                await channel.send(utils.convert_embed(status_message))
+                    status_message = "{0}{1}".format(status_message, '\nOpenSong  {} command received'.format(message))
+                    print(status_message)
+                    await channel.send(utils.convert_embed(status_message))
         await client.process_commands(message)
 
     # -----------------------------------#
@@ -288,6 +288,29 @@ def read_discord():
         await ctx.send(embed=embed_data)
 
     @slash.slash(
+        name="update-set",
+        description="Copies a set from OpenSong / DropBox to the website"
+    )
+    async def update_set(ctx, set_name):
+        set_matches = maintainsong.updateset(set_name) #--- push the set to the website        
+
+        content = ""
+        error_message = 'not_found'
+
+        if error_message in set_matches[0]:
+            status_message = '\nUpdate Set:', set_name
+            embed_data = discord.Embed(title="Update Set: " + set_name,
+                            description="set not found")
+            await ctx.send(embed=embed_data)
+        else:
+            set_matches = maintainsong.displaySet(set_name)
+            content = ""
+            for sets in set_matches:
+                content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+                embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", description=content)
+                await ctx.send(embed=embed_data)
+
+    @slash.slash(
         name="validate",
         description="Runs the startup validation script."
     )
@@ -297,7 +320,7 @@ def read_discord():
     # -----------------------------------#
     #     Start the discord bot.         #
     # -----------------------------------#
-    client.run(os.environ['DISCORD_TOKEN'])
+    #client.run(os.environ['DISCORD_TOKEN'])
 
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable

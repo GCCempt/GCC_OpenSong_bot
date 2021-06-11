@@ -74,6 +74,38 @@ def updatesong(song_name):
     return(status_message)
 # ------------End -  Update Song function
 
+# ------------Start -  updateSet - copy set from Dropbox and push to website using sftp
+def updateset(set_name):
+    import dropbox_api_call
+    import sftp_files
+
+    set_dir = 'sets/'
+    set_path = set_dir + set_name
+
+    error_message = 'not_found'
+
+    status_message = dropbox_api_call.dropboxread('set', set_name)        #--- download song from Dropbox
+    if error_message in status_message[0]:
+        return(status_message)
+
+    #--- push set to website if there is no error from DropBox
+    sftp_files.pushfiles('set', set_name)  # --- sftp the set to the website
+
+    status_message = '\nSet successfully uploaded to website: {}!'.format(set_name)
+    print(status_message)
+
+    #--- remove the temporary copy of the file in the local directory
+    if os.path.exists(set_path):
+        try:
+            os.remove(set_path)
+            print('\nTemporary Set removed: ', set_path)
+        except OSError as e:
+            logging.warning(e)
+            print('\nUnable to remove file: ', set_path)
+    
+    return(status_message)
+# ------------End -  UpdateSet function
+
 # ------------ Start Dislay Set function -  send link to song
 def displaySet(
         setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed

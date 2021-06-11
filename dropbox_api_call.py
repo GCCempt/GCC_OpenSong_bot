@@ -56,7 +56,7 @@ def dropboxread(file_type, file_name):
         local_computer_path = song_path + file_name
     else:
         dropbox_path = '/OpenSongV2/OpenSong Data/Sets/' + file_name
-        local_computer_path = song_path + file_name
+        local_computer_path = set_path + file_name
 
     dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)  # --- instantiate a Dropbox token
     dbx.users_get_current_account()

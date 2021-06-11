@@ -84,7 +84,6 @@ def filechecker():
 
     return status_message
 
-
 # --- function to read the key files, extract the date and very that the indidcated dates match
 # --- https://www.blog.pythonlibrary.org/2018/05/09/determining-if-all-elements-in-a-list-are-the-same-in-python/
 def comparefiledates():
@@ -286,10 +285,91 @@ def set_cleanup():
     print('\nFile Cleanup Processing completed!')
 
     return (status_message)
-
-
 # ------------End  -  set_cleanup process
 
+def check_for_latest_bulletin():
+    #-- failsafe routine which runs on a schedule to check if the bulletin is ready to download
+    import maintainsong
+    from downloadbulletin import build_directory_name, build_prev_month_directory_name, \
+        get_current_bulletin, get_bulletin
+    import getdatetime
+    import filelist
+    import os
+    import monitorfiles
+
+    bulletin_path = 'bulletin/'
+    next_bulletin_date = str(getdatetime.nextSunday())
+    save_next_bulletin_date = next_bulletin_date 
+
+	#--- check if bulletin message has been posted (i.e. bulletin.txt file exists)
+    if os.path.isfile(
+            bulletin_path + filelist.TextBulletinFilename):  # --- if the bulletin file already downloaded
+        file_status = str("Bulletin File {} already downloaded....".format(bulletin_path + filelist.TextBulletinFilename))
+        status_message = 'Bulletin: ' + '\u2705' + '\n'
+        print(status_message)
+        monitorfiles.send_discord_message('Bulletin Status', status_message)
+    else:
+        # check if there is a  new buleltin to download
+
+    	# bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/'  #-- bulletin URL
+        bulletinurl = build_directory_name()  # -- call my module getdate() to build the bulletin directory URL
+        bulletins = get_current_bulletin(bulletinurl)  # --- find the URL of the current bulletin
+   
+        if len(bulletins) == 0:  # --- no bulletins found for current month
+            bulletinurl = build_prev_month_directory_name()  # --- look in the previous month's directory
+            bulletins = get_current_bulletin(bulletinurl)  # --- find the latest bulletin of the previous month
+        
+        latest_bulletin = max(bulletins)  # --- get the latest bulletin
+
+        next_bulletin_date = next_bulletin_date[2:]
+        next_bulletin_date = next_bulletin_date.replace('-', '')     #--- remove dashes
+
+        #### TESTING OVERRIDE
+        #next_bulletin_date = '210606'
+        #### END TESTING OVERRIEDE
+    
+        if next_bulletin_date in latest_bulletin: #--- next week's bulletin ready to download
+            print('\nNext Bulletin Date matches=', next_bulletin_date)
+            status_message = 'Bulletin file found and will be processed for', save_next_bulletin_date
+            status_message = monitorfiles.send_discord_message('Bulletin Status', status_message)
+            
+            get_bulletin()
+            
+            status_message = monitorfiles.filechecker()
+            monitorfiles.send_discord_message('Automated Processing Status', status_message)
+
+            #-- check if the set for next week has already been built
+            set_matches = maintainsong.displaySet()	#--- check the website for next Sunday's set
+            if len(set_matches) == 1:      # --- found exact match; set alredy created
+                status_message = ('\nSet already created: ', next_bulletin_date)
+                print(status_message)
+                monitorfiles.send_discord_message('Set Status', status_message)
+
+        else:
+            status_message = '\nMext week Bulletin has not been uploaded as yet for: ', save_next_bulletin_date
+            #--- send message
+            monitorfiles.send_discord_message('Bulletin Status', status_message)
+    
+
+#--- end check for latest bulletin
+
+#--- Use Webhook to post Discord message
+#--- https://pypi.org/project/discord-webhook/
+def send_discord_message(msg_title='Test Message', msg_description='Lorem ipsum dolor sit', msg_color='03b2f8'):
+    #-- post Status messages to Discord
+    from discord_webhook import DiscordWebhook, DiscordEmbed
+
+    WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
+
+    webhook = DiscordWebhook(url=WEBHOOK_URL)
+    embed = DiscordEmbed(title=msg_title, description=msg_description, color=msg_color)
+
+    # add embed object to webhook
+    webhook.add_embed(embed)
+
+    response = webhook.execute()
+
+#--- end send discord webhook message
 
 # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
 def main():

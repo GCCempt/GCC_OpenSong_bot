@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e62ca09f9f71fd87f0397458576097b88e090ab1f2e54b80fdadf007a7a6b8a4"
+            "sha256": "8141f84328be33ce09a9e1d633c59bdf8462b48a2bad3117431c41885d1f3e2c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -58,6 +58,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==3.7.4.post0"
+        },
+        "apscheduler": {
+            "hashes": [
+                "sha256:1cab7f2521e107d07127b042155b632b7a1cd5e02c34be5a28ff62f77c900c6a",
+                "sha256:c06cc796d5bb9eb3c4f77727f6223476eb67749e7eea074d1587550702a7fbe3"
+            ],
+            "index": "pypi",
+            "version": "==3.7.0"
         },
         "async-timeout": {
             "hashes": [
@@ -236,6 +244,14 @@
             ],
             "index": "pypi",
             "version": "==1.2.2"
+        },
+        "discord-webhook": {
+            "hashes": [
+                "sha256:17e475d8a52fe0bfa26b071925f55087600e9bb96e821b611dc463f4b4998c89",
+                "sha256:f3d660df572caaa9c2621edd7e8634a70d6d8295ce9256c365838312457069a1"
+            ],
+            "index": "pypi",
+            "version": "==0.14.0"
         },
         "discord.py": {
             "hashes": [
