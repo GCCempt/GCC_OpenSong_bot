@@ -62,18 +62,27 @@ def task_trigger():
         'apscheduler.job_defaults.max_instances': '3',
     }, daemon=True)
 
-    #--- schedule the automated bulletin check process
+    #--- schedule the automated tasks
     if not scheduler.running:   #-- check if scheduler is currently running
-        my_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', 
+        #--- schedule the bulletin automation process
+        my_bulletin_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', 
             day_of_week='thu, fri, sat', 
             hour='18',
             minute='15')
         
+        print("Added - {}".format(my_bulletin_job))
+
+        #--- schedule the weekly file cleanup process
+        my_cleaup_job = scheduler.add_job(monitorfiles.cleanup, trigger='cron', 
+            day_of_week='sun', 
+            hour='13',
+            minute='30') 
+
+        print("Added - {}".format(my_cleaup_job))
+        
         scheduler.start() 
     
     scheduler.print_jobs()
-
-    print("Added - {}".format(my_job))
 
     # ---  start the discord Bot
     print("ID of process running Discord Bot: {}".format(threading.current_thread().name))

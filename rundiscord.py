@@ -1,56 +1,14 @@
 #!/usr/bin/env python3
 # --- program to launch the Discord OpenSong Processing
-import os
-import threading
-import time
-
-import schedule
-
-import mydiscord
-from monitorfiles import cleanup
 from schedule_tasks import task_trigger
 
-
-# --- https://schedule.readthedocs.io/en/stable/
-# --- Schedule OpenSong file cleanup
-def scheduled_task(scheduled_time='13:30'):  # -schedule weekly file cleanup
-
-    # Every Sunday at 13:30 am cleanup is called
-    # schedule.every().sunday.at("11:00").do(cleanup)
-    print("ID of process running on 1st thread: {}".format(threading.current_thread().name))
-    schedule.every().sunday.at(scheduled_time).do(cleanup)
-
-    # Loop so that the scheduling task keeps on running all time.
-
-    while True:
-        # Checks whether a scheduled task is pending to run or not
-        schedule.run_pending()
-        time.sleep(10)
-
-
-# --- end run_scheduled_task
-
-
 def main():
-    print('\nStart OpenSong Scheduled tasks!')
-    # print ID of current process
-    print("ID of process running main program: {}".format(os.getpid()))
-    print("Main thread name: {}".format(threading.current_thread().name))
+    print('\nStart OpenSong Discord Bot!')
 
-    # --- create thread for cleanup process
-    t1 = threading.Thread(target=scheduled_task, name='cleanup')
-
-    # starting threads
-    t1.start()
-
-    #--- use apscheduler to schedule the task for for the failsafe bulletin posting check
+    #--- use apscheduler to schedule the background tasks
     task_trigger()    
 
     # ---  note the Discord Bot is started out of the task_trigger function
-
-    # wait until all threads finish
-    t1.join()
-
 
 # --- End of function main()
 
