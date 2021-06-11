@@ -37,7 +37,7 @@ READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
-VERSION = '2.00 - All Under Heaven'
+VERSION = '2.01 - Allegiance'
 
 
 def read_discord():
