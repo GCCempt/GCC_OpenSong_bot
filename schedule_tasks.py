@@ -39,6 +39,64 @@ def run_Discord_Bot():
 
 # --- end of Discord thread
 
+#--- Scheduled Task Trigger
+def task_trigger():
+    #--- https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from datetime import datetime
+    from time import sleep
+    import monitorfiles
+    from mydiscord import read_discord
+
+    # The "apscheduler." prefix is hard coded
+    scheduler = BackgroundScheduler({
+        'apscheduler.executors.default': {
+            'class': 'apscheduler.executors.pool:ThreadPoolExecutor',
+            'max_workers': '20'
+        },
+        'apscheduler.executors.processpool': {
+            'type': 'processpool',
+            'max_workers': '5'
+        },
+        'apscheduler.job_defaults.coalesce': 'false',
+        'apscheduler.job_defaults.max_instances': '3',
+    }, daemon=True)
+
+    #--- schedule the automated tasks
+    if not scheduler.running:   #-- check if scheduler is currently running
+        #--- schedule the bulletin automation process
+        my_bulletin_job = scheduler.add_job(monitorfiles.check_for_latest_bulletin, trigger='cron', 
+            day_of_week='thu, fri, sat', 
+            hour='18',
+            minute='15')
+        
+        print("Added - {}".format(my_bulletin_job))
+
+        #--- schedule the weekly file cleanup process
+        my_cleaup_job = scheduler.add_job(monitorfiles.cleanup, trigger='cron', 
+            day_of_week='sun', 
+            hour='13',
+            minute='30') 
+
+        print("Added - {}".format(my_cleaup_job))
+        
+        scheduler.start() 
+    
+    scheduler.print_jobs()
+
+    # ---  start the discord Bot
+    print("ID of process running Discord Bot: {}".format(threading.current_thread().name))
+    read_discord()
+
+    try:
+        while True:
+            sleep(10)
+
+    except(KeyboardInterrupt, SystemExit):
+        SystemExit
+
+# --- end of Scheduled Task Trigger
+
 def main():
     # --- single threaded scheduled task
 

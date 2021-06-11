@@ -14,6 +14,7 @@ ENV FTP_HOSTNAME=''
 ENV FTP_USERNAME=''
 ENV ESV_API_KEY=''
 ENV ENVIRON=''
+ENV DISCORD_WEBHOOK_URL=''
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
