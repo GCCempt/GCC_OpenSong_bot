@@ -23,7 +23,7 @@ if not os.path.exists('logs/'):
 
 # TODO: Add "Handlers=[]" argument to write to stdout and the file.
 logging.basicConfig(filename='logs/debug.log',
-                    level=logging.DEBUG,
+                    level=logging.INFO,
                     format="%(asctime)s [%(levelname)s] [%(filename)s] --> %(message)s",
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
@@ -37,7 +37,7 @@ READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
-VERSION = '2.01 - Allegiance'
+VERSION = '2.02 - Andraste'
 
 
 def read_discord():
@@ -110,17 +110,28 @@ def read_discord():
 
                 # --- parse the incoming Discord message
                 status_message = utils.parsemessage()
+
                 if 'Worship Schedule' in message.content:
                     # Create a list of songs from the text tile.
                     song_list = utils.parse_songs_from_file(bulletin_path + filelist.WorshipScheduleFilename)
-                    # Check to see if the songs are valid.
-                    invalid_songs = utils.validate_songs(song_list, 5)
+                    if type(song_list) != str:
+                        # Check to see if the songs are valid.
+                        invalid_songs = utils.validate_songs(song_list, 5)
 
-                    # Return a message on the song status
-                    for return_message in invalid_songs['embed']:
-                        await client.get_channel(int(READ_CHANNEL)).send(embed=invalid_songs['embed'][return_message])
-                    # Apply any needed case-correction - must pass in the song_list of correct case.
-                    utils.song_case_correction(bulletin_path + filelist.WorshipScheduleFilename, invalid_songs['songs'])
+                        # Return a message on the song status
+                        for return_message in invalid_songs['embed']:
+                            await client.get_channel(int(READ_CHANNEL)) \
+                                .send(embed=invalid_songs['embed'][return_message])
+                        # Apply any needed case-correction - must pass in the song_list of correct case.
+                        utils.song_case_correction(bulletin_path + filelist.WorshipScheduleFilename,
+                                                   invalid_songs['songs'])
+                    else:
+                        logging.error("not able to validate any songs in the worship schedule.")
+                        embed_data = discord.Embed(title="Error!", color=0x2ECC71,
+                                                   description="There were not any songs found in the worship schedule."
+                                                               "Please ensure the formatting is correct and post"
+                                                               "the message again.")
+                        await message.channel.send(embed=embed_data)
 
                 if 'sermon info' in message.content:
                     await message.channel.send(embed=utils.status_embed("sermon info", message))
@@ -131,13 +142,13 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
-                    #status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
+                    # status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
                     print(status_message)
                     await channel.send(embed=utils.convert_embed(status_message))
 
-                #textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
-                #textFile.writelines(message.content)
-                #textFile.close()
+                # textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
+                # textFile.writelines(message.content)
+                # textFile.close()
 
                 # --- check if a valid status message was received
                 elif status_message:
@@ -214,29 +225,30 @@ def read_discord():
         description="Copies a new song from OpeonSong  to the website"
     )
     async def add_song(ctx, song_name):
-        status_message = maintainsong.addsong(song_name)   #--- validates song against Dropbox
+        status_message = maintainsong.addsong(song_name)  # --- validates song against Dropbox
         if 'no matching song found' in status_message:
             embed_data = discord.Embed(title="Song Not Found: " + song_name,
-                                description='no matching song found')
+                                       description='no matching song found')
             await ctx.send(embed=embed_data)
-            return()
+            return ()
 
-        else:  
-            song_matches = utils.search_songs(song_name)            #--- validate song name against website
+        else:
+            song_matches = utils.search_songs(song_name)  # --- validate song name against website
             content = ""
             for song in song_matches:
                 content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
                 song_name = song
-        
-            if len(song_matches) == 1:      # --- found exact match
+
+            if len(song_matches) == 1:  # --- found exact match
                 status_message = maintainsong.updatesong(song_name)
 
                 embed_data = discord.Embed(title="Update Song ",
-                                   description=content)
+                                           description=content)
                 await ctx.send(embed=embed_data)
             else:
-                embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
-                                   description=content)
+                embed_data = discord.Embed(
+                    title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
+                    description=content)
                 await ctx.send(embed=embed_data)
 
     @slash.slash(
@@ -244,22 +256,23 @@ def read_discord():
         description="Copies an existing song from OpenSong and SFTPs to the website "
     )
     async def update_song(ctx, song_name):
-        song_matches = utils.search_songs(song_name)            #--- validate song name against website
+        song_matches = utils.search_songs(song_name)  # --- validate song name against website
         content = ""
         for song in song_matches:
             content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
             song_name = song
-        
-        if len(song_matches) == 1:      # --- found exact match
-            #song_name = song_matches[song]
+
+        if len(song_matches) == 1:  # --- found exact match
+            # song_name = song_matches[song]
             status_message = maintainsong.updatesong(song_name)
 
             embed_data = discord.Embed(title="Update Song ",
-                                   description=content)
+                                       description=content)
             await ctx.send(embed=embed_data)
         else:
-            embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
-                                   description=content)
+            embed_data = discord.Embed(
+                title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
+                description=content)
             await ctx.send(embed=embed_data)
 
     @slash.slash(
@@ -292,7 +305,7 @@ def read_discord():
         description="Copies a set from OpenSong / DropBox to the website"
     )
     async def update_set(ctx, set_name):
-        set_matches = maintainsong.updateset(set_name) #--- push the set to the website        
+        set_matches = maintainsong.updateset(set_name)  # --- push the set to the website
 
         content = ""
         error_message = 'not_found'
@@ -300,14 +313,15 @@ def read_discord():
         if error_message in set_matches[0]:
             status_message = '\nUpdate Set:', set_name
             embed_data = discord.Embed(title="Update Set: " + set_name,
-                            description="set not found")
+                                       description="set not found")
             await ctx.send(embed=embed_data)
         else:
             set_matches = maintainsong.displaySet(set_name)
             content = ""
             for sets in set_matches:
                 content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-                embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", description=content)
+                embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).",
+                                           description=content)
                 await ctx.send(embed=embed_data)
 
     @slash.slash(
@@ -320,7 +334,7 @@ def read_discord():
     # -----------------------------------#
     #     Start the discord bot.         #
     # -----------------------------------#
-    #client.run(os.environ['DISCORD_TOKEN'])
+    # client.run(os.environ['DISCORD_TOKEN'])
 
     # --- Start the bot
     client.run(os.environ['DISCORD_TOKEN'])  # --- logon token retrieved from .env variable

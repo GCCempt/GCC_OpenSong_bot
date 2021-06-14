@@ -23,26 +23,30 @@ def parse_songs_from_file(worship_schedule):
     with open(worship_schedule) as file:
         worship_text = file.readlines()
     # Find the line with songs in the array. Assume everything after is a song per line.
-    formatted_song_list = []
+    formatted_song_list = "No songs found."
 
-    try:
-        worship_text.index('Songs\n')
-    except ValueError as error:
+    for index, line in enumerate(worship_text):
+        if 'songs' in line.lower():
+            song_start = index
+            formatted_song_list = []
+            for index2, song in enumerate(worship_text):
+                # Build a list of elements after "Songs" is found.
+                if "Hymn:" in song:
+                    if song.startswith("Hymn:"):
+                        stripped_song = song.rsplit("-", 1)
+                        stripped_song = stripped_song[0].strip("Hymn:")
+                        formatted_song_list.append(stripped_song.strip())
+                if index2 > song_start:
+                    stripped_song = song.rsplit("-", 1)
+                    stripped_song = stripped_song[0].strip("* ")
+                    formatted_song_list.append(stripped_song)
 
-        return 'No songs found.'
-    for index, song in enumerate(worship_text):
-        # Build a list of elements after "Songs" is found.
-        if "Hymn:" in song:
-            if song.startswith("Hymn:"):
-                stripped_song = song.rsplit("-", 1)
-                stripped_song = stripped_song[0].strip("Hymn:")
-                formatted_song_list.append(stripped_song.strip())
-        if index > worship_text.index('Songs\n'):
-            stripped_song = song.rsplit("-", 1)
-            stripped_song = stripped_song[0].strip("* ")
-            formatted_song_list.append(stripped_song)
-
-    return formatted_song_list
+    if len(formatted_song_list) <= 1:
+        logging.warning("Not enough sounds were found when parsing {file}".format(file=worship_schedule))
+        logging.warning(worship_text)
+        return "Not enough songs have were found.."
+    else:
+        return formatted_song_list
 
 
 # Takes in a list of songs.
@@ -220,7 +224,7 @@ def song_case_correction(song_file, song_list):
         for song in song_list:
             if song.lower() in line.lower():
                 file_text[index] = re.sub(song, song, file_text[index], flags=re.IGNORECASE)
-                logging.info("Updating the song-case of " + song)
+                logging.warning("Updating the song-case of " + song)
     with open(song_file, 'w') as file:
         file.writelines(file_text)
         file.close()
@@ -367,7 +371,6 @@ def read_ahead(my_list):
 # --- Parse the incoming Discord message
 def parsemessage():
     import filelist
-    from readworshipschedule import readWS
 
     bulletin_path = 'bulletin/'
     status_message = []
@@ -525,7 +528,6 @@ def read_ahead(my_list):
 # --- Parse the incoming Discord message
 def parsemessage():
     import filelist
-    from readworshipschedule import readWS
 
     bulletin_path = 'bulletin/'
     status_message = []
