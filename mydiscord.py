@@ -151,10 +151,6 @@ def read_discord():
                     print(status_message)
                     await channel.send(embed=utils.convert_embed(status_message))
 
-                # textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
-                # textFile.writelines(message.content)
-                # textFile.close()
-
                 # --- check if a valid status message was received
                 elif status_message:
                     status_message = monitorfiles.filechecker()
@@ -187,7 +183,7 @@ def read_discord():
             await ctx.send(embed=embed)
 
     @slash.slash(
-        name="status",
+        name="status", 
         description="Displays the status of the build process for this weeks set")
     async def status(ctx):
         await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
