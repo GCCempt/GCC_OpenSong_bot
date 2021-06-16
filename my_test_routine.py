@@ -88,10 +88,18 @@ def task_trigger():
 def main():
     import downloadbulletin
     from getdatetime import nextSunday
+    import maintainsong
+    from stringsplit import convertListToStringWithNewLine, convertListToString
 
     print('\nMy Test Routine - Start Test!\n')
 
-    monitorfiles.check_for_latest_bulletin()
+    status_message = convertListToString()
+
+    print('\nConvert List to String=\n', status_message)
+
+    status_message = convertListToStringWithNewLine()
+
+    print('\nConvert List To String With Newline=\n', status_message)
 
     # ============ DO NOT DELETE BELOW THIS LINE - MAIN FUNCTION CALL =======================
     #

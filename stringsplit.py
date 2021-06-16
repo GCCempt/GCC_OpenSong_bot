@@ -56,6 +56,13 @@ def convertListToString(Element_List=['The', 'Quick', 'Brown',
     # print('\n Joined String=', joined_string)
     return (joined_string)  # --- return String
 
+def convertListToStringWithNewLine(Element_List=['The', 'Quick', 'Brown',
+                                      'Fox']):  # --- default list provided, but can overriden on the function call
+    # text = 'Welcome\nto\nPythonExamples.org'
+    joined_string = '\n'.join(Element_List)
+
+    # print('\n Joined String=', joined_string)
+    return (joined_string)  # --- return String
 
 # --- Start parse string - split by '-'
 def split_on_dash(input_string):

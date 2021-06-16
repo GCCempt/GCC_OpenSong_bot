@@ -87,20 +87,25 @@ def read_discord():
                                                description="OpenSong Set Processing")
                     embed_data.add_field(name="Status:", value=status_message, inline=True)
                     await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-                    # --- call the DisplaySet function and use the default date ***********************
-                    set_matches = maintainsong.displaySet()
+                    
+                    # --- call the DisplaySet function to display the set
+                    split_string = status_message.split('\n')   #--- break up the message
+                    set_name = split_string[1]  #--- extract the set name from the message
+                    set_name = set_name.replace(' for: ', '')
+                    set_matches = maintainsong.displaySet(set_name)
 
-                    if len(set_matches) == 0:
-                        set_date = str(getdatetime.nextSunday())  # --- set the default date of the next Sunday
-
-                        status_message = '\nNo sets matching: {} found!'.format(set_date)
-                        await message.channel.send(status_message)
-                    else:
-                        for my_set, url in set_matches.items():
-                            embed = discord.Embed()
-                            embed.description = '[' + my_set + '](' + url + ')'
-                            # --- post embed message
-                            await message.channel.send(embed=embed)
+                    content = ""
+                    for sets in set_matches:
+                        content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+        
+                        if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+                            for my_set, url in set_matches.items():
+                                set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                                content = content + '\n' + set_summary
+        
+                    embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
+                        description=content)
+                    await message.channel.send(embed=embed_data)
 
             else:
                 #  write the Message to a file for later processing
@@ -297,7 +302,14 @@ def read_discord():
         content = ""
         for sets in set_matches:
             content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", description=content)
+        
+        if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+            for my_set, url in set_matches.items():
+                set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                content = content + '\n' + set_summary
+        
+        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
+                description=content)
         await ctx.send(embed=embed_data)
 
     @slash.slash(
