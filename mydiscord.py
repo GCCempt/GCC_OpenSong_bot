@@ -186,7 +186,35 @@ def read_discord():
         name="status", 
         description="Displays the status of the build process for this weeks set")
     async def status(ctx):
-        await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
+        #await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
+        status_message = monitorfiles.statuscheck()
+        if 'Set processing completed' in status_message:
+            embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
+                    description="OpenSong Set Processing")
+            embed_data.add_field(name="Status:", value=status_message, inline=True)
+            await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
+                    
+            # --- call the DisplaySet function to display the set
+            split_string = status_message.split('\n')   #--- break up the message
+            set_name = split_string[1]  #--- extract the set name from the message
+            set_name = set_name.replace(' for: ', '')
+            set_matches = maintainsong.displaySet(set_name)
+
+            content = ""
+            for sets in set_matches:
+                content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+        
+                if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+                    for my_set, url in set_matches.items():
+                        set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                        content = content + '\n' + set_summary
+        
+            embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
+                description=content)
+            await ctx.send(embed=embed_data)
+
+        else:
+            await ctx.send(status_message)
 
     @slash.slash(name="cleanup", description="Removes files from the bulletin directory")
     async def cleanup(ctx):
