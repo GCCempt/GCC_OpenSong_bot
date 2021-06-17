@@ -1,6 +1,7 @@
 # ------------ Add new song to OpenSong
 import os
 import logging
+from stringsplit import convertListToStringWithNewLine
 import subprocess  # --- for launching external shell commands
 import xml.etree.ElementTree as ET
 
@@ -107,8 +108,7 @@ def updateset(set_name):
 # ------------End -  UpdateSet function
 
 # ------------ Start Dislay Set function -  send link to song
-def displaySet(
-        setNameAttrib=str(getdatetime.nextSunday())):  # --- get a default date; will be overriden if date is passed
+def displaySet(setNameAttrib):   
     from abc import ABC
     from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
     from urllib import parse as uparse
@@ -116,10 +116,8 @@ def displaySet(
     from fuzzywuzzy import fuzz
     from utils import generate_set_name
 
-    setNameAttrib = generate_set_name()
-
     query = setNameAttrib  # --  this is the fuzzy varible for the the set search
-    print('\nSet Lookup date=', query)
+    print('\nSet Lookup for:', query)
 
     # Directory we're checking
     url = 'http://gccpraise.com/opensongv2/sets/?s='
@@ -175,6 +173,9 @@ def displaySet(
 def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
     from bs4 import BeautifulSoup
     import xml.etree.ElementTree as ET
+    from stringsplit import convertListToString
+    import dropbox_api_call
+    from sftp_files import getfiles
 
     worship_elements = []
     display_elements = []
@@ -185,24 +186,36 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
     setpath = 'sets/'
 
     # -------------- Open the Template Set and load into XML document tree -----------------------------
-    SetName = setpath + SetName
+    local_set_name = setpath + SetName
     print('\nBS4BuildSetSummary - SetName=', SetName)
 
-    # --- test finding the set file
-    datasource = open(SetName, 'rb')
+    # --- test finding the set in the local sets directory
+    try:
+        datasource = open(local_set_name, 'rb')
+    except:     #--- if the set is not found locally, try Dropbox
+        error_message = 'not_found'
+
+        #--- pull song to website if not found locally
+        status_message = getfiles('set', SetName)  # --- sftp the set from the website
+        #status_message = dropbox_api_call.dropboxread('set', SetName)  #--- download song from Dropbox
+        if error_message in status_message[0]:
+            status_message ='\nError - Set Not Found: {}'. format(SetName)
+            return(status_message)
+        else:
+            # --- test again opening the set in the local sets directory
+            try:
+                datasource = open(local_set_name, 'rb')
+            except:     #--- if the set is not found locally, try Dropbox
+                status_message = 'Set not_found'
+                return(status_message)
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
     print('\nBS4BuildSet - the number of slide_groups in the set: ', len(root[0]))
-
-    # try:
-    fd = open(SetName, 'r')
+   
+    fd = open(local_set_name, 'r', errors='ignore')
     xml_file = fd.read()
     soup = BeautifulSoup(xml_file, 'lxml')
-
-    # except:
-    #    status_code ='\nError - Set Not Found: {}'. format(SetName)
-    #    return(status_code)
 
     slide_groups = soup.find_all('slide_group')
     # os_body = soup.find_all('body')
@@ -248,6 +261,7 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
         display_element = str(i) + ' ' + display_element
         returned_elements.append(display_element)
 
-    return returned_elements
+    set_summary = convertListToStringWithNewLine(returned_elements)  #--- convert the list of elements to a string
+    return set_summary
 
 # --- end bs4 build Set Summary
