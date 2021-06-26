@@ -368,145 +368,6 @@ def read_ahead(my_list):
     yield (None)
 
 
-# --- Parse the incoming Discord message
-def parsemessage():
-    import filelist
-
-    bulletin_path = 'bulletin/'
-    status_message = []
-    valid_message = ''
-
-    try:
-        # --- Read the Discord message file
-        textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'r', encoding='utf-8', errors='ignore')
-        Lines = textFile.readlines()  # --- read the file into a list
-        # line = textFile.read()  # --- read the file into a list
-        textFile.close()
-    except:
-        file_status = "Discord Message file {} does not exist. Unable to process messages...".format(
-            bulletin_path + filelist.DiscordMessageFilename)
-        status_message.append(file_status)
-        return (status_message)
-
-    # --- process the file
-    items = read_ahead(Lines)
-    item = items.__next__()  # -- get the first line
-
-    while (item):
-        if item == None:
-            break
-
-        if 'sermoninfo' in item.replace(" ", '').replace('\t', '').lower():
-            message_text = ''
-            status_message.append('\nSermon Information received')
-
-            while (item):
-                message_text = message_text + item
-                next_line = items.__next__()
-
-                if next_line == None:
-                    # print(message_text)
-                    # print('\end of sermon info text')
-                    write_message_file(message_text, filelist.SermonInfoFilename)
-                    item = next_line
-                    break
-
-                if 'confessionofsin' in next_line.replace(" ", '').replace('\t',
-                                                                           '').lower() or 'assuranceofpardon' in next_line.replace(
-                    " ", '').replace('\t', '').lower():  # --- get the next item
-                    # print(message_text)
-                    # print('\end of sermon info text')
-                    write_message_file(message_text, filelist.SermonInfoFilename)
-                    item = next_line  # -- get the next item
-                    break
-
-                item = next_line  # -- get the next item
-
-        elif item != None and 'confessionofsin' in item.replace(" ", '').replace('\t', '').lower():
-            message_text = ''
-            status_message.append('\nConfession of Sin receoved')
-
-            while (item):
-                message_text = message_text + item
-                next_line = items.__next__()
-
-                if next_line == None:
-                    # print(message_text)
-                    # print('\end of confession of sin text')
-                    write_message_file(message_text, filelist.ConfessionFilename)
-                    item = next_line
-                    break
-
-                if 'sermoninfo' in next_line.replace(" ", '').replace('\t',
-                                                                      '').lower() or 'assuranceofpardon' in next_line.replace(
-                    " ", '').replace('\t', '').lower():  # --- get the next item
-                    # print(message_text)
-                    # print('\end of confession of sin text')
-                    write_message_file(message_text, filelist.ConfessionFilename)
-                    item = next_line  # -- get the next item
-                    break
-
-                item = next_line  # -- get the next item
-
-        elif item != None and 'assuranceofpardon' in item.replace(" ", '').replace('\t', '').lower():
-            message_text = ''
-            status_message.append('\nAssurance of Pardon received')
-
-            while (item):
-                message_text = message_text + item
-                next_line = items.__next__()
-
-                if next_line == None:
-                    # print(message_text)
-                    # print('\end of assurance of pardon text')
-                    write_message_file(message_text, filelist.AssuranceFilename)
-                    item = next_line
-                    break
-
-                if 'sermoninfo' in next_line.replace(" ", '').replace('\t', '').lower() or \
-                        'confessionofsin' in next_line.replace(
-                    " ", '').replace('\t', '').lower():  # --- get the next item
-                    # print(message_text)
-                    # print('\end of assurance of pardon text')
-                    write_message_file(message_text, filelist.AssuranceFilename)
-                    item = next_line  # -- get the next item
-                    break
-
-                item = next_line  # -- get the next item
-
-        elif item != None and 'worshipschedule' in item.replace(" ", '').replace('\t', '').lower():
-            message_text = ''
-            status_message.append('\nWorship Schedule received')
-
-            while (item):
-                message_text = message_text + item
-                next_line = items.__next__()
-
-                if next_line == None:
-                    # print(message_text)
-                    # print('\end of worship schedule text')
-                    write_message_file(message_text, filelist.WorshipScheduleFilename)
-                    item = next_line
-
-                    break
-                else:
-                    item = next_line
-
-            item = next_line  # -- get the next item
-
-        else:
-            item = items.__next__()  # --- skip unrecognized line
-
-    if len(status_message) == 0:  # --- no valid message received
-        status_message.append('\nUnrecognized message received')
-
-    return (status_message)
-    # --- end Parse the incoming Discord message
-    return (setname)  # --- return the generated set name
-
-    # --- routine to write message files generated by Discord Posts
-
-
 def write_message_file(message_text, file_name):
     bulletin_path = 'bulletin/'
 
@@ -581,7 +442,7 @@ def parsemessage():
 
         elif item != None and 'confessionofsin' in item.replace(" ", '').replace('\t', '').lower():
             message_text = ''
-            status_message.append('\nConfession of Sin receoved')
+            status_message.append('\nConfession of Sin received')
 
             while (item):
                 message_text = message_text + item
@@ -679,7 +540,7 @@ def status_embed(description, message):
     """
     embed = discord.Embed(color=0x2ECC71, description=description + " was successfully received!")
     embed.add_field(name="Time received:",
-                    value=message.created_at.strftime("%b %d %Y %H:%M:%S"),
+                    value=message.created_at.strftime("%m %d %Y %H:%M:%S"),
                     inline=True)
     embed.add_field(name="User:",
                     value=message.author,
