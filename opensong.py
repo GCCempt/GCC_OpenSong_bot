@@ -414,7 +414,7 @@ def updatefinalstatus():  # --- update the current status  file
     textFile = open(bulletin_path + filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
     filedate = textFile.read()  # --- read the file into a string
     textFile.close()
-    status_message = '\nBulletin Processing completed for ' + filedate
+    status_message = '\nBulletin processing completed for ' + filedate
 
     # --- Update the current status file
     textFile = open(bulletin_path + filelist.CurrentStatusFilename, 'a', encoding='utf-8',
