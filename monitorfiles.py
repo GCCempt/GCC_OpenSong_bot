@@ -84,68 +84,6 @@ def filechecker():
 
     return status_message
 
-# --- function to read the key files, extract the date and very that the indidcated dates match
-# --- https://www.blog.pythonlibrary.org/2018/05/09/determining-if-all-elements-in-a-list-are-the-same-in-python/
-def comparefiledates():
-    listofdates = []
-
-    # --- get bulletin dates
-    textFile = open(bulletin_path + filelist.BulletinFilename, 'r', encoding='utf-8', errors='ignore')
-    filedate = textFile.read()  # --- read the file into a string
-    textFile.close()
-    # --- parse the date and add to the list
-    returned_date = getdatetime.parsedates(filedate)
-    # print('\nCompare File Dates - returned date:', returned_date)
-    listofdates.append(returned_date)
-
-    # --- get Assurance of Pardon dates
-    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
-    filedate = textFile.read()  # --- read the file into a string
-    textFile.close()
-    # --- parse the date and add to the list
-    filedate = filedate.split(",", 1)
-    # print('\nAssurance of Pardon date=', filedate)
-    returned_date = getdatetime.parsedates(filedate)
-    # print('\nCompare File Dates - returned date:', returned_date)
-    listofdates.append(returned_date)
-
-    # --- get Confession of Sin dates
-    textFile = open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
-    filedate = textFile.read()  # --- read the file into a string
-    textFile.close()
-    # --- parse the date and add to the list
-    filedate = filedate.split(",", 1)
-    # print('\nAssurance of Pardon date=', filedate)
-    returned_date = getdatetime.parsedates(filedate)
-    # print('\nCompare File Dates - returned date:', returned_date)
-    listofdates.append(returned_date)
-
-    # --- get Worship Schedule dates
-    textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'r', encoding='utf-8', errors='ignore')
-    filedate = textFile.read()  # --- read the file into a string
-    textFile.close()
-    # --- parse the date and add to the list
-    filedate = filedate.split(",", 1)
-    # print('\nAssurance of Pardon date=', filedate)
-    returned_date = getdatetime.parsedates(filedate)
-    print('\nWorship Schedule Date:', returned_date)
-    # print('\nCompare File Dates - returned date:', returned_date)
-    listofdates.append(returned_date)
-
-    print('\nListOfDates=', listofdates)
-
-    if len(listofdates) < 1:
-        print('\nAll dates match')
-    # return True
-    if len(listofdates) == listofdates.count(listofdates[0]):
-        print('\nMonitorfiles.CompareFileDates - all dates match for:', listofdates[0])
-    else:
-        print('\nMonitorfiles.CompareFileDates - processing incomplete for:', listofdates[0])
-        print('\nDates found: ', listofdates)
-
-    return ()
-
-
 # --- function to respond to the '/status' discord post command
 def statuscheck():
     file_count = 0  # --- keep track of which files have been created
@@ -260,7 +198,7 @@ def cleanup():
 # ------------End  -  cleanup process
 
 # ------------Start -  cleanup process i.e. rename / delete files
-def set_cleanup():
+def set_cleanup(cleanup_type='all'):
     from utils import generate_set_name
 
     # --- clean up the OpenSong set
@@ -278,9 +216,10 @@ def set_cleanup():
             logging.warning(e)
             status_message = status_message + '\nUnable to remove file {}..'.format(file_name)
 
-    # --- clean up the OpenSong processing files
-    cleanup_status = cleanup()
-    status_message = status_message + cleanup_status
+    if cleanup_type == 'all':
+        # --- clean up the OpenSong processing files
+        cleanup_status = cleanup()
+        status_message = status_message + cleanup_status
 
     print('\nFile Cleanup Processing completed!')
 

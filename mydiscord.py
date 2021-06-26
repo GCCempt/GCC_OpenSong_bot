@@ -37,7 +37,7 @@ READ_CHANNEL = os.environ['READCHANNELID']
 POST_CHANNEL = os.environ['POSTCHANNELID']
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
-VERSION = '2.03 - Anlace'
+VERSION = '2.04 - Ariadne'
 
 
 def read_discord():
@@ -107,6 +107,7 @@ def read_discord():
                         description=content)
                     await message.channel.send(embed=embed_data)
 
+
             else:
                 #  write the Message to a file for later processing
                 textFile = open(bulletin_path + filelist.DiscordMessageFilename, 'w', encoding='utf-8', errors='ignore')
@@ -130,6 +131,7 @@ def read_discord():
                         # Apply any needed case-correction - must pass in the song_list of correct case.
                         utils.song_case_correction(bulletin_path + filelist.WorshipScheduleFilename,
                                                    invalid_songs['songs'])
+
                     else:
                         logging.error("not able to validate any songs in the worship schedule.")
                         embed_data = discord.Embed(title="Error!", color=0x2ECC71,
@@ -147,9 +149,37 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
-                    # status_message = monitorfiles.statuscheck()  # --- retrieve the current processing status
-                    print(status_message)
-                    await channel.send(embed=utils.convert_embed(status_message))
+                    monitorfiles.set_cleanup(cleanup_type='set')     #--- delete the set before processing
+
+                    status_message = monitorfiles.statuscheck()  # retrieve the current processing status
+
+                    #if 'Set processing completed' in status_message:
+                    if 'processing completed' in status_message:
+                        embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
+                                               description="OpenSong Set Processing")
+                        embed_data.add_field(name="Status:", value=status_message, inline=True)
+                        await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
+                    
+                        # --- call the DisplaySet function to display the set
+                        split_string = status_message.split('\n')   #--- break up the message
+                        set_name = split_string[1]  #--- extract the set name from the message
+                        set_name = set_name.replace(' for: ', '')
+                        set_matches = maintainsong.displaySet(set_name)
+
+                        content = ""
+                        for sets in set_matches:
+                            content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
+        
+                            if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+                                for my_set, url in set_matches.items():
+                                    set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                                    content = content + '\n' + set_summary
+        
+                        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
+                            description=content)
+                        await message.channel.send(embed=embed_data)
+
+                    #await channel.send(embed=utils.convert_embed(status_message))
 
                 # --- check if a valid status message was received
                 elif status_message:
