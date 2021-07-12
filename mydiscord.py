@@ -343,8 +343,8 @@ def read_discord():
         content = ""
         for song in song_matches:
             content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
-        embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s).",
-                                   description=content)
+        embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name, 
+                    description=content)
         await ctx.send(embed=embed_data)
 
     @slash.slash(
