@@ -319,16 +319,18 @@ def read_discord():
         content = ""
         for song in song_matches:
             content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
-            song_name = song
 
-        if len(song_matches) == 1:  # --- found exact match
-            # song_name = song_matches[song]
+        if len(song_matches) == 1 or song_name in song_matches:  # --- found exact match
             status_message = maintainsong.updatesong(song_name)
-
-            embed_data = discord.Embed(title="Update Song ",
+            content = ""
+            content = content + "\n" + "[" + song_name + "]" + "(" + song_matches[song_name] + ")"
+            embed_data = discord.Embed(title="Update Song: " + song_name, 
                                        description=content)
             await ctx.send(embed=embed_data)
         else:
+            for song in song_matches:
+                content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
+                #song_name = song
             embed_data = discord.Embed(
                 title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
                 description=content)
