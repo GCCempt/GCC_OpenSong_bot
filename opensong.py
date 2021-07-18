@@ -76,18 +76,13 @@ def processfiles(doctree):
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
     
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
-    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()  # --- read the file into a list
-
     slide_group_name = 'Assurance of Pardon'
-    scripture_ref = str(body_text[1].strip())
-    #print('\nScripture Reference:', scripture_ref)
-    body_text = slide_group_name + '\n' + scripture_ref
-    # print('\nBODY TEXT for Assurance of Pardon:\n', body_text)
-    addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
+    
+    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
+    body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
 
-    addnode.addscripture(doctree, slide_group_name, scripture_ref)
-
+    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
+    
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
     slide_group_name = 'Affirmation of Faith'
 
@@ -431,3 +426,8 @@ def updatefinalstatus():  # --- update the current status  file
 
     return status_message  # --- return the remaining string
 # -----------End Function to extract residual characters in string
+
+
+# ------------ Call the Main function to launch the process
+if __name__ == "__main__":
+    assembleset()
