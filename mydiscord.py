@@ -87,24 +87,24 @@ def read_discord():
                                                description="OpenSong Set Processing")
                     embed_data.add_field(name="Status:", value=status_message, inline=True)
                     await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-                    
+
                     # --- call the DisplaySet function to display the set
-                    split_string = status_message.split('\n')   #--- break up the message
-                    set_name = split_string[1]  #--- extract the set name from the message
+                    split_string = status_message.split('\n')  # --- break up the message
+                    set_name = split_string[1]  # --- extract the set name from the message
                     set_name = set_name.replace(' for: ', '')
                     set_matches = maintainsong.displaySet(set_name)
 
                     content = ""
                     for sets in set_matches:
                         content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-        
-                        if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+
+                        if len(set_matches) == 1:  # --- if there is only one match, displaya summary of the set
                             for my_set, url in set_matches.items():
-                                set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                                set_summary = maintainsong.bs4buildSetSummary(my_set)  # --- build the set summary
                                 content = content + '\n' + set_summary
-        
-                    embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
-                        description=content)
+
+                    embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).",
+                                               description=content)
                     await message.channel.send(embed=embed_data)
 
 
@@ -149,37 +149,37 @@ def read_discord():
                     await message.channel.send(embed=utils.status_embed("assurance of pardon", message))
 
                 if "Unrecognized" not in status_message:  # --- check if a valid status message was received
-                    monitorfiles.set_cleanup(cleanup_type='set')     #--- delete the set before processing
+                    monitorfiles.set_cleanup(cleanup_type='set')  # --- delete the set before processing
 
                     status_message = monitorfiles.statuscheck()  # retrieve the current processing status
 
-                    #if 'Set processing completed' in status_message:
+                    # if 'Set processing completed' in status_message:
                     if 'processing completed' in status_message:
                         embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
-                                               description="OpenSong Set Processing")
+                                                   description="OpenSong Set Processing")
                         embed_data.add_field(name="Status:", value=status_message, inline=True)
                         await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-                    
+
                         # --- call the DisplaySet function to display the set
-                        split_string = status_message.split('\n')   #--- break up the message
-                        set_name = split_string[1]  #--- extract the set name from the message
+                        split_string = status_message.split('\n')  # --- break up the message
+                        set_name = split_string[1]  # --- extract the set name from the message
                         set_name = set_name.replace(' for: ', '')
                         set_matches = maintainsong.displaySet(set_name)
 
                         content = ""
                         for sets in set_matches:
                             content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-        
-                            if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+
+                            if len(set_matches) == 1:  # --- if there is only one match, displaya summary of the set
                                 for my_set, url in set_matches.items():
-                                    set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                                    set_summary = maintainsong.bs4buildSetSummary(my_set)  # --- build the set summary
                                     content = content + '\n' + set_summary
-        
-                        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
-                            description=content)
+
+                        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).",
+                                                   description=content)
                         await message.channel.send(embed=embed_data)
 
-                    #await channel.send(embed=utils.convert_embed(status_message))
+                    # await channel.send(embed=utils.convert_embed(status_message))
 
                 # --- check if a valid status message was received
                 elif status_message:
@@ -205,42 +205,54 @@ def read_discord():
     @slash.slash(name="file", description="Shows the text of the given file.")
     async def show_file(ctx, filename):
         try:
-            file = discord.File(filename)
-            await ctx.send(file=file)
+            # Only allow the subdirectory of logs.
+            if filename.startswith("logs/"):
+                file = discord.File(filename)
+                await ctx.send(file=file)
+
+            # If any other directory tries to get accessed give an error.
+            elif not filename.find('/'):
+                logging.warning("Directory Traversal Detected!")
+                embed = discord.Embed(title="Error! ", color=discord.Colour.red(),
+                                      description="Please enter a valid filename. (Example: mydiscord.py")
+                await ctx.send(embed=embed)
+            else:
+                file = discord.File(filename)
+                await ctx.send(file=file)
         except Exception as e:
             logging.warning(e)
             embed = discord.Embed(title="Exception Error!", description=e)
             await ctx.send(embed=embed)
 
     @slash.slash(
-        name="status", 
+        name="status",
         description="Displays the status of the build process for this weeks set")
     async def status(ctx):
-        #await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
+        # await ctx.send(embed=utils.convert_embed(monitorfiles.statuscheck()))
         status_message = monitorfiles.statuscheck()
         if 'Set processing completed' in status_message:
             embed_data = discord.Embed(title="Set Status", color=0x2ECC71,
-                    description="OpenSong Set Processing")
+                                       description="OpenSong Set Processing")
             embed_data.add_field(name="Status:", value=status_message, inline=True)
             await client.get_channel(int(READ_CHANNEL)).send(embed=embed_data)
-                    
+
             # --- call the DisplaySet function to display the set
-            split_string = status_message.split('\n')   #--- break up the message
-            set_name = split_string[1]  #--- extract the set name from the message
+            split_string = status_message.split('\n')  # --- break up the message
+            set_name = split_string[1]  # --- extract the set name from the message
             set_name = set_name.replace(' for: ', '')
             set_matches = maintainsong.displaySet(set_name)
 
             content = ""
             for sets in set_matches:
                 content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-        
-                if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+
+                if len(set_matches) == 1:  # --- if there is only one match, displaya summary of the set
                     for my_set, url in set_matches.items():
-                        set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                        set_summary = maintainsong.bs4buildSetSummary(my_set)  # --- build the set summary
                         content = content + '\n' + set_summary
-        
-            embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
-                description=content)
+
+            embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).",
+                                       description=content)
             await ctx.send(embed=embed_data)
 
         else:
@@ -324,13 +336,13 @@ def read_discord():
             status_message = maintainsong.updatesong(song_name)
             content = ""
             content = content + "\n" + "[" + song_name + "]" + "(" + song_matches[song_name] + ")"
-            embed_data = discord.Embed(title="Update Song: " + song_name, 
+            embed_data = discord.Embed(title="Update Song: " + song_name,
                                        description=content)
             await ctx.send(embed=embed_data)
         else:
             for song in song_matches:
                 content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
-                #song_name = song
+                # song_name = song
             embed_data = discord.Embed(
                 title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
                 description=content)
@@ -345,8 +357,9 @@ def read_discord():
         content = ""
         for song in song_matches:
             content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
-        embed_data = discord.Embed(title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name, 
-                    description=content)
+        embed_data = discord.Embed(
+            title="Found " + str(len(song_matches)) + " possible matche(s) for song: " + song_name,
+            description=content)
         await ctx.send(embed=embed_data)
 
     @slash.slash(
@@ -358,14 +371,14 @@ def read_discord():
         content = ""
         for sets in set_matches:
             content = content + "\n" + "[" + sets + "]" + "(" + set_matches[sets] + ")"
-        
-        if len(set_matches) == 1:          #--- if there is only one match, displaya summary of the set
+
+        if len(set_matches) == 1:  # --- if there is only one match, displaya summary of the set
             for my_set, url in set_matches.items():
-                set_summary = maintainsong.bs4buildSetSummary(my_set) #--- build the set summary
+                set_summary = maintainsong.bs4buildSetSummary(my_set)  # --- build the set summary
                 content = content + '\n' + set_summary
-        
-        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).", 
-                description=content)
+
+        embed_data = discord.Embed(title="Found " + str(len(set_matches)) + " possible matche(s).",
+                                   description=content)
         await ctx.send(embed=embed_data)
 
     @slash.slash(
