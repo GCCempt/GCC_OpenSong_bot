@@ -10,11 +10,19 @@ categories:
       - 'fix'
       - 'bugfix'
       - 'bug'
-      - 'security'
   - title: '🧰 Maintenance'
-    label: 'chore'
+    labels: 
+      - 'chore'
+      - 'dependencies'
+      - 'documentation'
+  - title: '🔒 Security'
+    labels: 
+      - 'chore'
+      - 'dependencies'
+      - 'documentation'
+      
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+change-title-escapes: '\<*_&`' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
   major:
     labels:
@@ -27,6 +35,6 @@ version-resolver:
       - 'patch'
   default: patch
 template: |
-  ## Changes
+  ## What's Changed
 
   $CHANGES
