@@ -31,7 +31,7 @@ def assembleset():
     doctree = ET.parse(datasource)
     root = doctree.getroot()
     print('\nAssembleSet - the number of slide_groups in the set: ', len(root[0]))
-
+ 
     # -------------- call the process files function to process the files with the extracted bulletin information
     status_message = processfiles(doctree)  # --- pass the XML set document tree
 
@@ -44,6 +44,8 @@ def assembleset():
 def processfiles(doctree):
     import addnode
     import processAffirmationOfFaith
+    import re
+    import utils
 
     # -------------- Read the contents of the Call To Worship text file -----------------------------
     slide_group_name = 'Call to Worship'
@@ -51,20 +53,24 @@ def processfiles(doctree):
 
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add confession text function
 
-    # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
-    textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the file into a string
-    # print(body_text)
-
+    # -------------- process the sermon information -----------------------------
     slide_group_name = 'Sermon'
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
 
-    # -- Add the Sermon Scripture to the XML document
-    scripture = body_text.splitlines()
-    scripture_ref = scripture[1].strip()
-    #print('\nOpenSong.processfiles - Sermon Scripture Reference=', scripture_ref)
-    addnode.addscripture(doctree, slide_group_name, scripture_ref)
+     # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
+    scripture_ref, sermon_title = utils.extract_sermon_info()
+    sermon_info = sermon_title + '\n' + scripture_ref
+    slide_group_name = 'Sermon'
 
+    addnode.addbodytext(doctree, slide_group_name, sermon_info)  # --- call the addbodytext function
+
+    # -- Add the Sermon Scripture to the XML document
+    #scripture = body_text.splitlines()
+    #scripture_ref = scripture[1].strip()
+    #scripture_ref = '1 Cor. 12:4–31'    #for testing
+    #scripture_ref, body_text = utils.extract_sermon_scripture()
+
+    addnode.addscripture(doctree, slide_group_name, scripture_ref)
     # -------------- Process the contents of the Confession of Sin text file -----------------------------
     slide_group_name = 'Confession of Sin'
 
@@ -231,7 +237,6 @@ def writeXMLSet(doctree):
     myroot = doctree.getroot()  # --- XML document tree passed as a parameter
 
     myroot.attrib = {'name': setNameAttrib}  # --- assign the set name attribute
-    print(myroot.tag, myroot.attrib)
 
     # --- End of processing - write out the modified worship set
 

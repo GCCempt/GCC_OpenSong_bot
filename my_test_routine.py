@@ -87,11 +87,17 @@ def task_trigger():
 #--- main routine to unit test independent functions
 def main():
     import downloadbulletin
+    import opensong
     from getdatetime import nextSunday
     import maintainsong
     from stringsplit import convertListToStringWithNewLine, convertListToString
 
     print('\nMy Test Routine - Start Test!\n')
+
+    status_message = opensong.assembleset()
+    print('Assemble Set processing complete', status_message)
+    
+    return
 
     status_message = convertListToString()
 
