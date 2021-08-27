@@ -211,7 +211,7 @@ def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
-    print('\nBS4BuildSet - the number of slide_groups in the set: ', len(root[0]))
+    #print('\nBS4BuildSet - the number of slide_groups in the set: ', len(root[0]))
    
     fd = open(local_set_name, 'r', errors='ignore')
     xml_file = fd.read()

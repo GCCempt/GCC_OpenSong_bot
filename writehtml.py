@@ -158,13 +158,14 @@ def buildhtmlcontent():
 def buildSermonScriptureContent():
     import passagelookup
     import stringsplit
-    # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
+    import utils
+ 
     print('\nStarting BuildSermonScriptureContent')
 
-    textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
-    text_lines = textFile.readlines()  # --- read the file into a list
-    textFile.close()
-    scripture_ref = text_lines[1]
+    # -- retrieve the sermon scripture from the sermon text file
+    scripture_ref, sermon_title = utils.extract_sermon_info()  
+    if "failed" in scripture_ref:
+        return()
 
     # --- FOR TESTING - OVERRIDE WITH DEFAULT VALUE
     # scripture_ref = 'Galatians 2:1–10; John 3:16'
