@@ -14,7 +14,7 @@ bulletin_path = 'bulletin/'
 
 # --- using urllib2
 def get_bulletin():  # --- function to download bulletin
-
+    import urllib.request
     # bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/'  #-- bulletin URL
     bulletinurl = build_directory_name()  # -- call my module getdate() to build the bulletin directory URL
 
@@ -26,9 +26,18 @@ def get_bulletin():  # --- function to download bulletin
         bulletins = get_current_bulletin(bulletinurl)  # --- find the latest bulletin of the previous month
 
     current_bulletin = max(bulletins)  # --- get the current bulletin
-    current_bulletin = bulletinurl + current_bulletin
-    # --- retrieve the bulletin and write to local file
-    urlretrieve(current_bulletin, bulletin_path + filelist.PDFBulletinFilename)
+    current_bulletin_url = bulletinurl + current_bulletin
+    # --- retrieve the current bulletin and write to local file
+
+    # Download the current bulletin file from `url` and save it locally under `file_name`:
+    req = urllib.request.Request(current_bulletin_url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0')
+    req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
+
+    file_name = bulletin_path + filelist.PDFBulletinFilename
+    with urllib.request.urlopen(req)  as response, open(file_name, 'wb') as out_file:
+        data = response.read() # a `bytes` object
+        out_file.write(data)
 
     readbulletin.getfiles()  # --- process the downloaded bulletin file
     status_message = monitorfiles.filechecker()  # --- check if all files are ready to be processed
@@ -44,14 +53,18 @@ def get_current_bulletin(bulletinurl):  # --- function to find the most recent b
     # bulletinurl = build_directory_name()
     # -- call my module getdate() to build the bulletin directory URL
 
-    print('\nDownloadBulletin.get_current_bulletin - Bulletin file path: ', bulletinurl)
     # outputfile = 'C:\\Dropbox\\OpenSongV2\\Bulletin\\bulletin.pdf'
     # #---  path for downloaded bulletin
+    #bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/2021/07/'  #-- bulletin URL OVERRIDE FOR TESTING
+    print('\nDownloadBulletin.get_current_bulletin - Bulletin file path: ', bulletinurl)
 
-    # url = url.replace(" ","%20")
     bulletins = []
     url = bulletinurl
     req = Request(url)
+
+    #---- fix issue #167 HTTP Error 406
+    req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0')
+    req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
 
     a = urlopen(req).read()  # --- read the bulletin directory
 
