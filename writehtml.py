@@ -8,29 +8,35 @@ bulletin_path = 'bulletin/'
 # --- retrieve the content to be included in the HTML file
 def readctw():
     # --- read the call to worship file
-    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the first line from the file
-    textFile.close()
+    status_message = []
 
-    ctw = status_message[1]  # --- get the Call To Worship reference
+    try:
+        with open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8') as textFile:
+            status_message = textFile.readlines()  # --- read the file into a list
+            ctw = status_message[1]  # --- get the Call To Worship reference
+    except:
+        status_message.append("** Missing Call To Worship File!\n")
+        ctw = status_message[0]  
+        print(status_message)
 
     return (ctw)
-
-
 # --- end retrieve call to worship
 
 # --- retrieve the Scripture Reading file
 def readscripture():
     # --- read the Scripture Reading file
-    textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the first line from the file
-    textFile.close()
+    status_message = []
 
-    scripture_text = status_message[1]  # --- get the Call To Worship reference
+    try:
+        with open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8') as textFile:
+            status_message = textFile.readlines()  # --- read the file into a list
+            scripture_text = status_message[1]  # --- get the Call To Worship reference
+    except:
+        status_message.append("** Missing Scripture Text File!\n")
+        scripture_text = status_message[0]   
+        print(status_message)
 
     return (scripture_text)
-
-
 # --- end retrieve call to worship
 
 # --- retrieve the songs to be included in the HTML file
@@ -50,11 +56,17 @@ def readsongs():
 # --- retrieve the sermon text to be included in the HTML file
 def readsermon():
     # --- read the sermon text file
-    textFile = open(bulletin_path + filelist.SermonInfoFilename, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the file into a list
-    textFile.close()
+    status_message = []
 
-    sermon = status_message[1]  # --- get the sermon text
+    try:
+        with open(bulletin_path + filelist.SermonInfoFilename, 'r', encoding='utf-8') as textFile:
+            status_message = textFile.readlines()  # --- read the file into a list
+            sermon = status_message[1]  # --- get the sermon text
+    except:
+        status_message.append("** Missing Sermon Information File!\n")
+        sermon = status_message[0]   
+        print(status_message)
+
     return (sermon)
 
 
