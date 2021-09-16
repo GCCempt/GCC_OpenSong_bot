@@ -552,9 +552,14 @@ def status_embed(description, message):
 def extract_sermon_info():
     import filelist  # --- definition of list of files and directories used in the proces
     bulletin_path = 'bulletin/'
+
  # -------------- Read the contents of the Bulletin Sermon  text file -----------------------------
-    textFile = open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the file into a string
+    try:
+        with open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8') as textFile:
+            body_text = textFile.read()     #--- read the file into a string
+    except:
+        body_text = "Missing Sermon Information file"
+        return("Error", body_text)
 
     line_split = re.split("[“”\n]", body_text)      #split the string into a list
     sermon_title = line_split[1]
@@ -567,4 +572,4 @@ def extract_sermon_info():
     else:
         status_message = ('Extract Scripture Reference failed - invalid scripture reference:', body_text)
         print(status_message)
-        return(status_message) 
+        return("Error", status_message) 
