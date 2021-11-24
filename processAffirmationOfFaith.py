@@ -5,8 +5,12 @@ def read_affirmation_of_faith():
     bulletin_path = 'bulletin/'
     body_text = ''
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
-    textFile = open(bulletin_path + filelist.AffirmationFileName, 'r', encoding='utf-8', errors='ignore')
-    affirmation_of_faith = textFile.read().replace('\n', ' ')  # --- read the file into a string and strip newline characters
+    try:
+        with open(bulletin_path + filelist.AffirmationFileName, 'r') as textFile:
+            affirmation_of_faith = textFile.read().replace('\n', ' ')
+    except:
+        body_text = "Missing affirmation of faith"
+        return(body_text)
 
     # --- determine if this is a Heidelberg Catechism
     if 'HEIDELBERG CATECHISM' in affirmation_of_faith or 'WESTMINSTER LARGER CATECHISM' in affirmation_of_faith:

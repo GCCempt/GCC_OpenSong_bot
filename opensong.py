@@ -17,27 +17,27 @@ sample_set_path = 'sample_sets/'
 def assembleset():
     import xml.etree.ElementTree as ET
 
-    # -------------- Get the set name from the setname file -----------------------------
-    textFile = open(bulletin_path + filelist.SetFilename, 'r', encoding='utf-8',
+    # -------------- Get the Template set name from the setname file -----------------------------
+    try:
+        textFile = open(bulletin_path + filelist.SetFilename, 'r', encoding='utf-8',
                     errors='ignore')  # --- read the file containing the selected Set name
-    XMLsetName = textFile.readline()  # --- read the first line from the file
-    textFile.close()
+        XMLsetName = textFile.readline()  # --- read the first line from the file
+        textFile.close()
+    except:
+        logging.debug("** Missing Template Set file - processing terminated**")
+        exit()
 
     # -------------- Open the Template Set and load into XML document tree -----------------------------
-    print('\nOpenSong.assembleset() Current Working Directory:', os.getcwd())
-
     datasource = open(sample_set_path + XMLsetName, 'rb')
 
     doctree = ET.parse(datasource)
     root = doctree.getroot()
-    print('\nAssembleSet - the number of slide_groups in the set: ', len(root[0]))
+    print('\nAssembleSet - the number of slide_groups in the template set: ', len(root[0]))
+
  
     # -------------- call the process files function to process the files with the extracted bulletin information
     status_message = processfiles(doctree)  # --- pass the XML set document tree
-
     return (status_message)
-
-
 # ------------ End Assemble Set function -
 
 # ------------Start -  Process files with extracted bulletin information
@@ -51,7 +51,7 @@ def processfiles(doctree):
     slide_group_name = 'Call to Worship'
     body_text = parsecalltoworship()  # --- call the 'parsecalltoworship' routine to separate the text into slides / list
 
-    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add confession text function
+    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- add the call to worship to the set
 
     # -------------- process the sermon information -----------------------------
     slide_group_name = 'Sermon'
@@ -64,58 +64,67 @@ def processfiles(doctree):
 
     addnode.addbodytext(doctree, slide_group_name, sermon_info)  # --- call the addbodytext function
 
-    # -- Add the Sermon Scripture to the XML document
-    #scripture = body_text.splitlines()
-    #scripture_ref = scripture[1].strip()
-    #scripture_ref = '1 Cor. 12:4–31'    #for testing
-    #scripture_ref, body_text = utils.extract_sermon_scripture()
+    # -- Add the Sermon Scripture to the XML document if there is no error
+    if not "Error" in scripture_ref:
+        addnode.addscripture(doctree, slide_group_name, scripture_ref)
 
-    addnode.addscripture(doctree, slide_group_name, scripture_ref)
     # -------------- Process the contents of the Confession of Sin text file -----------------------------
     slide_group_name = 'Confession of Sin'
 
-    textFile = open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
-
+    try:
+        with open(bulletin_path + filelist.ConfessionFilename, 'r', encoding='utf-8') as textFile:
+            body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
+    except:
+        body_text = "Missing Confession of faith"
+        return(body_text)
+ 
     body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
-
-    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
+    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- add the Confession of Faith to the set
     
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
     slide_group_name = 'Assurance of Pardon'
     
-    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
+    try:
+        with open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8') as textFile:
+            body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
+            addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
+    except:
+        body_text = "**Missing Assurance of Pardon file"
+        print(body_text)
 
-    addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
-    
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
     slide_group_name = 'Affirmation of Faith'
 
     body_text = processAffirmationOfFaith.read_affirmation_of_faith()
     addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
 
-    # -------------- Read the contents of the Scripture Reading text file -----------------------------
-    textFile = open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.read()  # --- read the file into a string
-    body_text = body_text + '\n'
-
+    # -------------- Process the Scripture Reading text file -----------------------------
     slide_group_name = 'Scripture Reading'
     addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
 
-    # -- Add the Scripture Text to the XML document
-    scripture = body_text.splitlines()
-    scripture_ref = scripture[1].strip()
-    # print('\nScripture Reference=', scripture_ref)
-    addnode.addscripture(doctree, slide_group_name, scripture_ref)
+    try:
+        with open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8') as textFile:
+            body_text = textFile.read()  # --- read the file into a string
+            body_text = body_text + '\n'
+            
+            # -- Add the Scripture Text to the XML document
+            scripture = body_text.splitlines()
+            scripture_ref = scripture[1].strip()
+            # print('\nScripture Reference=', scripture_ref)
+            addnode.addscripture(doctree, slide_group_name, scripture_ref)
+    except:
+        body_text = "** Missing Sermon Scripture file!\n"
+        print(body_text)
 
-    # -------------- Read the contents of the Announcements text file -----------------------------
-    textFile = open(bulletin_path + filelist.AnnouncementFileName, 'r', encoding='utf-8', errors='ignore')
-    body_text = textFile.readlines()  # --- read the file into a list
-
-    slide_group_name = 'Announcements'
-    # addnode.addbodytext(doctree, slide_group_name, body_text) #--- call the addbodytext function
-    addnode.addbodyslides(doctree, slide_group_name, body_text)
+    # -------------- Process the Announcements text file -----------------------------
+    try:
+        with open(bulletin_path + filelist.AnnouncementFileName, 'r', encoding='utf-8') as textFile:
+            body_text = textFile.readlines()  # --- read the file into a list
+            slide_group_name = 'Announcements'
+            addnode.addbodyslides(doctree, slide_group_name, body_text)
+    except:
+        body_text = "** Missing Announcements file!\n"
+        print(body_text)
 
     # --- Process the Worship songs-----------------------------
     processsongs(doctree)
@@ -124,8 +133,6 @@ def processfiles(doctree):
     status_message = writeXMLSet(doctree)
 
     return status_message
-
-
 # ------------End -  Process files with extracted bulletin information
 
 # ------------Start -  Process Songs
@@ -290,8 +297,13 @@ def split_keep_after(string, char, count):  # --- input string, delimiter, occur
 # ------------Start Function to parse the call to worship
 def parsecalltoworship():
     # -------------- Read the contents of the Call To Worship text file -----------------------------
-    textFile = open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8', errors='ignore')
-    Lines = textFile.readlines()  # --- read the file into a list
+    try:
+        with open(bulletin_path + filelist.CallToWorshipFileName, 'r', encoding='utf-8') as textFile:
+            Lines = textFile.readlines()    #--- read the file into a list
+    except:
+        body_text = "Missing Call to Worship"
+        return(body_text)
+
     # print(body_text)
     leader_flag = ''
     congregation_flag = ''
