@@ -45,6 +45,9 @@ def readsongs():
     # --- get the list of worship songs
     songs = readworshipschedule.readWS()
 
+    if 'Error' in songs[0]:
+            return ("**Error ", "in ", "Worship ", "Schedule")
+
     soa = songs[1][0]
     sor = songs[4][0]
     sop1 = songs[2][0]
@@ -74,29 +77,32 @@ def readsermon():
 
 # --- retrieve the assurance of pardon text to be included in the HTML file
 def readassurance():
-    # --- read the sermon text file
-    textFile = open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the file into a list
-    textFile.close()
+    # --- read the assurance of pardon text file
+    try:
+        with open(bulletin_path + filelist.AssuranceFilename, 'r', encoding='utf-8') as textFile:
+            status_message = textFile.readlines  # --- read the rest of the file into a list
+            assurance = status_message[1]  # --- get the sermon text
+            return (assurance)
+    except:
+        status_message = "**Missing Assurance of Pardon file"
+        return (status_message)
 
-    assurance = status_message[1]  # --- get the sermon text
-    return (assurance)
-
-
-# --- end retrieve sermon
+# --- end assurance of pardon text
 
 # --- retrieve the bulletin date to be included in the HTML file
 def readbulletindate():
     # --- read the sermon text file
-    textFile = open(bulletin_path + filelist.BulletinDateFilename, 'r', encoding='utf-8', errors='ignore')
-    status_message = textFile.readlines()  # --- read the first line from the file
-    textFile.close()
+    status_message = []
+    try:
+        with open(bulletin_path + filelist.BulletinDateFilename, 'r', encoding='utf-8') as textFile:
+            status_message = textFile.readlines  # --- read the rest of the file into a list
+            bulletin_date = status_message[0]  # --- get the bulletin_date
+            return (bulletin_date)
+    except:
+        bulletin_date =  "**Missing Bulletin Date file"
+        return (bulletin_date)
 
-    bulletin_date = status_message[0]  # --- get the sermon text
-    return (bulletin_date)
-
-
-# --- end retrieve sermon
+# --- end retrieve bulletin_date
 
 # --- main routine
 def buildhtmlcontent():

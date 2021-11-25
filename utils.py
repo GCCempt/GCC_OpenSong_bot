@@ -558,7 +558,7 @@ def extract_sermon_info():
         with open(bulletin_path + filelist.BulletinSermonFilename, 'r', encoding='utf-8') as textFile:
             body_text = textFile.read()     #--- read the file into a string
     except:
-        body_text = "Missing Sermon Information file"
+        body_text = "**Missing Sermon Information file"
         return("Error", body_text)
 
     line_split = re.split("[“”\n]", body_text)      #split the string into a list
