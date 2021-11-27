@@ -78,7 +78,8 @@ def processfiles(doctree):
             body_text.insert(0, slide_group_name)  # --- insert the title at the beginning of the list
             addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- add the Confession of Faith to the set
     except:
-        body_text.insert(0, "Missing Confession of Sin")
+        body_text.insert(0, "** Missing Confession of Sin")
+        print(body_text[0])
         addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- add the Confession of Faith to the set
     
     # -------------- Read the contents of the Assurance of Pardon text file -----------------------------
@@ -90,7 +91,7 @@ def processfiles(doctree):
             body_text = textFile.readlines()[1:]  # --- skip the first line and read the rest of the file into a list
             addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
     except:
-        body_text.insert(0, "**Missing Assurance of Pardon file")
+        body_text.insert(0, "** Missing Assurance of Pardon file")
         addnode.addbodyslides(doctree, slide_group_name, body_text)  # --- call the add body text function
         print(body_text)
 
@@ -103,7 +104,6 @@ def processfiles(doctree):
 
     # -------------- Process the Scripture Reading text file -----------------------------
     slide_group_name = 'Scripture Reading'
-    #addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
 
     try:
         with open(bulletin_path + filelist.ScriptureFileName, 'r', encoding='utf-8') as textFile:
@@ -111,12 +111,14 @@ def processfiles(doctree):
             body_text = body_text + '\n'
             
             # -- Add the Scripture Text to the XML document
+            addnode.addbodytext(doctree, slide_group_name, body_text)  # --- call the addbodytext function
+
             scripture = body_text.splitlines()
             scripture_ref = scripture[1].strip()
             # print('\nScripture Reference=', scripture_ref)
             addnode.addscripture(doctree, slide_group_name, scripture_ref)
     except:
-        scripture_ref = "**Missing Sermon Scripture file!\n"
+        scripture_ref = "** Missing Sermon Scripture file!\n"
         addnode.addbodytext(doctree, slide_group_name, scripture_ref)  # --- call the addbodytext function
         print(scripture_ref)
 
@@ -128,7 +130,7 @@ def processfiles(doctree):
             body_text = textFile.readlines()  # --- read the file into a list
             addnode.addbodyslides(doctree, slide_group_name, body_text)
     except:
-        body_text.insert(0, "**Missing Announcements file!\n")
+        body_text.insert(0, "** Missing Announcements file!\n")
         addnode.addbodyslides(doctree, slide_group_name, body_text)
         print(body_text)
 
