@@ -12,11 +12,16 @@ def readWS():
     # print('\nReadWorshipSchedule - file name: ' + filelist.WorshipScheduleFilename)
     # --- array to hold the worship songs and presentation order for each song extracted from Discord into a file
     songs = []
+    lines = []
 
     # ----- read the worship schedule file extracted from Discord into a list / array
 
-    textFile = open(bulletin_path + filelist.WorshipScheduleFilename, 'r')
-    lines = textFile.readlines()
+    try:
+        with open(bulletin_path + filelist.WorshipScheduleFilename, 'r', encoding='utf-8') as textFile:
+            lines = textFile.readlines()  # --- read the file into an array
+    except:
+        lines.insert(0, "** Error - Missing Worship Schedule file!\n")
+        return(lines)
 
     count = 0
     for line in lines:
