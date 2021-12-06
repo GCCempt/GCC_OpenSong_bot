@@ -15,7 +15,7 @@ def fitz_extract_text(bulletin_path, OutputtextFilename):
             # line = line.encode('utf-8')
             # print('\nCount=',count, 'line=', line))
             count += 1
-            text += page.getText().strip()
+            text += page.get_text().strip()
     # print(text)
 
     # --- write the PDF text to a temporary text file

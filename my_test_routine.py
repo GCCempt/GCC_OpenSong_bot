@@ -91,11 +91,16 @@ def main():
     from getdatetime import nextSunday
     import maintainsong
     from stringsplit import convertListToStringWithNewLine, convertListToString
+    import passagelookup
+    import utils
 
     print('\nMy Test Routine - Start Test!\n')
 
-    status_message = opensong.assembleset()
-    print('Assemble Set processing complete', status_message)
+    scripture_ref = "The Incarnation: The True God Who Took on Flesh; John 3:16"
+    status_message = []
+    status_message = passagelookup.build_scripture_text(scripture_ref)
+    #status_message = utils.parse_passages(scripture_ref)
+    print('Returned value:\n', status_message)
     
     return
 

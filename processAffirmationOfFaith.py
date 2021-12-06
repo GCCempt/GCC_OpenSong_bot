@@ -6,7 +6,7 @@ def read_affirmation_of_faith():
     body_text = []
     # -------------- Read the contents of the Affirmation of Faith text file -----------------------------
     try:
-        with open(bulletin_path + filelist.AffirmationFileName, 'r') as textFile:
+        with open(bulletin_path + filelist.AffirmationFileName, 'r', encoding='utf-8') as textFile:
             affirmation_of_faith = textFile.read().replace('\n', ' ')
     except:
         body_text.insert(0, "**Missing affirmation of faith")
