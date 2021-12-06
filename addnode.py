@@ -80,14 +80,17 @@ def addscripture(mytree, slide_group_name, scripture_ref):
                 new_slides = ET.SubElement(new_slide_group, 'slides')
 
                 # ----------- Build Slide and body text for each verse in the scripture passage
-                for p in range(0, len(verses)):
-                    # print(verses[p])
-                    new_slide = ET.SubElement(new_slides, 'slide')
-                    new_body = ET.SubElement(new_slide, 'body')
-                    if scripture_ref in verses[1]:
-                        continue
-                    else:
-                        new_body.text = verses[p]
+                if len(verses) > 0:     #-- check for error in the scripture lookup
+                    for p in range(0, len(verses)):
+                        # print(verses[p])
+                        new_slide = ET.SubElement(new_slides, 'slide')
+                        new_body = ET.SubElement(new_slide, 'body')
+                        if scripture_ref in verses[1]:
+                            continue
+                        else:
+                            new_body.text = verses[p]
+                else:
+                    new_body.text = verses[0]       #-- add passage lookup error to set
 
                 # ----------- Add the static "Thanks be to God" text for the Scripture Reading
                 if slide_group_name == 'Scripture Reading':
