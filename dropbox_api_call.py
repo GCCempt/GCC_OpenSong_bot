@@ -33,7 +33,7 @@ def dropboxsync(file_type, file_name):
 
     # --- upload the file to Dropbox from the local file
     dbx.files_upload(open(local_computer_path, "rb").read(), dropbox_path, mode=dropbox.files.WriteMode.overwrite)
-    print("[UPLOADED] {}".format(dropbox_path))
+    print("[UPLOADED TO DROPBOX LOCATION:] {}".format(dropbox_path))
     dbx.close()
 # --- end dropbox sync
 

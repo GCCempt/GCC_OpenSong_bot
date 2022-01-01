@@ -250,6 +250,7 @@ def trim_text(song_name, presentation_order):
 # ------------Start -  Write the new XML set
 def writeXMLSet(doctree):
     from utils import generate_set_name
+    from maintainsong import dropbox_website_sync
 
     set_path = 'sets/'
 
@@ -266,20 +267,15 @@ def writeXMLSet(doctree):
 
     status_message = updatefinalstatus()  # --- update the current status file upon comletion of processing
 
-    # --- push the set to the website and to Dropbox
+# --- push the completed set to Dropbox
     file_type = 'set'
-    sftp_files.pushfiles(file_type, setNameAttrib)  # --- sftp the set to the website
     dropbox_api_call.dropboxsync(file_type, setNameAttrib)  # --- sync the set to Dropbox
 
-    # --- push the html files to the website
-    if os.environ['ENVIRON'] == 'PROD' or os.environ['ENVIRON'] == 'MAINDEV':
-        file_type = 'bulletin'
-        sftp_files.pushfiles(file_type, filelist.HTMLBulletinFilename)  # --- sftp the bulletin.html file
-        sftp_files.pushfiles(file_type, filelist.HTMLSermonScriptureFilename)  # --- sftp the sermonscripture.html file
+    # --- Sync DropBox to the Website
+    item_name = 'set'
+    status_message = dropbox_website_sync(item_name)
 
     return status_message
-
-
 # ------------End -  Write the new XML set
 
 # ------------Start Function to split string into list by '.'

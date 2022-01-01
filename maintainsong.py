@@ -16,7 +16,7 @@ song_path = 'songs/'
 new_song_path = bulletin_path + filelist.NewSongTextFilename
 
 
-# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
+# ------------Start -  Add Song - copy song from Dropbox to website
 def addsong(song_name):
     import dropbox_api_call
     import sftp_files
@@ -27,12 +27,6 @@ def addsong(song_name):
         song_name = file_name   #--- convert the song_name to the validated file metadata from DropBox
         song_path = song_dir + song_name
 
-        #--- push song to website
-        sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
-
-        status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
-        print(status_message)
-
         #--- remove the temporary copy of the file in the local directory
         if os.path.exists(song_path):
             try:
@@ -42,40 +36,28 @@ def addsong(song_name):
                 logging.warning(e)
                 print('\nUnable to remove file: ', song_path)
     else:
-        status_message = '\nError in Dropbox Song Download - no matching song found'
+        status_message = '\nError - no matching song found', song_name
     
     return(status_message)
 # ------------End -  Update Song function
 
 
-# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
-def updatesong(song_name):
-    import dropbox_api_call
-    import sftp_files
-    song_dir = 'songs/'
-    song_path = song_dir + song_name
-
-    status_message = dropbox_api_call.dropboxread('song', song_name)        #--- download song from Dropbox
-
-    #--- push song to website
-    sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
-
-    status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
+# ------------Start -  Sync DrobBox to Website
+def dropbox_website_sync(item_name):
+    import requests
+    url = "https://gccpraise.com/update.php"
+    res = requests.get(url)
+    if res.status_code == 200:
+        status_message = '\nDropbox successfully synced to website: {}!'.format(item_name)
+    else:
+        status_message = '\nDropbox sync to website failed: {}!'.format(item_name)
+    
     print(status_message)
-
-    #--- remove the temporary copy of the file in the local directory
-    if os.path.exists(song_path):
-        try:
-            os.remove(song_path)
-            print('\nTemporary Song removed: ', song_path)
-        except OSError as e:
-            logging.warning(e)
-            print('\nUnable to remove file: ', song_path)
-    
     return(status_message)
-# ------------End -  Update Song function
 
-# ------------Start -  updateSet - copy set from Dropbox and push to website using sftp
+# ------------End -  DropBox and Website Sync
+
+# ------------Start -  updateSet - copy set from Dropbox to website
 def updateset(set_name):
     import dropbox_api_call
     import sftp_files
@@ -107,67 +89,35 @@ def updateset(set_name):
     return(status_message)
 # ------------End -  UpdateSet function
 
-# ------------ Start Dislay Set function -  send link to song
+# ------------ Start Dislay Set function -  return URL link to set
 def displaySet(setNameAttrib):   
-    from abc import ABC
-    from html.parser import HTMLParser  # docs - https://docs.python.org/3/library/html.parser.html
-    from urllib import parse as uparse
-    from urllib.request import urlopen, Request
-    from fuzzywuzzy import fuzz
-    from utils import generate_set_name
+    import urllib.parse 
+    
+    set_name_enc = urllib.parse.quote(setNameAttrib)    #urlencode the SetName
+    set_url = "https://gccpraise.com/publish_set.php?s=" + set_name_enc
+    
+    print(set_url)
+    return(set_url)
 
-    query = setNameAttrib  # --  this is the fuzzy varible for the the set search
-    print('\nSet Lookup for:', query)
+# ------------End -  DisplaySet function
 
-    # Directory we're checking
-    url = 'http://gccpraise.com/opensongv2/sets/?s='
-    # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
-    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
-    # Read the content and decode it
-    content = page.read().decode()
-    # Initialize empty list for songs.
-    set_list = []
-    # URL Prefix
-    prefix = "http://gccpraise.com/os-viewer/publish_set.php?s="
-    # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
-    threshold = 95
+# ------------ Start check if Set exists - return status code
+def isSetExists(setNameAttrib):   
+    import requests
+    
+    set_name_enc = displaySet(setNameAttrib)    #urlencode the SetName
+    set_url = "https://gccpraise.com/publish_set.php?s=" + set_name_enc
+    res = requests.get(set_url)
 
-    # Subclass/Override HTMLParser and define the methods we need to change.
-    class Parse(HTMLParser, ABC):
-        def __init__(self):
-            # Since Python 3, we need to call the __init__() function of the parent class
-            super().__init__()
-            self.reset()
+    if res.status_code == 200:
+           status_message = '\nStatus 200: Set found on website: {}!'.format(set_url)
+    else:
+        status_message = '\nSet does not exist on website: {}!'.format(set_url)
 
-        # override handle_starttag method to only return the contents of anchor tags as a searchable list.
-        def handle_starttag(self, tag, attrs):
-            # Only parse the 'anchor' tag.
-            if tag == "a":
-                for name, link in attrs:
-                    if name == "href":
-                        set_list.append(link)
+    print(set_url)
+    return(set_url)
 
-    # Create a new parse object.
-    directory_parser = Parse()
-    # Call feed method. incomplete data is buffered until more data is fed or close() is called.
-    directory_parser.feed(content)
-    # format the URL list by replacing the HTML safe %20
-    set_list = [myset.replace("%20", " ") for myset in set_list]
-    # TODO: Remove test query
-    # query = "2021-04-04"
-    # Build empty dictionary to add matches to.
-    matches = {}
-    # Check the match ratio on each song in the song list. This is expensive using pure-python.
-    for myset in set_list:
-        if fuzz.partial_ratio(myset, query) >= threshold:
-            set_name = myset.replace("%20", " ")
-            myset = uparse.quote(myset, safe='')
-            myset = prefix + myset
-            matches[set_name] = myset
-    return matches
-
-
-# ------------ end DisplaySet
+# ------------End -  check if Set exists
 
 # ------------ Use Beautiful Soup to extract summary of OpenSong XML Set
 def bs4buildSetSummary(SetName='2021-04-04 GCCEM Sunday Worship'):
