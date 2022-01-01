@@ -149,10 +149,13 @@ def generate_link_dict(url):
     page_parser.feed(content)
     # format the URL list by replacing the HTML safe %20
     link_list = [my_set.replace("%20", " ") for my_set in link_list]
+    # Need to remove "'preview_index.php?s=" from the links
+
     page_links = {}
     for link in link_list:
         set_name = link.replace("%20", " ")
-        link = parse.quote(link, safe='')
+        set_name = set_name.replace('preview_index.php?s=', '')
+        # link = parse.quote(link, safe='')
         link = index_url + link
         page_links[set_name] = link
 
@@ -175,7 +178,6 @@ def search_songs(query):
     # Initialize empty list for songs.
     song_list = []
     # URL Prefix
-    #prefix = "http://gccpraise.com/preview_song.php?s="
     prefix = "http://gccpraise.com/"
 
     # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
@@ -202,6 +204,7 @@ def search_songs(query):
     directory_parser.feed(content)
     # format the URL list by replacing the HTML safe %20
     song_list = [song.replace("%20", " ") for song in song_list]
+    song_list = [song.replace("preview_index.php?s=", '') for song in song_list]
     # TODO: Remove test query
     # query = "the King of Heaven"
     # Build empty dictionary to add matches to.
@@ -211,7 +214,7 @@ def search_songs(query):
         if fuzz.partial_ratio(song, query) >= threshold:
             song_name = song.replace("%20", " ")
             song = uparse.quote(song, safe='')
-            song = prefix + song
+            song = prefix + "/preview_song.php?s=" + song
             matches[song_name] = song
 
     return matches
