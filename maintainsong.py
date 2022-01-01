@@ -16,7 +16,7 @@ song_path = 'songs/'
 new_song_path = bulletin_path + filelist.NewSongTextFilename
 
 
-# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
+# ------------Start -  Add Song - copy song from Dropbox to website
 def addsong(song_name):
     import dropbox_api_call
     import sftp_files
@@ -27,12 +27,6 @@ def addsong(song_name):
         song_name = file_name   #--- convert the song_name to the validated file metadata from DropBox
         song_path = song_dir + song_name
 
-        #--- push song to website
-        sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
-
-        status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
-        print(status_message)
-
         #--- remove the temporary copy of the file in the local directory
         if os.path.exists(song_path):
             try:
@@ -42,40 +36,28 @@ def addsong(song_name):
                 logging.warning(e)
                 print('\nUnable to remove file: ', song_path)
     else:
-        status_message = '\nError in Dropbox Song Download - no matching song found'
+        status_message = '\nError - no matching song found', song_name
     
     return(status_message)
 # ------------End -  Update Song function
 
 
-# ------------Start -  Update Song - copy song from Dropbox and push to website using sftp
-def updatesong(song_name):
-    import dropbox_api_call
-    import sftp_files
-    song_dir = 'songs/'
-    song_path = song_dir + song_name
-
-    status_message = dropbox_api_call.dropboxread('song', song_name)        #--- download song from Dropbox
-
-    #--- push song to website
-    sftp_files.pushfiles('song', song_name)  # --- sftp the set to the website
-
-    status_message = '\nSong successfully uploaded to website: {}!'.format(song_name)
+# ------------Start -  Update Song - copy files from Dropbox to website
+def dropbox_website_sync(item_name):
+    import requests
+    url = "https://gccpraise.com/update.php"
+    res = requests.get(url)
+    if res.status_code == 200:
+        status_message = '\nDropbox successfully uploaded to website: {}!'.format(item_name)
+    else:
+        status_message = '\nDropbox upload to website failed: {}!'.format(item_name)
+    
     print(status_message)
-
-    #--- remove the temporary copy of the file in the local directory
-    if os.path.exists(song_path):
-        try:
-            os.remove(song_path)
-            print('\nTemporary Song removed: ', song_path)
-        except OSError as e:
-            logging.warning(e)
-            print('\nUnable to remove file: ', song_path)
-    
     return(status_message)
-# ------------End -  Update Song function
 
-# ------------Start -  updateSet - copy set from Dropbox and push to website using sftp
+# ------------End -  DropBox and Website Sync
+
+# ------------Start -  updateSet - copy set from Dropbox to website
 def updateset(set_name):
     import dropbox_api_call
     import sftp_files
@@ -120,7 +102,7 @@ def displaySet(setNameAttrib):
     print('\nSet Lookup for:', query)
 
     # Directory we're checking
-    url = 'http://gccpraise.com/opensongv2/sets/?s='
+    url = 'http://gccpraise.com/Sets/?s='
     # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
     page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
     # Read the content and decode it
@@ -128,7 +110,7 @@ def displaySet(setNameAttrib):
     # Initialize empty list for songs.
     set_list = []
     # URL Prefix
-    prefix = "http://gccpraise.com/os-viewer/publish_set.php?s="
+    prefix = "http://gccpraise.com/publish_set.php?s="
     # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
     threshold = 95
 

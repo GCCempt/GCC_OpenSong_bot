@@ -60,7 +60,7 @@ def validate_songs(song_list, limit):
     :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
     a success/fail message. You must iterate through the embed dict to send all the messages.
     """
-    url_to_search = 'http://gccpraise.com/opensongv2/xml/'
+    url_to_search = 'http://gccpraise.com/'
     invalid_songs = []
     valid_songs = []
     source_data = generate_link_dict(url_to_search)
@@ -104,18 +104,25 @@ def validate_songs(song_list, limit):
 
 
 def generate_link_dict(url):
+    from maintainsong import dropbox_website_sync
     """
     Creates a list of all links on a given page.
 
     :param url: The url of the page to check.
     :return: returns a dictionary of hyperlinks and their associated text.
     """
+    #--- synchronize Drobox to the website before searching"
+    item_name = "initial sync"
+    status_message = dropbox_website_sync(item_name)
+
+
     log_message = 'URL to search received=' + url
     logging.info(log_message)
 
     index_url = url
     # Some sites may deny python headers so we set it to Mozilla.
-    page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla'}))
+    #page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla/5.0'}))
+    page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'}))
     # Read the content and decode it
     content = page.read().decode()
     # Initialize empty list for links.
@@ -160,15 +167,17 @@ def search_songs(query):
     from fuzzywuzzy import fuzz
 
     # Directory we're checking
-    url = 'http://gccpraise.com/opensongv2/xml/'
+    url = 'http://gccpraise.com/'
     # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
-    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
+    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla/5.0'}))
     # Read the content and decode it
     content = page.read().decode()
     # Initialize empty list for songs.
     song_list = []
     # URL Prefix
-    prefix = "http://gccpraise.com/os-viewer/preview_song.php?s="
+    #prefix = "http://gccpraise.com/preview_song.php?s="
+    prefix = "http://gccpraise.com/"
+
     # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
     threshold = 80
 
@@ -275,7 +284,7 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
 
 
 def generate_song_name():
-    song_dict = generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    song_dict = generate_link_dict("http://gccpraise.com/")
     # Generate a Song
     if '/opensongv2/' in song_dict:
         song_dict.pop('/opensongv2/')

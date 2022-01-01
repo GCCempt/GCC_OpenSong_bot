@@ -6,7 +6,7 @@ from utils import generate_random_worship_schedule
 
 def test_parse_songs_from_file():
     # Create dictionary of songs to use for our test.
-    song_dict = utils.generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    song_dict = utils.generate_link_dict("http://gccpraise.com/")
 
     # Create a random file to edit.
     hymn_filename = 'parse_hymn_tests.txt'

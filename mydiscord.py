@@ -293,7 +293,7 @@ def read_discord():
 
     @slash.slash(
         name="add-song",
-        description="Copies a new song from OpeonSong  to the website"
+        description="Updates the song index on the gccpraise.com website"
     )
     async def add_song(ctx, song_name):
         status_message = maintainsong.addsong(song_name)  # --- validates song against Dropbox
@@ -311,7 +311,7 @@ def read_discord():
                 song_name = song
 
             if len(song_matches) == 1:  # --- found exact match
-                status_message = maintainsong.updatesong(song_name)
+                status_message = maintainsong.dropbox_website_sync(song_name)
 
                 embed_data = discord.Embed(title="Update Song ",
                                            description=content)
@@ -324,7 +324,7 @@ def read_discord():
 
     @slash.slash(
         name="update-song",
-        description="Copies an existing song from OpenSong and SFTPs to the website "
+        description="Updates the song index on the gccpraise.com website "
     )
     async def update_song(ctx, song_name):
         song_matches = utils.search_songs(song_name)  # --- validate song name against website
@@ -333,7 +333,7 @@ def read_discord():
             content = content + "\n" + "[" + song + "]" + "(" + song_matches[song] + ")"
 
         if len(song_matches) == 1 or song_name in song_matches:  # --- found exact match
-            status_message = maintainsong.updatesong(song_name)
+            status_message = maintainsong.dropbox_website_sync(song_name)
             content = ""
             content = content + "\n" + "[" + song_name + "]" + "(" + song_matches[song_name] + ")"
             embed_data = discord.Embed(title="Update Song: " + song_name,
