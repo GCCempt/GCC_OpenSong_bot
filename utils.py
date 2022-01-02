@@ -60,7 +60,7 @@ def validate_songs(song_list, limit):
     :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
     a success/fail message. You must iterate through the embed dict to send all the messages.
     """
-    url_to_search = 'http://gccpraise.com/opensongv2/xml/'
+    url_to_search = 'http://gccpraise.com/'
     invalid_songs = []
     valid_songs = []
     source_data = generate_link_dict(url_to_search)
@@ -104,18 +104,25 @@ def validate_songs(song_list, limit):
 
 
 def generate_link_dict(url):
+    from maintainsong import dropbox_website_sync
     """
     Creates a list of all links on a given page.
 
     :param url: The url of the page to check.
     :return: returns a dictionary of hyperlinks and their associated text.
     """
+    #--- synchronize Drobox to the website before searching"
+    item_name = "initial sync"
+    status_message = dropbox_website_sync(item_name)
+
+
     log_message = 'URL to search received=' + url
     logging.info(log_message)
 
     index_url = url
     # Some sites may deny python headers so we set it to Mozilla.
-    page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla'}))
+    #page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla/5.0'}))
+    page = request.urlopen(request.Request(index_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'}))
     # Read the content and decode it
     content = page.read().decode()
     # Initialize empty list for links.
@@ -142,10 +149,13 @@ def generate_link_dict(url):
     page_parser.feed(content)
     # format the URL list by replacing the HTML safe %20
     link_list = [my_set.replace("%20", " ") for my_set in link_list]
+    # Need to remove "'preview_index.php?s=" from the links
+
     page_links = {}
     for link in link_list:
         set_name = link.replace("%20", " ")
-        link = parse.quote(link, safe='')
+        set_name = set_name.replace('preview_index.php?s=', '')
+        # link = parse.quote(link, safe='')
         link = index_url + link
         page_links[set_name] = link
 
@@ -160,15 +170,16 @@ def search_songs(query):
     from fuzzywuzzy import fuzz
 
     # Directory we're checking
-    url = 'http://gccpraise.com/opensongv2/xml/'
+    url = 'http://gccpraise.com/'
     # Wordpress will deny the python urllib user agent, so we set it to Mozilla.
-    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla'}))
+    page = urlopen(Request(url, headers={'User-Agent': 'Mozilla/5.0'}))
     # Read the content and decode it
     content = page.read().decode()
     # Initialize empty list for songs.
     song_list = []
     # URL Prefix
-    prefix = "http://gccpraise.com/os-viewer/preview_song.php?s="
+    prefix = "http://gccpraise.com/"
+
     # a number which ranges from 0 to 100, this is used to set how strict the matching needs to be
     threshold = 80
 
@@ -193,6 +204,7 @@ def search_songs(query):
     directory_parser.feed(content)
     # format the URL list by replacing the HTML safe %20
     song_list = [song.replace("%20", " ") for song in song_list]
+    song_list = [song.replace("preview_index.php?s=", '') for song in song_list]
     # TODO: Remove test query
     # query = "the King of Heaven"
     # Build empty dictionary to add matches to.
@@ -202,7 +214,7 @@ def search_songs(query):
         if fuzz.partial_ratio(song, query) >= threshold:
             song_name = song.replace("%20", " ")
             song = uparse.quote(song, safe='')
-            song = prefix + song
+            song = prefix + "/preview_song.php?s=" + song
             matches[song_name] = song
 
     return matches
@@ -275,7 +287,7 @@ def parse_passages(input_passages):  # --- input is a scripture reference string
 
 
 def generate_song_name():
-    song_dict = generate_link_dict("http://gccpraise.com/opensongv2/xml/")
+    song_dict = generate_link_dict("http://gccpraise.com/")
     # Generate a Song
     if '/opensongv2/' in song_dict:
         song_dict.pop('/opensongv2/')

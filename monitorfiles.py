@@ -277,13 +277,6 @@ def check_for_latest_bulletin():
             status_message = monitorfiles.filechecker()
             monitorfiles.send_discord_message('Automated Processing Status', status_message)
 
-            #-- check if the set for next week has already been built
-            set_matches = maintainsong.displaySet()	#--- check the website for next Sunday's set
-            if len(set_matches) == 1:      # --- found exact match; set alredy created
-                status_message = ('\nSet already created: ', next_bulletin_date)
-                print(status_message)
-                monitorfiles.send_discord_message('Set Status', status_message)
-
         else:
             status_message = '\nMext week Bulletin has not been uploaded as yet for: ', save_next_bulletin_date
             #--- send message
