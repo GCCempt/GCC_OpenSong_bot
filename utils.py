@@ -581,8 +581,10 @@ def extract_sermon_info():
     matches = [match for match in line_split if ":" in match]
     if len(matches) > 0:        #match found on possible scripture ref
         scripture_ref = str(matches[0])      #select the first match
-        return(scripture_ref, sermon_title)
     else:
-        status_message = ('Error -Extract Sermon Scripture Reference failed - invalid or missing sermon scripture reference:', body_text)
+        status_message = ('*** Error -- invalid or missing sermon scripture reference; default scripture added below ***:', body_text)
         print(status_message)
-        return("Error", status_message) 
+        scripture_ref = "Genesis 1:1"   #set default scripture
+        sermon_title = sermon_title + '\n' + status_message[0]
+
+    return(scripture_ref, sermon_title)
