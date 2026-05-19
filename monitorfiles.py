@@ -229,8 +229,7 @@ def set_cleanup(cleanup_type='all'):
 def check_for_latest_bulletin():
     #-- failsafe routine which runs on a schedule to check if the bulletin is ready to download
     import maintainsong
-    from downloadbulletin import build_directory_name, build_prev_month_directory_name, \
-        get_current_bulletin, get_bulletin
+    from downloadbulletin import get_current_bulletin, get_bulletin
     import getdatetime
     import filelist
     import os
@@ -238,9 +237,9 @@ def check_for_latest_bulletin():
 
     bulletin_path = 'bulletin/'
     next_bulletin_date = str(getdatetime.nextSunday())
-    save_next_bulletin_date = next_bulletin_date 
+    save_next_bulletin_date = next_bulletin_date
 
-	#--- check if bulletin message has been posted (i.e. bulletin.txt file exists)
+    #--- check if bulletin message has been posted (i.e. bulletin.txt file exists)
     if os.path.isfile(
             bulletin_path + filelist.TextBulletinFilename):  # --- if the bulletin file already downloaded
         file_status = str("Bulletin File {} already downloaded....".format(bulletin_path + filelist.TextBulletinFilename))
@@ -248,40 +247,40 @@ def check_for_latest_bulletin():
         print(status_message)
         monitorfiles.send_discord_message('Bulletin Status', status_message)
     else:
-        # check if there is a  new buleltin to download
+        # check if there is a  new bulletin to download via the WP REST API
+        bulletins = get_current_bulletin()  # --- newest-first list of EM_Bulletin entries
 
-    	# bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/'  #-- bulletin URL
-        bulletinurl = build_directory_name()  # -- call my module getdate() to build the bulletin directory URL
-        bulletins = get_current_bulletin(bulletinurl)  # --- find the URL of the current bulletin
-   
-        if len(bulletins) == 0:  # --- no bulletins found for current month
-            bulletinurl = build_prev_month_directory_name()  # --- look in the previous month's directory
-            bulletins = get_current_bulletin(bulletinurl)  # --- find the latest bulletin of the previous month
-        
-        latest_bulletin = max(bulletins)  # --- get the latest bulletin
+        if not bulletins:
+            status_message = '\nNo EM_Bulletin entries returned by the WordPress REST API for: ' + save_next_bulletin_date
+            monitorfiles.send_discord_message('Bulletin Status', status_message)
+            return
 
-        next_bulletin_date = next_bulletin_date[2:]
-        next_bulletin_date = next_bulletin_date.replace('-', '')     #--- remove dashes
+        latest_bulletin = bulletins[0]  # --- newest entry
+        latest_url = latest_bulletin.get('url', '')
+        latest_slug = latest_bulletin.get('slug', '')
+
+        next_bulletin_date_yymmdd = next_bulletin_date[2:].replace('-', '')  # --- e.g. '260517'
 
         #### TESTING OVERRIDE
-        #next_bulletin_date = '210606'
-        #### END TESTING OVERRIEDE
-    
-        if next_bulletin_date in latest_bulletin: #--- next week's bulletin ready to download
-            print('\nNext Bulletin Date matches=', next_bulletin_date)
-            status_message = 'Bulletin file found and will be processed for', save_next_bulletin_date
-            status_message = monitorfiles.send_discord_message('Bulletin Status', status_message)
-            
+        #next_bulletin_date_yymmdd = '210606'
+        #### END TESTING OVERRIDE
+
+        if next_bulletin_date_yymmdd in latest_url or next_bulletin_date_yymmdd in latest_slug:
+            #--- next week's bulletin ready to download
+            print('\nNext Bulletin Date matches=', next_bulletin_date_yymmdd)
+            status_message = 'Bulletin file found and will be processed for {}'.format(save_next_bulletin_date)
+            monitorfiles.send_discord_message('Bulletin Status', status_message)
+
             get_bulletin()
-            
+
             status_message = monitorfiles.filechecker()
             monitorfiles.send_discord_message('Automated Processing Status', status_message)
 
         else:
-            status_message = '\nMext week Bulletin has not been uploaded as yet for: ', save_next_bulletin_date
+            status_message = '\nNext week Bulletin has not been uploaded as yet for: {}'.format(save_next_bulletin_date)
             #--- send message
             monitorfiles.send_discord_message('Bulletin Status', status_message)
-    
+
 
 #--- end check for latest bulletin
 
