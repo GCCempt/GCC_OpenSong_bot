@@ -1,6 +1,6 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.9-slim-buster
-RUN apt-get update && apt-get install --no-install-recommends build-essential python-dev -y \
+FROM python:3.9-slim-bookworm
+RUN apt-get update && apt-get install --no-install-recommends build-essential python3-dev -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
