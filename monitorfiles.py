@@ -247,39 +247,51 @@ def check_for_latest_bulletin():
         print(status_message)
         monitorfiles.send_discord_message('Bulletin Status', status_message)
     else:
-        # check if there is a  new bulletin to download via the WP REST API
-        bulletins = get_current_bulletin()  # --- newest-first list of EM_Bulletin entries
+        try:
+            # check if there is a  new bulletin to download via the WP REST API
+            bulletins = get_current_bulletin()  # --- newest-first list of EM_Bulletin entries
 
-        if not bulletins:
-            status_message = '\nNo EM_Bulletin entries returned by the WordPress REST API for: ' + save_next_bulletin_date
-            monitorfiles.send_discord_message('Bulletin Status', status_message)
+            if not bulletins:
+                status_message = '\nNo EM_Bulletin entries returned by the WordPress REST API for: ' + save_next_bulletin_date
+                monitorfiles.send_discord_message('Bulletin Status', status_message)
+                return
+
+            latest_bulletin = bulletins[0]  # --- newest entry
+            latest_url = latest_bulletin.get('url', '')
+            latest_slug = latest_bulletin.get('slug', '')
+
+            next_bulletin_date_yymmdd = next_bulletin_date[2:].replace('-', '')  # --- e.g. '260517'
+
+            #### TESTING OVERRIDE
+            #next_bulletin_date_yymmdd = '210606'
+            #### END TESTING OVERRIDE
+
+            # --- anchor on the bulletin prefix so we don't match arbitrary 6-digit
+            # --- substrings elsewhere in the URL/slug.  WordPress lowercases slugs
+            # --- but the URL filename is `EM_Bulletin_...`, so compare lowercased.
+            target = 'em_bulletin_{}'.format(next_bulletin_date_yymmdd)
+            if target in latest_slug.lower() or target in latest_url.lower():
+                #--- next week's bulletin ready to download
+                print('\nNext Bulletin Date matches=', next_bulletin_date_yymmdd)
+                status_message = 'Bulletin file found and will be processed for {}'.format(save_next_bulletin_date)
+                monitorfiles.send_discord_message('Bulletin Status', status_message)
+
+                get_bulletin()
+
+                status_message = monitorfiles.filechecker()
+                monitorfiles.send_discord_message('Automated Processing Status', status_message)
+
+            else:
+                status_message = '\nNext week Bulletin has not been uploaded as yet for: {}'.format(save_next_bulletin_date)
+                #--- send message
+                monitorfiles.send_discord_message('Bulletin Status', status_message)
+        except Exception as e:
+            logging.exception("Scheduled bulletin check failed: %s", e)
+            monitorfiles.send_discord_message(
+                'Bulletin check failed',
+                str(e)[:1500],
+            )
             return
-
-        latest_bulletin = bulletins[0]  # --- newest entry
-        latest_url = latest_bulletin.get('url', '')
-        latest_slug = latest_bulletin.get('slug', '')
-
-        next_bulletin_date_yymmdd = next_bulletin_date[2:].replace('-', '')  # --- e.g. '260517'
-
-        #### TESTING OVERRIDE
-        #next_bulletin_date_yymmdd = '210606'
-        #### END TESTING OVERRIDE
-
-        if next_bulletin_date_yymmdd in latest_url or next_bulletin_date_yymmdd in latest_slug:
-            #--- next week's bulletin ready to download
-            print('\nNext Bulletin Date matches=', next_bulletin_date_yymmdd)
-            status_message = 'Bulletin file found and will be processed for {}'.format(save_next_bulletin_date)
-            monitorfiles.send_discord_message('Bulletin Status', status_message)
-
-            get_bulletin()
-
-            status_message = monitorfiles.filechecker()
-            monitorfiles.send_discord_message('Automated Processing Status', status_message)
-
-        else:
-            status_message = '\nNext week Bulletin has not been uploaded as yet for: {}'.format(save_next_bulletin_date)
-            #--- send message
-            monitorfiles.send_discord_message('Bulletin Status', status_message)
 
 
 #--- end check for latest bulletin

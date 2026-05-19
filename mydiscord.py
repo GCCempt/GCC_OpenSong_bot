@@ -78,7 +78,7 @@ def read_discord():
                     embed_data = discord.Embed(
                         title="Bulletin download failed",
                         color=0xE74C3C,
-                        description=str(e),
+                        description=str(e)[:3900],
                     )
                     await message.channel.send(embed=embed_data)
                     await client.process_commands(message)

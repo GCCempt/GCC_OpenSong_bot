@@ -24,6 +24,11 @@ USER_AGENT = (
     'Gecko/20100101 Firefox/78.0'
 )
 
+# --- network timeouts (seconds).  Tunable in one place so a slow/hung
+# --- Hostinger response can't block the async Discord handler indefinitely.
+API_TIMEOUT = 30  # JSON REST API call
+DOWNLOAD_TIMEOUT = 60  # PDF download (larger payload)
+
 
 # --- using urllib2
 def get_bulletin():  # --- function to download bulletin
@@ -46,7 +51,7 @@ def get_bulletin():  # --- function to download bulletin
     req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
 
     file_name = bulletin_path + filelist.PDFBulletinFilename
-    with urllib.request.urlopen(req) as response, open(file_name, 'wb') as out_file:
+    with urllib.request.urlopen(req, timeout=DOWNLOAD_TIMEOUT) as response, open(file_name, 'wb') as out_file:
         data = response.read()  # a `bytes` object
         out_file.write(data)
 
@@ -74,7 +79,7 @@ def get_current_bulletin():  # --- function to find the most recent bulletin via
     req.add_header('User-Agent', USER_AGENT)
     req.add_header('Accept', 'application/json')
 
-    raw = urlopen(req).read()
+    raw = urlopen(req, timeout=API_TIMEOUT).read()
     entries = json.loads(raw)
 
     bulletins = []
