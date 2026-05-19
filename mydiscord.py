@@ -71,7 +71,18 @@ def read_discord():
             # check the Discord message is for the Bulletin post -----
             if "bulletinhasbeenposted" in msg.replace(" ", '').replace('\t', '').lower():
                 # Download the bulletin which was just posted
-                logging.info(downloadbulletin.get_bulletin())
+                try:
+                    logging.info(downloadbulletin.get_bulletin())
+                except Exception as e:
+                    logging.exception("Bulletin download failed: %s", e)
+                    embed_data = discord.Embed(
+                        title="Bulletin download failed",
+                        color=0xE74C3C,
+                        description=str(e),
+                    )
+                    await message.channel.send(embed=embed_data)
+                    await client.process_commands(message)
+                    return
                 await message.channel.send(embed=utils.status_embed("bulletin", message))
                 status_message = monitorfiles.statuscheck()  # retrieve the current processing status
 
