@@ -1,8 +1,7 @@
 # ---- https://www.geeksforgeeks.org/downloading-files-web-using-python/
-from datetime import datetime, timedelta
-from urllib.request import Request, urlopen, urlretrieve
-
-from bs4 import BeautifulSoup
+import json
+import urllib.request
+from urllib.request import Request, urlopen
 
 import filelist  # --- definition of list of files and directories used in the process
 import monitorfiles
@@ -11,32 +10,44 @@ import readbulletin
 set_path = 'sets/'
 bulletin_path = 'bulletin/'
 
+# --- WordPress REST API endpoint for media discovery.
+# --- The church site moved to Hostinger and the Apache directory autoindex now
+# --- returns HTTP 403, so the old "scrape /wp-content/uploads/YYYY/MM/" approach
+# --- no longer works.  The WP REST media endpoint replaces it.
+WP_MEDIA_API_URL = (
+    'https://graceem.gccvapca.org/wp-json/wp/v2/media'
+    '?search=EM_Bulletin&orderby=date&order=desc&per_page=10'
+)
+
+USER_AGENT = (
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) '
+    'Gecko/20100101 Firefox/78.0'
+)
+
 
 # --- using urllib2
 def get_bulletin():  # --- function to download bulletin
-    import urllib.request
-    # bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/'  #-- bulletin URL
-    bulletinurl = build_directory_name()  # -- call my module getdate() to build the bulletin directory URL
+    bulletins = get_current_bulletin()  # --- find the URL of the current bulletin
 
-    bulletins = get_current_bulletin(bulletinurl)  # --- find the URL of the current bulletin
+    if not bulletins:  # --- no EM_Bulletin entries returned by the WP REST API
+        raise RuntimeError(
+            'No EM_Bulletin entries were returned by the WordPress REST API at '
+            '{}.  Either the search term changed or the site is unreachable.'
+            .format(WP_MEDIA_API_URL)
+        )
 
-    # print('\n Bulletins=', bulletins, 'number of bulletins=', len(bulletins))
-    if len(bulletins) == 0:  # --- no bulletins found for current month
-        bulletinurl = build_prev_month_directory_name()  # --- look in the previous month's directory
-        bulletins = get_current_bulletin(bulletinurl)  # --- find the latest bulletin of the previous month
+    current_bulletin = bulletins[0]  # --- newest entry (API returns desc by date)
+    current_bulletin_url = current_bulletin['url']
 
-    current_bulletin = max(bulletins)  # --- get the current bulletin
-    current_bulletin_url = bulletinurl + current_bulletin
     # --- retrieve the current bulletin and write to local file
-
     # Download the current bulletin file from `url` and save it locally under `file_name`:
     req = urllib.request.Request(current_bulletin_url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0')
+    req.add_header('User-Agent', USER_AGENT)
     req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
 
     file_name = bulletin_path + filelist.PDFBulletinFilename
-    with urllib.request.urlopen(req)  as response, open(file_name, 'wb') as out_file:
-        data = response.read() # a `bytes` object
+    with urllib.request.urlopen(req) as response, open(file_name, 'wb') as out_file:
+        data = response.read()  # a `bytes` object
         out_file.write(data)
 
     readbulletin.getfiles()  # --- process the downloaded bulletin file
@@ -47,67 +58,45 @@ def get_bulletin():  # --- function to download bulletin
 
 # --- end of get_bulltine function
 
-# --- https://stackoverflow.com/questions/11023530/python-to-list-http-files-and-directories/34718858
-def get_current_bulletin(bulletinurl):  # --- function to find the most recent bulletin
-    # bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/2021/02/'  #-- bulletin URL
-    # bulletinurl = build_directory_name()
-    # -- call my module getdate() to build the bulletin directory URL
 
-    # outputfile = 'C:\\Dropbox\\OpenSongV2\\Bulletin\\bulletin.pdf'
-    # #---  path for downloaded bulletin
-    #bulletinurl = 'http://graceem.gccvapca.org/wp-content/uploads/2021/07/'  #-- bulletin URL OVERRIDE FOR TESTING
-    print('\nDownloadBulletin.get_current_bulletin - Bulletin file path: ', bulletinurl)
+def get_current_bulletin():  # --- function to find the most recent bulletin via WP REST API
+    """Query the WordPress REST API for EM_Bulletin media entries.
+
+    Returns a list of dicts, newest first, where each dict has at minimum:
+        url  - the PDF URL (from `guid.rendered`)
+        date - the upload timestamp (ISO-8601 string from `date`)
+        slug - the WordPress slug (e.g. 'em_bulletin_260517')
+    """
+    print('\nDownloadBulletin.get_current_bulletin - WP REST API:', WP_MEDIA_API_URL)
+
+    req = Request(WP_MEDIA_API_URL)
+    # ---- fix issue #167 HTTP Error 406
+    req.add_header('User-Agent', USER_AGENT)
+    req.add_header('Accept', 'application/json')
+
+    raw = urlopen(req).read()
+    entries = json.loads(raw)
 
     bulletins = []
-    url = bulletinurl
-    req = Request(url)
-
-    #---- fix issue #167 HTTP Error 406
-    req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0')
-    req.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
-
-    a = urlopen(req).read()  # --- read the bulletin directory
-
-    soup = BeautifulSoup(a, 'html.parser')
-    x = (soup.find_all('a'))
-    for i in x:
-        file_name = i.extract().get_text()
-        url_new = url + file_name
-        url_new = url_new.replace(" ", "%20")
-        if file_name[-1] == '/' and file_name[0] != '.':
-            # read_url(url_new)          # call this function recursively for each subdirectory
-            break
-        # print(url_new)
-        if '.pdf' in file_name:
-            # print(file_name)
-            bulletins.append(file_name)
+    for entry in entries:
+        guid = entry.get('guid') or {}
+        url = guid.get('rendered', '')
+        # --- defensive: only keep entries that actually look like bulletin PDFs
+        if '.pdf' not in url.lower():
+            continue
+        if 'em_bulletin' not in url.lower() and 'em_bulletin' not in entry.get('slug', '').lower():
+            continue
+        bulletins.append({
+            'url': url,
+            'date': entry.get('date', ''),
+            'slug': entry.get('slug', ''),
+        })
 
     return bulletins
 
 
-# --- https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
-# --- function to get the current year and month to build the correct bulletin directory URL
-def build_directory_name():
-    current_month = datetime.now().strftime('%m')  # ---// 02 //This is 0 padded
-    current_year_full = datetime.now().strftime('%Y')  # ---// 2018
-
-    # print('Current year:', current_year_full, ' current month:', current_month)
-    bulletin_directory = 'http://graceem.gccvapca.org/wp-content/uploads/' + current_year_full + '/' + current_month + '/'
-    print('Bulletin Directory:', bulletin_directory)
-
-    return bulletin_directory
-
-
-# --- https://stackoverflow.com/questions/28189442/datetime-current-year-and-month-in-python
-def build_prev_month_directory_name():  # --- function to build the bulletin directory URL for previous month
-    current_month = datetime.now() - timedelta(days=6)  # ---// Go back 6 days
-    current_month = current_month.strftime('%m')  # ---// This is 0 padded
-
-    current_year_full = datetime.now() - timedelta(days=6)  # ---// Go bakc 6 days
-    current_year_full = current_year_full.strftime('%Y')  # ---// This is padded
-
-    print('Current year:', current_year_full, ' current month:', current_month)
-    bulletin_directory = 'http://graceem.gccvapca.org/wp-content/uploads/' + current_year_full + '/' + current_month + '/'
-    print('Bulletin Directory:', bulletin_directory)
-
-    return bulletin_directory
+if __name__ == "__main__":
+    results = get_current_bulletin()
+    print('Found {} EM_Bulletin entries.  Top 3:'.format(len(results)))
+    for entry in results[:3]:
+        print('  ', entry['date'], entry['url'])
