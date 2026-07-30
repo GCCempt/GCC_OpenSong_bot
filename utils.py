@@ -51,6 +51,7 @@ def parse_songs_from_file(worship_schedule):
 
 # Takes in a list of songs.
 def validate_songs(song_list, limit):
+    from maintainsong import dropbox_website_sync
     """
     Performs a case-insensitive check on the given dictionary to find matching
     if the passed songs have any matching keys in the dict.
@@ -59,7 +60,12 @@ def validate_songs(song_list, limit):
     :param limit: The maximum number of song suggestions to return
     :return: dict with 2 keys; embed data objects to be used with discord.py's embed send and
     a success/fail message. You must iterate through the embed dict to send all the messages.
+
+    Note: issue #188 - before validation, call the dropbox_website_sync() function to populate the song_index;
     """
+    item_name = 'initial'
+    status_message = dropbox_website_sync(item_name)
+
     url_to_search = 'http://gccpraise.com/'
     invalid_songs = []
     valid_songs = []
@@ -581,8 +587,10 @@ def extract_sermon_info():
     matches = [match for match in line_split if ":" in match]
     if len(matches) > 0:        #match found on possible scripture ref
         scripture_ref = str(matches[0])      #select the first match
-        return(scripture_ref, sermon_title)
     else:
-        status_message = ('Error -Extract Sermon Scripture Reference failed - invalid or missing sermon scripture reference:', body_text)
+        status_message = ('*** Error -- invalid or missing sermon scripture reference; default scripture added below ***:', body_text)
         print(status_message)
-        return("Error", status_message) 
+        scripture_ref = "Genesis 1:1"   #set default scripture
+        sermon_title = sermon_title + '\n' + status_message[0]
+
+    return(scripture_ref, sermon_title)
